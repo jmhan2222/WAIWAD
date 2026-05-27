@@ -40,14 +40,6 @@ function Tag({ children, color = C.orange }) {
   );
 }
 
-function Ph({ label, style }) {
-  return (
-    <div style={{ background: "#FF660008", border: "1.5px dashed #FF660030", borderRadius: 10, padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 48, ...style }}>
-      <span style={{ fontSize: 12, color: "#FF660055", fontStyle: "italic" }}>{label || "[ 내용 작성 예정 ]"}</span>
-    </div>
-  );
-}
-
 // ── Timer ──────────────────────────────────────────
 
 function useTimer(totalSec) {
@@ -68,128 +60,153 @@ function useTimer(totalSec) {
 
 const CASES = [
   {
-    title: "터뷸런스 + 라면 요청",
-    type: "안전 vs 서비스 판단",
-    context: ["중거리 노선", "라이트 터뷸런스 잠잠해짐", "벨트사인 켜진 상태"],
-    scenario: "물 붓자마자 라이트 터뷸런스 발생. 벨트사인 아직 On.\n32열 승객이 아까 주문한 라면 빨리 달라고 함.",
+    badge: "CASE 1 · 안전 직결 🔴",
+    badgeColor: C.red,
+    title: "벨트사인이 켜져 있는데, 라면은 빨리 달라고 해요",
+    context: ["✈️ 중거리 국제선", "⚡ 라이트 터뷸런스 직후", "🔔 벨트사인 ON"],
+    scenario:
+`인천→방콕 편. 순항 중 라이트 터뷸런스가 있었고 지금은 잠잠해진 상태.
+벨트사인은 아직 켜져 있음.
+
+AR이 갤리에서 에어카페 라면 준비 중,
+32열 승객이 콜버튼을 눌렀다.
+
+승객  "아까 라면 주문했는데요, 물 넣어서 빨리 갖다주실 수 있어요?
+배가 너무 고파서요."
+
+AR이 뜨거운 물을 붓는 순간,
+기체가 다시 한 번 가볍게 흔들렸다.`,
     questions: [
-      "지금 라면을 제공할 수 있는가? 판단 근거는?",
-      "벨트사인이 켜진 상태에서 서비스 제공은 어떤 기준을 위반하는가?",
-      "승객에게 어떻게 안내할 것인가?",
+      "🤔 벨트사인이 켜진 상태에서 뜨거운 물을 붓는 행위 — 가능한가?",
+      "💬 승객에게 어떻게 안내할 것인가? 구체적인 한 마디는?",
+      "📢 사무장에게 보고해야 하는 상황인가? 타이밍은?",
     ],
   },
   {
-    title: "야간 I/B — 기내식 먼저 달라고 해요",
-    type: "서비스 순서 vs 개별 요청",
-    context: ["야간 중거리 국제선 I/B", "기내식 서비스 시작 전", "승객 개별 요청"],
-    scenario: "야간 중거리 I/B 비행. 기내식 서비스가 아직 시작되지 않은 상태.\n12열 승객이 AL에게 다가와 말했다.\n\"배가 많이 고픈데, 제 기내식 먼저 받을 수 있나요?\"",
+    badge: "CASE 2 · 서비스 절차 🟠",
+    badgeColor: C.amber,
+    title: "저만 먼저 받으면 안 되나요?",
+    context: ["🌙 야간 중거리 I/B", "🍱 일괄제공 준비 중", "👤 개별 먼저 요청"],
+    scenario:
+`인천 귀국편 야간 중거리. 현지 시각 새벽 1시 출발.
+순항 고도 도달 후, AR이 사전기내식 일괄 제공을 준비 중.
+아직 배포 시작 전이다.
+
+7C 승객(한국인 남성, 50대)이 AR을 불렀다.
+
+승객  "저 기내식 사전 주문했는데, 저만 먼저 받으면 안 돼요?
+현지에서 못 먹고 온 터라 너무 배가 고파서요.
+옆에 분들이랑 같이 드시면 될 것 같은데..."
+
+갤리에 해당 승객 기내식이 탑재되어 있고,
+사전기내식 제공은 일괄 제공이 원칙.
+주변 5~6명의 사전기내식 승객도 아직 제공 전이다.`,
     questions: [
-      "기내식을 순서보다 먼저 제공할 수 있는가? 판단 기준은?",
-      "허용한다면 — 어디까지 허용하고, 어떻게 실행할 것인가?",
-      "승객에게 어떻게 안내할 것인가?",
+      "⚖️ 일괄 제공 원칙이 있는 상황에서 개별 먼저 제공 — 가능한가? 근거는?",
+      "🎫 \"사전 주문했다\"는 말이 판단을 바꾸는 근거가 되는가?",
+      "👥 주변 승객들도 아직 못 받은 상황 — 형평성 문제가 생길 수 있는가?",
     ],
   },
   {
-    title: "맥주 추가 요청 — 취기가 있어 보여요",
-    type: "주류 추가 판매 판단",
-    context: ["에어카페 서비스 중", "맥주 1캔 판매 완료", "추가 요청 + 취기 의심"],
-    scenario: "에어카페 서비스 중. 24열 승객에게 맥주 1캔을 판매했다.\n약 20분 후, 같은 승객이 다시 맥주를 요청했다.\nAL이 보니 승객의 말투와 눈빛에 취기가 느껴졌다.",
+    badge: "CASE 3 · 서비스 판단 🟠",
+    badgeColor: C.amber,
+    title: "맥주 세 번째 요청, 근데 이미 취기가 있어요",
+    context: ["🍺 맥주 2캔 기구매", "😶 이미 취기 있음", "📋 최대 3캔 규정"],
+    scenario:
+`인천→오사카 편. 에어카페 서비스 진행 중.
+
+22B 승객(남성, 30대)이 맥주를 이미 2캔 구매한 상태.
+서비스가 어느 정도 마무리될 즈음, 승객이 AR을 다시 불렀다.
+
+승객  "맥주 하나만 더요~ 마지막이에요!"
+
+AR이 보니 얼굴이 이미 붉고, 눈이 약간 충혈되어 있다.
+말투는 명랑하지만 발음이 조금 어눌하다.
+
+제주항공 기내 주류 제공 기준은 최대 3캔.
+승객이 요청하는 건 규정상 마지막 1캔이다.`,
     questions: [
-      "이 상황에서 맥주를 추가 판매해야 하는가? 판단 근거는?",
-      "취기 판단은 누가, 어떻게 해야 하는가?",
-      "승객이 재차 요청한다면 어떻게 대응할 것인가?",
+      "📋 규정상 3캔 한도 — 3번째 요청이라고 제공해야 하는가?",
+      "🤔 \"규정상 마지막 1캔\"이라는 사실이 판단을 쉽게 만드는가, 더 어렵게 만드는가?",
+      "📢 거절 시 승객 반응이 거세질 경우 대응 방식은? 사무장 보고는 언제 하는가?",
     ],
   },
   {
-    title: "보딩 중 탑승권 분실 — 사무장은 어디에?",
-    type: "보딩 중 커뮤니케이션 우선순위",
-    context: ["보딩 진행 중", "사무장 Aisle 위치", "비즈니스 라이트 6명 응대 중"],
-    scenario: "보딩 진행 중. 사무장은 Aisle에서 웰컴그리팅 중.\nFR이 비즈니스 라이트 승객 6명의 짐정리와 그리팅을 돕고 있을 때,\n한 승객이 FR에게 조용히 말했다.\n\"탑승권을 잃어버린 것 같아요.\"\n워키로 할까, 콜버튼을 누를까, 자리를 비울까.",
+    badge: "CASE 4 · 절차 판단 🟠",
+    badgeColor: C.amber,
+    title: "탑승권을 못 찾겠대요, 사무장님은 응대 중이고",
+    context: ["🚪 보딩 진행 중", "🧳 사무장 응대 중", "❓ FR 단독 판단 상황"],
+    scenario:
+`탑승 시작 15분째. 비즈니스라이트 구역 승객 6명이
+짐 정리와 웰컴그리팅을 받고 있는 상황.
+사무장은 Aisle 앞쪽에서 응대 중이다.
+
+FR이 탑승구 쪽에 있는데, 운송직원이 다가왔다.
+
+운송직원  "이 손님이 탑승권을 못 찾겠다고 하시는데,
+일단 안으로 들어오셨어요."
+
+승객은 핸드폰과 가방을 계속 뒤지고 있고,
+탑승구 밖에는 아직 줄이 길다.
+
+사무장에게 직접 다가가야 하나, 콜버튼을 눌러야 하나.`,
     questions: [
-      "FR은 지금 어떤 판단을 해야 하는가? 우선순위는?",
-      "사무장에게 보고하는 방법 — 워키, 콜버튼, 자리 이동 중 무엇이 적절한가?",
-      "이 상황을 사전에 예방할 수 있었다면 — 어떤 준비가 필요했나?",
+      "🔄 FR이 선택할 수 있는 행동 옵션은? 각각의 장단점은?",
+      "📣 사무장이 다른 승객 응대 중일 때 — 어떤 방식으로 보고하는 것이 맞는가?",
+      "🚫 탑승권 없는 승객 처리 — FR이 단독으로 결정할 수 있는가?",
     ],
   },
   {
-    title: "보딩 중 에어카페 — 지금 살 수 있어요?",
-    type: "보딩 중 서비스 경계",
-    context: ["보딩 진행 중", "13열 승객", "에어카페 사전 구매 요청"],
-    scenario: "보딩이 한창 진행 중인 상황.\n13열 승객이 에어카페 구역까지 올라와 AL에게 말했다.\n\"신라면이랑 OOO 지금 살 수 있어요?\n빨리 사두고 싶어서 먼저 왔어요.\"",
+    badge: "CASE 5 · 서비스 절차 🟡",
+    badgeColor: "#C8A800",
+    title: "배가 고프다며 보딩 중에 몇 번이나 요청해요",
+    context: ["🚶 보딩 진행 중", "🛒 에어카페 미개시", "🔁 반복 요청"],
+    scenario:
+`탑승이 한창 진행 중인 상황.
+13열에 짐을 넣던 승객이 지나가는 AR을 불러 세웠다.
+
+승객  "저 에어카페에서 신라면이랑 음료 미리 살 수 있어요?
+배가 너무 고파서요, 이륙하고 나서 기다리기가 힘들 것 같아요."
+
+AR이 정중히 "이륙 후에 안내드리겠다"고 했지만,
+승객은 잠시 후 다시 말했다.
+
+승객  "그냥 지금 결제만 해주시면 되는 거 아닌가요?
+카드 여기 있는데, 금방이잖아요."
+
+탑승이 계속 진행되는 중에 두 번, 세 번째로 요청이 이어진다.`,
     questions: [
-      "보딩 중 에어카페 판매는 가능한가? 규정상 기준은?",
-      "판매가 불가하다면 — 승객에게 어떻게 안내할 것인가?",
-      "승객이 자리에서 계속 기다리겠다고 한다면?",
+      "🚫 보딩 중 에어카페 개별 판매 — 가능한가? 왜 안 되는가?",
+      "🔁 같은 요청이 반복될 때 — AR의 응대 방식은 어떻게 달라져야 하는가?",
+      "📢 사무장에게 보고해야 하는 시점은 언제인가? AR 선에서 해결 가능한가?",
     ],
   },
   {
-    title: "담요 추가 요청 — 지난번엔 주셨는데요",
-    type: "규정 외 요청 응대",
-    context: ["순항 중", "담요 추가 요청", "응급담요 규정 없음"],
-    scenario: "순항 중. 15열 승객이 AL에게 다가왔다.\n\"너무 추운데, 담요 하나 더 받을 수 있을까요?\n지난번에 이용했을 때는 주셨거든요.\"\nAL은 응급담요 규정을 떠올렸다. 규정에는 없었다.",
+    badge: "CASE 6 · 재량 영역 🟡",
+    badgeColor: "#C8A800",
+    title: "지난번에도 줬는데, 담요 하나만 주시면 안 돼요?",
+    context: ["🌡️ 단거리 국내선 겨울편", "🛑 담요 서비스 규정 없음", "👶 유아 동반 승객 있음"],
+    scenario:
+`김포→제주 편. 순항 중.
+
+3B 승객(여성, 40대)이 AR을 불렀다.
+
+승객  "저 좀 추운데요, 담요 하나 주실 수 있어요?
+지난번에 이 비행기 탔을 때 받았거든요."
+
+국내선에는 담요 서비스 규정이 없다.
+응급 담요(Emergency Blanket)는 갤리에 있지만
+이건 응급 상황 전용이다.
+옆자리에 유아를 안고 있는 승객도 추워 보인다.`,
     questions: [
-      "응급담요가 규정에 없다면 — 이 요청을 어떻게 판단해야 하는가?",
-      "\"지난번에 주셨다\"는 승객 발언이 판단에 영향을 미쳐야 하는가?",
-      "이 상황을 어떻게 마무리할 것인가?",
+      "❓ \"지난번에 줬다\"는 말 — 판단 근거가 될 수 있는가?",
+      "🚨 응급 담요 사용 — 비응급 상황에서 가능한가?",
+      "👨‍✈️ 유아 동반 승객까지 있는 이 상황 — 사무장 판단이 필요한가?",
     ],
   },
 ];
 
-// ── PART 3 DATA ────────────────────────────────────
-
-const SCENES = [
-  {
-    n: 1,
-    time: "DOOR CLOSE 1분 전",
-    phase: "지상",
-    title: '"이번만 해드리는 거예요"',
-    narrative: "운송직원은 보이지 않는 상태.\n승객이 갑자기 좌석 변경을 요청했고,\n사무장이 직접 나서서 처리했다.",
-    violations: [
-      "운송직원 부재 중 사무장 단독 좌석 변경 처리",
-      '"이번만이에요" — 예외 승인 발언으로 선례 형성 위험',
-    ],
-  },
-  {
-    n: 2,
-    time: "이륙 후 서비스",
-    phase: "기내 후방",
-    title: '"새벽이니까 얼른 끝내자"',
-    narrative: "사전기내식 14개가 후방에 탑재.\n갤리브리핑도, 카트도 없이 서비스가 시작됐다.\n인디비쥬얼 서비스 — 선임이 혼자 나가라고 했다.\n기내식 1개 부족 → 남은 거 드릴게요. 알러지는?",
-    violations: [
-      "카트 미사용 서비스 — 난기류 없어도 규정 위반",
-      "한국어 방송만 종료 후 즉시 서비스 개시",
-      "인디비쥬얼 서비스 2인 1조 원칙 미준수",
-      "갤리브리핑 미진행",
-      "대체 기내식 제공 시 알러지 확인 미실시",
-    ],
-  },
-  {
-    n: 3,
-    time: "기내 면세 서비스",
-    phase: "기내",
-    title: '"일단 해보자"',
-    narrative: "DP 배정이 불분명한 상태.\nAL이 사무장에게 자신이 함께 하겠다고 했고,\n확인 없이 서비스가 시작됐다.",
-    violations: [
-      "DP 부듀티 여부 미확인 상태에서 AL 임의 배정",
-      "탑승권 확인 없이 카드 결제 진행",
-      "액체류 100ml 구매 승객 — 환승 여부 미확인 (5월 강조 사항)",
-    ],
-  },
-  {
-    n: 4,
-    time: "기내 비정상 상황",
-    phase: "IRRE 발생",
-    title: '"방송은 네가 해줘"',
-    narrative: "기내 비정상 상황(IRRE)이 발생했다.\n사무장은 방송등급이 높다는 이유로 AL에게 방송을 넘겼다.\n기장으로부터 정보는 오지 않았고, 15분이 지났다.",
-    violations: [
-      "IRRE 방송을 AL에게 위임 — 방송등급은 위임 사유가 아님",
-      "기장으로부터 정보 미수신 상태로 15분 경과",
-      "10분마다 업데이트 방송 규정 미준수",
-    ],
-  },
-];
-
-// ── PART 0: Title ──────────────────────────────────
+// ── SLIDE 01: Title ─────────────────────────────────
 
 function TitleSlide() {
   return (
@@ -197,11 +214,47 @@ function TitleSlide() {
       <div style={{ position: "absolute", right: -100, top: -100, width: 520, height: 520, borderRadius: "50%", background: `radial-gradient(circle,${C.orange}1A 0%,transparent 65%)` }} />
       <div style={{ position: "absolute", left: -60, bottom: -60, width: 300, height: 300, borderRadius: "50%", background: `radial-gradient(circle,${C.orange}0C 0%,transparent 65%)` }} />
       <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 84px", zIndex: 2 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: C.orange, letterSpacing: "0.22em", marginBottom: 22 }}>JEJU AIR · CABIN SERVICE TRAINING · 50MIN</div>
-        <div style={{ fontSize: 64, fontWeight: 900, color: C.white, lineHeight: 1.0, letterSpacing: "-0.03em", marginBottom: 10 }}>규정과 판단 사이</div>
-        <div style={{ fontSize: 18, color: "#4A4A4A", marginBottom: 36, letterSpacing: "0.06em" }}>Between Rules and Judgment</div>
+        <div style={{ fontSize: 10, fontWeight: 700, color: C.orange, letterSpacing: "0.22em", marginBottom: 22 }}>JEJU AIR · 객실서비스 교육 · 오전 1교시 · 50분</div>
+        <div style={{ fontSize: 64, fontWeight: 900, color: C.white, lineHeight: 1.0, letterSpacing: "-0.03em", marginBottom: 12 }}>규정과 판단 사이</div>
+        <div style={{ fontSize: 18, color: "#4A4A4A", marginBottom: 36, letterSpacing: "0.04em" }}>우리는 현장에서 어떻게 결정하는가</div>
         <Accent />
         <div style={{ marginTop: 26, fontSize: 12, color: "#444" }}>전 경력 객실승무원 대상 · 50분 세션</div>
+      </div>
+      <Bar />
+    </div>
+  );
+}
+
+// ── SLIDE 02: Table of Contents ─────────────────────
+
+function TableOfContentsSlide() {
+  const parts = [
+    { n: 1, color: C.orange, emoji: "💬", title: "규정과 실제 근무 사이의 간극", desc: "조별 토론 6케이스", time: "35분" },
+    { n: 2, color: C.amber,  emoji: "📋", title: "사무장 판단 하에 제공 가능한 영역", desc: "CSM 조문 기반 토론", time: "준비 중" },
+    { n: 3, color: C.red,    emoji: "🔍", title: "지켜야 하는 규정", desc: "사례 중심 분석", time: "준비 중" },
+    { n: 4, color: C.green,  emoji: "🌱", title: "올바른 문화 만들기", desc: "클로징", time: "준비 중" },
+  ];
+  return (
+    <div style={{ width: "100%", height: "100%", background: C.dark, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "30px 72px 18px" }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: "#555", letterSpacing: "0.22em", marginBottom: 8 }}>SESSION OVERVIEW</div>
+        <div style={{ fontSize: 32, fontWeight: 900, color: C.white }}>오늘의 세션 구성</div>
+        <Accent style={{ marginTop: 12 }} />
+      </div>
+      <div style={{ flex: 1, padding: "0 72px 28px", display: "flex", flexDirection: "column", gap: 10 }}>
+        {parts.map(p => (
+          <div key={p.n} style={{ display: "flex", alignItems: "center", gap: 20, background: "#1E1E1E", borderRadius: 12, padding: "16px 24px", borderLeft: `4px solid ${p.color}` }}>
+            <div style={{ minWidth: 64 }}>
+              <div style={{ fontSize: 10, fontWeight: 800, color: p.color, letterSpacing: "0.1em" }}>PART {p.n}</div>
+              <div style={{ fontSize: 10, color: p.n === 1 ? p.color + "99" : "#3A3A3A", marginTop: 3, fontWeight: p.n === 1 ? 700 : 400 }}>{p.time}</div>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: p.n === 1 ? C.white : "#444", marginBottom: 3 }}>{p.title}</div>
+              <div style={{ fontSize: 11, color: p.n === 1 ? "#666" : "#333" }}>{p.desc}</div>
+            </div>
+            <div style={{ fontSize: 22, opacity: p.n === 1 ? 1 : 0.3 }}>{p.emoji}</div>
+          </div>
+        ))}
       </div>
       <Bar />
     </div>
@@ -211,9 +264,9 @@ function TitleSlide() {
 // ── Section Opener ─────────────────────────────────
 
 const PART_META = {
-  1: { title: "규정과 실제 근무 사이의 간극", sub: "현장에서 우리는 어떻게 판단하고 있는가", tag: "케이스 6개 · 소그룹 토의" },
-  2: { title: "사무장 판단 영역", sub: "CSM 조문이 말하는 것과 현장 사이", tag: "CSM 조문 기반 토론" },
-  3: { title: "지켜야 하는 규정 — Red Line", sub: "신입 승무원의 눈으로 다시 보기", tag: "내러티브 방식" },
+  1: { title: "규정과 실제 근무 사이의 간극", sub: "아래 6가지 상황, 우리 편조라면 어떻게 했을까요?", tag: "케이스 6개 · 소그룹 토의 후 전체 공유" },
+  2: { title: "사무장 판단 하에 제공 가능한 영역", sub: "CSM 조문이 말하는 것과 현장 사이", tag: "CSM 조문 기반 토론" },
+  3: { title: "지켜야 하는 규정", sub: "사례 중심으로 살펴보는 판단의 경계", tag: "사례 분석" },
   4: { title: "올바른 문화 만들기", sub: "우리가 함께 만들어가야 할 것", tag: "클로징" },
 };
 
@@ -227,56 +280,48 @@ function SectionOpener({ part }) {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 80px 0 92px", zIndex: 2 }}>
         <div style={{ fontSize: 10, fontWeight: 800, color, letterSpacing: "0.22em", marginBottom: 16 }}>PART {part} · {m.tag}</div>
         <div style={{ fontSize: 44, fontWeight: 900, color: C.white, lineHeight: 1.1, marginBottom: 14 }}>{m.title}</div>
-        <div style={{ fontSize: 17, color: "#4A4A4A", marginBottom: 32 }}>{m.sub}</div>
-        <Accent color={color} />
+        <div style={{ fontSize: 17, color: "#4A4A4A", marginBottom: 28 }}>{m.sub}</div>
+        <Accent color={color} style={{ marginBottom: 28 }} />
+        {part === 1 ? (
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <span style={{ fontSize: 18 }}>💬</span>
+            <span style={{ fontSize: 13, color: "#555" }}>케이스별 소그룹 토의 → 전체 공유 순으로 진행됩니다</span>
+          </div>
+        ) : (
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#1E1E1E", borderRadius: 8, padding: "10px 18px", alignSelf: "flex-start" }}>
+            <span style={{ fontSize: 14 }}>🔧</span>
+            <span style={{ fontSize: 12, color: "#444" }}>내용 준비 중입니다</span>
+          </div>
+        )}
       </div>
       <Bar color={color} />
     </div>
   );
 }
 
-// ── PART 1 ─────────────────────────────────────────
+// ── PART 1: Case Scenario Slide (dark) ─────────────
 
-function CaseSlide({ n, data = {} }) {
-  const dark = n % 2 === 0;
-  const bg = dark ? C.dark : C.white;
-  const fg = dark ? C.white : C.dark;
-  const cardBg = dark ? C.card : C.grayLight;
-  const sub = dark ? "#888" : C.gray;
-  const ctx = data.context?.length ? data.context : ["[ 노선 ]", "[ 조건 A ]", "[ 조건 B ]"];
-  const qs = data.questions ?? [];
+function CaseScenarioSlide({ data }) {
+  const bc = data.badgeColor;
   return (
-    <div style={{ width: "100%", height: "100%", background: bg, display: "flex", flexDirection: "column" }}>
-      <div style={{ padding: "30px 64px 0" }}>
-        <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
-          <Pill>PART 1</Pill>
-          <Tag>케이스 {n} / 6</Tag>
-          <span style={{ fontSize: 11, color: sub }}>{data.type || "[ 케이스 유형 ]"}</span>
+    <div style={{ width: "100%", height: "100%", background: C.dark, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "22px 60px 0" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
+          <Pill bg={C.orange}>PART 1</Pill>
+          <span style={{ background: bc + "22", color: bc, border: `1px solid ${bc}55`, borderRadius: 4, padding: "2px 12px", fontSize: 11, fontWeight: 800 }}>{data.badge}</span>
         </div>
-        <div style={{ fontSize: 26, fontWeight: 800, color: fg, marginBottom: 6 }}>{data.title || `[ 케이스 ${n} 제목 ]`}</div>
-        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-          {ctx.map((t, i) => (
-            <span key={i} style={{ background: cardBg, borderRadius: 6, padding: "3px 12px", fontSize: 11, color: sub }}>{t}</span>
+        <div style={{ fontSize: 24, fontWeight: 900, color: C.white, lineHeight: 1.3, marginBottom: 10 }}>{data.title}</div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+          {data.context.map((t, i) => (
+            <span key={i} style={{ background: "#222", borderRadius: 20, padding: "4px 14px", fontSize: 11, color: "#666", border: "1px solid #2A2A2A" }}>{t}</span>
           ))}
         </div>
-        <Accent style={{ marginBottom: 14 }} />
+        <Accent />
       </div>
-      <div style={{ flex: 1, padding: "0 64px 22px", display: "grid", gridTemplateColumns: "3fr 2fr", gap: 16 }}>
-        <div style={{ background: dark ? "#1E1E1E" : C.grayLight, borderRadius: 12, padding: "18px 22px", display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: C.orange, letterSpacing: "0.1em", marginBottom: 10 }}>SCENARIO</div>
-          {data.scenario
-            ? <div style={{ fontSize: 13, color: dark ? "#CCC" : C.dark, lineHeight: 1.9, whiteSpace: "pre-line", flex: 1 }}>{data.scenario}</div>
-            : <Ph label={`[ 케이스 ${n} — 시나리오 내용 ]`} style={{ flex: 1, background: "transparent", border: "none", justifyContent: "flex-start", alignItems: "flex-start" }} />
-          }
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: C.orange, letterSpacing: "0.1em" }}>생각해볼 것</div>
-          {[0, 1, 2].map(qi => (
-            <div key={qi} style={{ background: cardBg, borderRadius: 10, padding: "12px 16px", borderLeft: `4px solid ${C.orange}` }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color: C.orange, marginRight: 6 }}>Q{qi + 1}</span>
-              <span style={{ fontSize: 12, color: sub }}>{qs[qi] || `[ 생각해볼 질문 ${qi + 1} ]`}</span>
-            </div>
-          ))}
+      <div style={{ flex: 1, padding: "12px 60px 22px" }}>
+        <div style={{ background: "#111", borderRadius: 14, padding: "22px 28px", height: "100%", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
+          <div style={{ fontSize: 9, fontWeight: 800, color: C.orange, letterSpacing: "0.18em", marginBottom: 14 }}>SCENARIO</div>
+          <div style={{ fontSize: 13.5, color: "#B8B8B8", lineHeight: 2.0, whiteSpace: "pre-line", flex: 1 }}>{data.scenario}</div>
         </div>
       </div>
       <Bar />
@@ -284,328 +329,156 @@ function CaseSlide({ n, data = {} }) {
   );
 }
 
-function DiscussTimerSlide() {
+// ── PART 1: Case Discussion Slide (light + timer) ──
+
+function CaseDiscussSlide({ data }) {
   const totalSec = 15 * 60;
   const { elapsed, running, setRunning, fmt, reset, pct } = useTimer(totalSec);
   const remaining = totalSec - elapsed;
   const tc = remaining < 120 ? "#FF4444" : remaining < 300 ? "#FFA500" : C.orange;
+  const bc = data.badgeColor;
   return (
-    <div style={{ width: "100%", height: "100%", background: C.dark, display: "flex", flexDirection: "column" }}>
-      <div style={{ padding: "26px 64px 0" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-          <div>
-            <div style={{ display: "flex", gap: 8, marginBottom: 6 }}>
+    <div style={{ width: "100%", height: "100%", background: C.grayLight, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "20px 60px 0" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8, flexWrap: "wrap" }}>
               <Pill>PART 1</Pill>
+              <span style={{ background: bc + "22", color: bc, border: `1px solid ${bc}55`, borderRadius: 4, padding: "2px 12px", fontSize: 11, fontWeight: 800 }}>{data.badge}</span>
               <Tag color={C.green}>소그룹 토의 · 15분</Tag>
             </div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: C.white }}>[ 소그룹 토의 — 가이드 ]</div>
+            <div style={{ fontSize: 19, fontWeight: 800, color: C.dark, lineHeight: 1.35 }}>{data.title}</div>
           </div>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 54, fontWeight: 900, color: tc, fontVariantNumeric: "tabular-nums", letterSpacing: "-0.03em" }}>{fmt(remaining)}</div>
-            <div style={{ position: "relative", height: 8, width: 180, background: "#2A2A2A", borderRadius: 4, margin: "6px auto" }}>
+          <div style={{ textAlign: "center", background: C.dark, borderRadius: 14, padding: "14px 20px", flexShrink: 0 }}>
+            <div style={{ fontSize: 44, fontWeight: 900, color: tc, fontVariantNumeric: "tabular-nums", letterSpacing: "-0.03em", lineHeight: 1 }}>{fmt(remaining)}</div>
+            <div style={{ position: "relative", height: 5, width: 130, background: "#2A2A2A", borderRadius: 4, margin: "8px auto" }}>
               <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${(1 - pct) * 100}%`, background: tc, borderRadius: 4, transition: "width 1s linear" }} />
             </div>
-            <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-              <button onClick={() => setRunning(r => !r)} style={{ background: running ? "#444" : C.orange, color: C.white, border: "none", borderRadius: 6, padding: "6px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+            <div style={{ display: "flex", gap: 6, justifyContent: "center", marginTop: 8 }}>
+              <button onClick={() => setRunning(r => !r)} style={{ background: running ? "#444" : C.orange, color: C.white, border: "none", borderRadius: 6, padding: "5px 13px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                 {running ? "⏸ 일시정지" : elapsed === 0 ? "▶ 시작" : "▶ 재개"}
               </button>
-              <button onClick={reset} style={{ background: "#333", color: "#888", border: "none", borderRadius: 6, padding: "6px 10px", fontSize: 12, cursor: "pointer" }}>↺</button>
+              <button onClick={reset} style={{ background: "#333", color: "#888", border: "none", borderRadius: 6, padding: "5px 9px", fontSize: 11, cursor: "pointer" }}>↺</button>
             </div>
           </div>
         </div>
-        <Accent style={{ marginTop: 14, marginBottom: 18 }} />
+        <Accent style={{ marginTop: 12 }} />
       </div>
-      <div style={{ flex: 1, padding: "0 64px 22px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: C.orange, letterSpacing: "0.1em" }}>토의 질문</div>
-          {[1, 2, 3].map(q => (
-            <div key={q} style={{ background: C.card, borderRadius: 10, padding: "14px 18px", borderLeft: `4px solid ${C.orange}` }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color: C.orange, marginRight: 8 }}>Q{q}</span>
-              <span style={{ fontSize: 13, color: "#CCC" }}>[ 토의 질문 {q} ]</span>
-            </div>
-          ))}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: "#888", letterSpacing: "0.1em" }}>진행 안내</div>
-          {["[ 진행 안내 A ]", "[ 진행 안내 B ]", "[ 진행 안내 C ]"].map((g, i) => (
-            <div key={i} style={{ background: "#242424", borderRadius: 8, padding: "12px 16px" }}>
-              <span style={{ color: C.orange, marginRight: 8 }}>›</span>
-              <span style={{ fontSize: 12, color: "#AAA" }}>{g}</span>
-            </div>
-          ))}
-        </div>
+      <div style={{ flex: 1, padding: "12px 60px 22px", display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ fontSize: 9, fontWeight: 800, color: C.orange, letterSpacing: "0.18em" }}>소그룹 토의 질문</div>
+        {data.questions.map((q, i) => (
+          <div key={i} style={{ background: C.white, borderRadius: 12, padding: "15px 20px", borderLeft: `5px solid ${C.orange}`, boxShadow: "0 2px 6px rgba(0,0,0,0.06)", display: "flex", alignItems: "flex-start", gap: 12, flex: 1 }}>
+            <span style={{ fontSize: 10, fontWeight: 900, color: C.orange, minWidth: 22, marginTop: 2, background: C.orange + "18", borderRadius: 4, padding: "2px 6px", textAlign: "center" }}>Q{i + 1}</span>
+            <span style={{ fontSize: 13.5, color: C.dark, lineHeight: 1.65 }}>{q}</span>
+          </div>
+        ))}
       </div>
       <Bar />
     </div>
   );
 }
 
-// ── PART 2 ─────────────────────────────────────────
+// ── PART 1: Share Slide (전체 공유) ─────────────────
 
-function CSMSlide({ n }) {
-  const color = C.amber;
-  const dark = n % 2 === 0;
-  const bg = dark ? C.dark : C.white;
-  const fg = dark ? C.white : C.dark;
-  const cardBg = dark ? C.card : C.grayLight;
-  const sub = dark ? "#888" : C.gray;
-  return (
-    <div style={{ width: "100%", height: "100%", background: bg, display: "flex", flexDirection: "column" }}>
-      <div style={{ padding: "32px 64px 0" }}>
-        <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
-          <Pill bg={color}>PART 2</Pill>
-          <Tag color={color}>CSM 조문 {n}</Tag>
-        </div>
-        <div style={{ fontSize: 26, fontWeight: 800, color: fg, marginBottom: 6 }}>[ CSM 조문 {n} 제목 ]</div>
-        <Accent color={color} style={{ marginBottom: 18 }} />
-      </div>
-      <div style={{ flex: 1, padding: "0 64px 22px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color, letterSpacing: "0.1em" }}>조문 내용</div>
-          <Ph label="[ CSM 조문 원문 ]" style={{ flex: 1 }} />
-          <Ph label="[ 관련 해설 또는 배경 ]" />
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color, letterSpacing: "0.1em" }}>토론 포인트</div>
-          {["A", "B", "C"].map((p, i) => (
-            <div key={i} style={{ background: cardBg, borderRadius: 10, padding: "14px 18px", borderLeft: `4px solid ${color}` }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color, marginRight: 8 }}>P{i + 1}</span>
-              <span style={{ fontSize: 12, color: sub }}>[ 토론 포인트 {p} ]</span>
-            </div>
-          ))}
-        </div>
-      </div>
-      <Bar color={color} />
-    </div>
-  );
-}
-
-function Part2DiscussSlide() {
-  const color = C.amber;
-  return (
-    <div style={{ width: "100%", height: "100%", background: C.dark, display: "flex", flexDirection: "column" }}>
-      <div style={{ padding: "32px 64px 0" }}>
-        <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-          <Pill bg={color}>PART 2</Pill>
-          <Tag color={color}>사무장 판단 토론</Tag>
-        </div>
-        <div style={{ fontSize: 26, fontWeight: 800, color: C.white, marginBottom: 6 }}>[ 토론 주제 ]</div>
-        <Accent color={color} style={{ marginBottom: 18 }} />
-      </div>
-      <div style={{ flex: 1, padding: "0 64px 22px", display: "flex", flexDirection: "column", gap: 14 }}>
-        <Ph label="[ 토론 시나리오 또는 상황 설명 ]" style={{ flex: 2 }} />
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, flex: 1 }}>
-          <Ph label="[ 토론 질문 A ]" />
-          <Ph label="[ 토론 질문 B ]" />
-        </div>
-      </div>
-      <Bar color={color} />
-    </div>
-  );
-}
-
-// ── PART 3: Storytelling ───────────────────────────
-
-function P3InterviewSlide() {
-  return (
-    <div style={{ width: "100%", height: "100%", background: "#1A1510", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", right: -80, top: -80, width: 360, height: 360, borderRadius: "50%", background: `radial-gradient(circle,${C.amber}0C 0%,transparent 65%)` }} />
-      <div style={{ position: "absolute", left: -40, bottom: -40, width: 260, height: 260, borderRadius: "50%", background: `radial-gradient(circle,${C.red}0A 0%,transparent 65%)` }} />
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 100px", zIndex: 2 }}>
-        <div style={{ display: "flex", gap: 8, marginBottom: 36 }}>
-          <Pill bg={C.red}>PART 3</Pill>
-          <Tag color={C.amber}>신입 인터뷰</Tag>
-        </div>
-        <div style={{ fontSize: 26, fontWeight: 400, color: "#E8DDD0", lineHeight: 1.9, marginBottom: 32, whiteSpace: "pre-line" }}>
-          {"\"교관님이 규정은 다 가르쳐 주셨어요.\n근데 실제 비행은... 달랐어요.\n\n선배님이 이렇게 하라고 하면,\n그게 맞는 건지 물어볼 수가 없어요.\n비행 중이잖아요.\""}
-        </div>
-        <Accent color={C.amber} style={{ marginBottom: 18 }} />
-        <div style={{ fontSize: 12, color: "#6A5A48" }}>신입 CA · 입사 8개월 차 · ICN → NRT · 새벽 비행</div>
-      </div>
-      <Bar color={C.red} />
-    </div>
-  );
-}
-
-function P3TimelineSlide() {
-  return (
-    <div style={{ width: "100%", height: "100%", background: C.dark, display: "flex", flexDirection: "column" }}>
-      <div style={{ padding: "28px 64px 0" }}>
-        <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-          <Pill bg={C.red}>PART 3</Pill>
-          <Tag color={C.red}>ICN → NRT 비행 타임라인</Tag>
-        </div>
-        <div style={{ fontSize: 22, fontWeight: 800, color: C.white, marginBottom: 4 }}>이 비행에서 무슨 일이 있었나</div>
-        <Accent color={C.red} />
-      </div>
-      <div style={{ padding: "18px 64px 0" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 14, fontWeight: 900, color: C.white }}>ICN</div>
-            <div style={{ fontSize: 10, color: "#555" }}>인천</div>
-          </div>
-          <div style={{ flex: 1, position: "relative", height: 2 }}>
-            <div style={{ position: "absolute", inset: 0, background: "#2A2A2A" }} />
-            <div style={{ position: "absolute", inset: 0, background: `linear-gradient(90deg,${C.red},${C.red}33)` }} />
-            {[14, 38, 62, 86].map((pct, i) => (
-              <div key={i} style={{ position: "absolute", top: "50%", left: `${pct}%`, transform: "translate(-50%,-50%)", width: 10, height: 10, borderRadius: "50%", background: C.red, border: "2px solid #1A1A1A" }} />
-            ))}
-          </div>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 14, fontWeight: 900, color: C.white }}>NRT</div>
-            <div style={{ fontSize: 10, color: "#555" }}>나리타</div>
-          </div>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12 }}>
-          {SCENES.map(s => (
-            <div key={s.n} style={{ background: "#222", borderRadius: 12, padding: "16px 18px", borderTop: `3px solid ${C.red}` }}>
-              <div style={{ fontSize: 10, fontWeight: 800, color: C.red, letterSpacing: "0.1em", marginBottom: 5 }}>장면 {s.n}</div>
-              <div style={{ fontSize: 11, color: "#666", marginBottom: 6 }}>{s.time}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: C.white, lineHeight: 1.4, marginBottom: 10, fontStyle: "italic" }}>{s.title}</div>
-              <div style={{ fontSize: 10, color: "#555" }}>위반 {s.violations.length}건</div>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div style={{ flex: 1 }} />
-      <Bar color={C.red} />
-    </div>
-  );
-}
-
-function P3SceneSlide({ scene }) {
-  const [revealed, setRevealed] = useState(new Set());
-  const toggle = (i) => setRevealed(prev => {
+function ShareSlide() {
+  const [checked, setChecked] = useState(new Set());
+  const toggle = (i) => setChecked(prev => {
     const next = new Set(prev);
     if (next.has(i)) next.delete(i); else next.add(i);
     return next;
   });
-  const revealAll = () => setRevealed(new Set(scene.violations.map((_, i) => i)));
-  const found = revealed.size;
-  const total = scene.violations.length;
-
-  return (
-    <div style={{ width: "100%", height: "100%", background: C.dark, display: "flex", flexDirection: "column" }}>
-      <div style={{ padding: "24px 64px 0" }}>
-        <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 6 }}>
-          <Pill bg={C.red}>PART 3</Pill>
-          <Tag color={C.red}>장면 {scene.n}</Tag>
-          <span style={{ fontSize: 11, color: "#777" }}>{scene.time}</span>
-          <span style={{ fontSize: 10, color: "#3A3A3A", margin: "0 2px" }}>·</span>
-          <span style={{ fontSize: 11, color: "#555" }}>{scene.phase}</span>
-        </div>
-        <div style={{ fontSize: 24, fontWeight: 800, color: C.white, marginBottom: 8, fontStyle: "italic" }}>{scene.title}</div>
-        <Accent color={C.red} />
-      </div>
-      <div style={{ flex: 1, padding: "14px 64px 18px", display: "grid", gridTemplateColumns: "2fr 3fr", gap: 20 }}>
-        {/* Left: Narrative */}
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: "#555", letterSpacing: "0.1em", marginBottom: 8 }}>상황 전개</div>
-          <div style={{ background: "#1C1C1C", borderRadius: 12, padding: "18px 20px", flex: 1 }}>
-            <div style={{ fontSize: 13, color: "#C4B5A8", lineHeight: 2.1, whiteSpace: "pre-line" }}>{scene.narrative}</div>
-          </div>
-        </div>
-        {/* Right: Violations (reveal on click) */}
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: C.red, letterSpacing: "0.1em" }}>
-              레드라인 위반{found > 0 ? ` · ${found} / ${total} 확인` : ""}
-            </div>
-            {found < total && (
-              <button onClick={revealAll} style={{ background: "transparent", border: "1px solid #333", borderRadius: 4, padding: "3px 10px", fontSize: 10, color: "#555", cursor: "pointer" }}>
-                전체 보기
-              </button>
-            )}
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 7, flex: 1 }}>
-            {scene.violations.map((v, i) => {
-              const on = revealed.has(i);
-              return (
-                <div
-                  key={i}
-                  onClick={() => toggle(i)}
-                  style={{
-                    cursor: "pointer",
-                    background: on ? `${C.red}14` : "#1E1E1E",
-                    border: `1.5px solid ${on ? C.red + "55" : "#2A2A2A"}`,
-                    borderRadius: 8,
-                    padding: "10px 14px",
-                    transition: "background 0.2s, border-color 0.2s",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    minHeight: 44,
-                    userSelect: "none",
-                  }}
-                >
-                  <div style={{
-                    width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
-                    background: on ? C.red : "#2A2A2A",
-                    border: `2px solid ${on ? C.red : "#3A3A3A"}`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 11, fontWeight: 900, color: C.white,
-                    transition: "background 0.2s",
-                  }}>
-                    {on ? "!" : "?"}
-                  </div>
-                  {on
-                    ? <span style={{ fontSize: 12, color: "#EEE", lineHeight: 1.55, flex: 1 }}>{v}</span>
-                    : <span style={{ fontSize: 11, color: "#3A3A3A", fontStyle: "italic" }}>클릭해서 확인</span>
-                  }
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-      <Bar color={C.red} />
-    </div>
-  );
-}
-
-// ── PART 4 ─────────────────────────────────────────
-
-function CultureSlide() {
-  const color = C.green;
+  const items = [
+    { emoji: "🔴", text: "케이스 1 — 벨트사인 상황: 우리 편조의 판단 기준은 무엇이었나요?" },
+    { emoji: "🟠", text: "케이스 2 — 개별 먼저 제공: 허용한 경우와 거절한 경우, 그 이유는?" },
+    { emoji: "🟠", text: "케이스 3 — 주류 거절: 실제로 어떻게 말했나요?" },
+    { emoji: "🟠", text: "케이스 4 — 보딩 중 단독 판단: 어느 시점에 사무장에게 보고했나요?" },
+    { emoji: "🟡", text: "케이스 5 — 보딩 중 반복 요청: 몇 번째에서 대응 방식을 바꿨나요?" },
+    { emoji: "🟡", text: "케이스 6 — 담요 요청: 사무장 판단을 구했나요, 직접 결정했나요?" },
+  ];
   return (
     <div style={{ width: "100%", height: "100%", background: C.white, display: "flex", flexDirection: "column" }}>
-      <div style={{ padding: "32px 64px 0" }}>
-        <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-          <Pill bg={color}>PART 4</Pill>
-          <Tag color={color}>올바른 문화 만들기</Tag>
+      <div style={{ padding: "24px 60px 0" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
+          <Pill>PART 1</Pill>
+          <Tag color={C.green}>전체 공유</Tag>
         </div>
-        <div style={{ fontSize: 26, fontWeight: 800, color: C.dark, marginBottom: 6 }}>[ 문화 만들기 — 주제 ]</div>
-        <Accent color={color} style={{ marginBottom: 18 }} />
+        <div style={{ fontSize: 24, fontWeight: 900, color: C.dark, marginBottom: 4 }}>그룹별 공유 포인트</div>
+        <div style={{ fontSize: 12, color: C.gray, marginBottom: 12 }}>각 케이스에서 편조가 나눈 판단을 전체와 함께 공유합니다</div>
+        <Accent />
       </div>
-      <div style={{ flex: 1, padding: "0 64px 22px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-        <Ph label="[ 핵심 내용 또는 사례 ]" />
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {["[ 실천 포인트 A ]", "[ 실천 포인트 B ]", "[ 실천 포인트 C ]"].map((t, i) => (
-            <div key={i} style={{ background: C.grayLight, borderRadius: 10, padding: "14px 18px", borderLeft: `4px solid ${color}` }}>
-              <span style={{ fontSize: 11, fontWeight: 800, color, marginRight: 8 }}>›</span>
-              <span style={{ fontSize: 12, color: C.gray }}>{t}</span>
+      <div style={{ flex: 1, padding: "12px 60px 22px", display: "flex", flexDirection: "column", gap: 7 }}>
+        {items.map((item, i) => {
+          const on = checked.has(i);
+          return (
+            <div
+              key={i}
+              onClick={() => toggle(i)}
+              style={{
+                display: "flex", alignItems: "center", gap: 14,
+                background: on ? C.orange + "0C" : C.grayLight,
+                border: `1.5px solid ${on ? C.orange + "44" : "transparent"}`,
+                borderRadius: 10, padding: "11px 18px", cursor: "pointer",
+                transition: "all 0.2s", userSelect: "none", flex: 1,
+              }}
+            >
+              <div style={{
+                width: 20, height: 20, borderRadius: 5, flexShrink: 0,
+                background: on ? C.orange : C.white,
+                border: `2px solid ${on ? C.orange : "#CCC"}`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 11, color: C.white, fontWeight: 900,
+                transition: "all 0.2s",
+              }}>
+                {on ? "✓" : ""}
+              </div>
+              <span style={{ fontSize: 15, flexShrink: 0 }}>{item.emoji}</span>
+              <span style={{ fontSize: 13, color: on ? C.dark : "#888", fontWeight: on ? 700 : 400, lineHeight: 1.5 }}>{item.text}</span>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
-      <Bar color={color} />
+      <Bar />
     </div>
   );
 }
 
-function ClosingSlide() {
-  const color = C.green;
+// ── Session Timeline ────────────────────────────────
+
+const TIMELINE = [
+  { label: "도입", color: "#555",    from: 0,  to: 1  },
+  { label: "PART 1 · 케이스 토의",  color: C.orange, from: 2,  to: 14 },
+  { label: "전체 공유", color: C.green,  from: 15, to: 15 },
+  { label: "PART 2–4", color: "#333",    from: 16, to: 18 },
+];
+
+const TIMELINE_FLEX = [5, 35, 10, 2];
+
+function SessionTimeline({ cur }) {
+  const seg = TIMELINE.findIndex(s => cur >= s.from && cur <= s.to);
   return (
-    <div style={{ width: "100%", height: "100%", background: C.dark, display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", right: -80, bottom: -80, width: 440, height: 440, borderRadius: "50%", background: `radial-gradient(circle,${color}18 0%,transparent 65%)` }} />
-      <div style={{ position: "absolute", left: -40, top: -40, width: 260, height: 260, borderRadius: "50%", background: `radial-gradient(circle,${C.orange}0C 0%,transparent 65%)` }} />
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 84px", zIndex: 2 }}>
-        <Pill bg={color} style={{ marginBottom: 20, alignSelf: "flex-start" }}>PART 4 — CLOSING</Pill>
-        <div style={{ fontSize: 40, fontWeight: 900, color: C.white, lineHeight: 1.2, marginBottom: 20 }}>[ 클로징 핵심 메시지 ]</div>
-        <Accent color={color} style={{ marginBottom: 28 }} />
-        <Ph label="[ 마무리 메시지 — 참석자에게 전하는 말 ]" style={{ maxWidth: 580 }} />
+    <div style={{ marginTop: 12, width: "100%", maxWidth: 960 }}>
+      <div style={{ display: "flex", gap: 3, height: 24 }}>
+        {TIMELINE.map((s, i) => {
+          const active = i === seg;
+          return (
+            <div
+              key={i}
+              style={{
+                flex: TIMELINE_FLEX[i],
+                borderRadius: 6,
+                background: active ? s.color : s.color + "33",
+                border: `1.5px solid ${active ? s.color : s.color + "22"}`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "all 0.3s",
+              }}
+            >
+              <span style={{ fontSize: 9, fontWeight: active ? 800 : 500, color: active ? C.white : s.color + "66", letterSpacing: "0.04em" }}>
+                {s.label}
+              </span>
+            </div>
+          );
+        })}
       </div>
-      <Bar color={color} />
     </div>
   );
 }
@@ -613,29 +486,25 @@ function ClosingSlide() {
 // ── Slide Registry ─────────────────────────────────
 
 const SLIDES = [
-  { id: "title",        part: 0, label: "타이틀",              Comp: TitleSlide },
-  { id: "p1-open",      part: 1, label: "PART 1 오프너",       Comp: () => <SectionOpener part={1} /> },
-  { id: "p1-c1",        part: 1, label: "케이스 1",            Comp: () => <CaseSlide n={1} data={CASES[0]} /> },
-  { id: "p1-c2",        part: 1, label: "케이스 2",            Comp: () => <CaseSlide n={2} data={CASES[1]} /> },
-  { id: "p1-c3",        part: 1, label: "케이스 3",            Comp: () => <CaseSlide n={3} data={CASES[2]} /> },
-  { id: "p1-c4",        part: 1, label: "케이스 4",            Comp: () => <CaseSlide n={4} data={CASES[3]} /> },
-  { id: "p1-c5",        part: 1, label: "케이스 5",            Comp: () => <CaseSlide n={5} data={CASES[4]} /> },
-  { id: "p1-c6",        part: 1, label: "케이스 6",            Comp: () => <CaseSlide n={6} data={CASES[5]} /> },
-  { id: "p1-discuss",   part: 1, label: "소그룹 토의 (15분)",  Comp: DiscussTimerSlide },
-  { id: "p2-open",      part: 2, label: "PART 2 오프너",       Comp: () => <SectionOpener part={2} /> },
-  { id: "p2-csm1",      part: 2, label: "CSM 조문 A",          Comp: () => <CSMSlide n={1} /> },
-  { id: "p2-csm2",      part: 2, label: "CSM 조문 B",          Comp: () => <CSMSlide n={2} /> },
-  { id: "p2-discuss",   part: 2, label: "사무장 판단 토론",     Comp: Part2DiscussSlide },
-  { id: "p3-open",      part: 3, label: "PART 3 오프너",       Comp: () => <SectionOpener part={3} /> },
-  { id: "p3-interview", part: 3, label: "신입 인터뷰",         Comp: P3InterviewSlide },
-  { id: "p3-timeline",  part: 3, label: "비행 타임라인",       Comp: P3TimelineSlide },
-  { id: "p3-scene1",    part: 3, label: "장면 1 — 좌석 변경",  Comp: () => <P3SceneSlide scene={SCENES[0]} /> },
-  { id: "p3-scene2",    part: 3, label: "장면 2 — 기내식",     Comp: () => <P3SceneSlide scene={SCENES[1]} /> },
-  { id: "p3-scene3",    part: 3, label: "장면 3 — 면세",       Comp: () => <P3SceneSlide scene={SCENES[2]} /> },
-  { id: "p3-scene4",    part: 3, label: "장면 4 — IRRE",       Comp: () => <P3SceneSlide scene={SCENES[3]} /> },
-  { id: "p4-open",      part: 4, label: "PART 4 오프너",       Comp: () => <SectionOpener part={4} /> },
-  { id: "p4-culture",   part: 4, label: "문화 만들기",          Comp: CultureSlide },
-  { id: "p4-closing",   part: 4, label: "클로징",              Comp: ClosingSlide },
+  { id: "title",    part: 0, label: "타이틀",             Comp: TitleSlide },
+  { id: "toc",      part: 0, label: "세션 구성",           Comp: TableOfContentsSlide },
+  { id: "p1-open",  part: 1, label: "PART 1 오프너",       Comp: () => <SectionOpener part={1} /> },
+  { id: "p1-c1a",   part: 1, label: "케이스 1 — 시나리오", Comp: () => <CaseScenarioSlide data={CASES[0]} /> },
+  { id: "p1-c1b",   part: 1, label: "케이스 1 — 토의",    Comp: () => <CaseDiscussSlide data={CASES[0]} /> },
+  { id: "p1-c2a",   part: 1, label: "케이스 2 — 시나리오", Comp: () => <CaseScenarioSlide data={CASES[1]} /> },
+  { id: "p1-c2b",   part: 1, label: "케이스 2 — 토의",    Comp: () => <CaseDiscussSlide data={CASES[1]} /> },
+  { id: "p1-c3a",   part: 1, label: "케이스 3 — 시나리오", Comp: () => <CaseScenarioSlide data={CASES[2]} /> },
+  { id: "p1-c3b",   part: 1, label: "케이스 3 — 토의",    Comp: () => <CaseDiscussSlide data={CASES[2]} /> },
+  { id: "p1-c4a",   part: 1, label: "케이스 4 — 시나리오", Comp: () => <CaseScenarioSlide data={CASES[3]} /> },
+  { id: "p1-c4b",   part: 1, label: "케이스 4 — 토의",    Comp: () => <CaseDiscussSlide data={CASES[3]} /> },
+  { id: "p1-c5a",   part: 1, label: "케이스 5 — 시나리오", Comp: () => <CaseScenarioSlide data={CASES[4]} /> },
+  { id: "p1-c5b",   part: 1, label: "케이스 5 — 토의",    Comp: () => <CaseDiscussSlide data={CASES[4]} /> },
+  { id: "p1-c6a",   part: 1, label: "케이스 6 — 시나리오", Comp: () => <CaseScenarioSlide data={CASES[5]} /> },
+  { id: "p1-c6b",   part: 1, label: "케이스 6 — 토의",    Comp: () => <CaseDiscussSlide data={CASES[5]} /> },
+  { id: "p1-share", part: 1, label: "전체 공유",            Comp: ShareSlide },
+  { id: "p2-open",  part: 2, label: "PART 2 오프너",       Comp: () => <SectionOpener part={2} /> },
+  { id: "p3-open",  part: 3, label: "PART 3 오프너",       Comp: () => <SectionOpener part={3} /> },
+  { id: "p4-open",  part: 4, label: "PART 4 오프너",       Comp: () => <SectionOpener part={4} /> },
 ];
 
 // ── App ────────────────────────────────────────────
@@ -664,7 +533,7 @@ export default function App() {
         <Comp />
       </div>
 
-      <div style={{ marginTop: 18, display: "flex", alignItems: "center", gap: 16 }}>
+      <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 16 }}>
         <button onClick={() => go(-1)} disabled={cur === 0} style={{ background: cur === 0 ? "#222" : C.orange, color: C.white, border: "none", borderRadius: 8, padding: "9px 22px", fontSize: 13, fontWeight: 700, cursor: cur === 0 ? "default" : "pointer", opacity: cur === 0 ? 0.3 : 1 }}>
           ← 이전
         </button>
@@ -677,7 +546,7 @@ export default function App() {
         </button>
       </div>
 
-      <div style={{ marginTop: 14, display: "flex", gap: 4, alignItems: "center", flexWrap: "wrap", justifyContent: "center", maxWidth: 800 }}>
+      <div style={{ marginTop: 12, display: "flex", gap: 4, alignItems: "center", flexWrap: "wrap", justifyContent: "center", maxWidth: 800 }}>
         {SLIDES.map((s, i) => {
           const isActive = i === cur;
           const dotColor = PART_C[s.part];
@@ -691,7 +560,9 @@ export default function App() {
         })}
       </div>
 
-      <div style={{ marginTop: 12, display: "flex", gap: 16, alignItems: "center" }}>
+      <SessionTimeline cur={cur} />
+
+      <div style={{ marginTop: 10, display: "flex", gap: 16, alignItems: "center" }}>
         {[1, 2, 3, 4].map(p => (
           <div key={p} style={{ display: "flex", alignItems: "center", gap: 5 }}>
             <div style={{ width: 8, height: 8, borderRadius: 2, background: PART_C[p] }} />
