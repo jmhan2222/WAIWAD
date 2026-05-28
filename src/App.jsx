@@ -265,9 +265,9 @@ function TableOfContentsSlide() {
 
 const PART_META = {
   1: { title: "규정과 실제 근무 사이의 간극", sub: "아래 6가지 상황, 우리 편조라면 어떻게 했을까요?", tag: "케이스 6개 · 소그룹 토의 후 전체 공유" },
-  2: { title: "사무장 판단 하에 제공 가능한 영역", sub: "CSM 조문이 말하는 것과 현장 사이", tag: "CSM 조문 기반 토론" },
-  3: { title: "지켜야 하는 규정", sub: "사례 중심으로 살펴보는 판단의 경계", tag: "사례 분석" },
-  4: { title: "올바른 문화 만들기", sub: "우리가 함께 만들어가야 할 것", tag: "클로징" },
+  2: { title: "사무장 판단 하에\n제공 가능한 영역", sub: "규정이 허용한 재량 — 그 기준은 무엇인가?", tag: "CSM 조문 기반 토론" },
+  3: { title: "지켜야 하는 규정", sub: "신입승무원의 눈으로 본 ICN-NRT 비행", tag: "사례 중심 분석" },
+  4: { title: "올바른 문화\n만들기", sub: "누가 해도 동일한 비행", tag: "클로징" },
 };
 
 function SectionOpener({ part }) {
@@ -279,18 +279,13 @@ function SectionOpener({ part }) {
       <div style={{ position: "absolute", right: -80, top: -80, width: 420, height: 420, borderRadius: "50%", background: `radial-gradient(circle,${color}14 0%,transparent 65%)` }} />
       <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 80px 0 92px", zIndex: 2 }}>
         <div style={{ fontSize: 10, fontWeight: 800, color, letterSpacing: "0.22em", marginBottom: 16 }}>PART {part} · {m.tag}</div>
-        <div style={{ fontSize: 44, fontWeight: 900, color: C.white, lineHeight: 1.1, marginBottom: 14 }}>{m.title}</div>
+        <div style={{ fontSize: 44, fontWeight: 900, color: C.white, lineHeight: 1.1, marginBottom: 14, whiteSpace: "pre-line" }}>{m.title}</div>
         <div style={{ fontSize: 17, color: "#4A4A4A", marginBottom: 28 }}>{m.sub}</div>
         <Accent color={color} style={{ marginBottom: 28 }} />
-        {part === 1 ? (
+        {part === 1 && (
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             <span style={{ fontSize: 18 }}>💬</span>
             <span style={{ fontSize: 13, color: "#555" }}>케이스별 소그룹 토의 → 전체 공유 순으로 진행됩니다</span>
-          </div>
-        ) : (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#1E1E1E", borderRadius: 8, padding: "10px 18px", alignSelf: "flex-start" }}>
-            <span style={{ fontSize: 14 }}>🔧</span>
-            <span style={{ fontSize: 12, color: "#444" }}>내용 준비 중입니다</span>
           </div>
         )}
       </div>
@@ -483,6 +478,373 @@ function SessionTimeline({ cur }) {
   );
 }
 
+// ── PART 2: CSM Card Slide A ───────────────────────
+
+function P2CSMCardSlide() {
+  return (
+    <div style={{ width: "100%", height: "100%", background: C.white, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "24px 60px 0" }}>
+        <Pill bg={C.amber}>PART 2</Pill>
+        <div style={{ marginTop: 12, fontSize: 13, fontWeight: 800, color: C.amber, letterSpacing: "0.1em" }}>📋 CSM 3.4.2.4  사무장의 권한</div>
+        <Accent color={C.amber} style={{ marginTop: 10 }} />
+      </div>
+      <div style={{ flex: 1, padding: "16px 60px 22px", display: "flex", flexDirection: "column", gap: 16 }}>
+        <div style={{ flex: 1, display: "flex", gap: 20 }}>
+          <div style={{ flex: 1, background: C.grayLight, borderRadius: 14, padding: "24px 28px", borderTop: `4px solid ${C.amber}` }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: C.dark, marginBottom: 14 }}>라. 에어카페 상품 제공</div>
+            <div style={{ background: C.white, borderRadius: 10, padding: "16px 20px", borderLeft: `4px solid ${C.amber}` }}>
+              <div style={{ fontSize: 13, color: C.dark, lineHeight: 1.9 }}>4. 기타 사무장의 판단 하에<br />제공이 필요한 상황 발생 시</div>
+            </div>
+          </div>
+          <div style={{ flex: 1, background: C.grayLight, borderRadius: 14, padding: "24px 28px", borderTop: `4px solid ${C.amber}` }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: C.dark, marginBottom: 14 }}>마. 클리닝 쿠폰</div>
+            <div style={{ background: C.white, borderRadius: 10, padding: "16px 20px", borderLeft: `4px solid ${C.amber}` }}>
+              <div style={{ fontSize: 13, color: C.dark, lineHeight: 1.9 }}>3. 기타 사무장의 판단 하에<br />제공이 필요한 상황 발생 시</div>
+            </div>
+          </div>
+        </div>
+        <div style={{ background: "#FFF8F0", border: `1px solid ${C.amber}33`, borderRadius: 10, padding: "14px 24px" }}>
+          <div style={{ fontSize: 13, color: "#7A4A00", lineHeight: 1.85 }}>
+            📌 '판단 하에'라는 표현 — 이것이 어떤 의미인지,<br />어떤 상황에 적용할 수 있는지를 함께 생각해봅시다.
+          </div>
+        </div>
+      </div>
+      <Bar color={C.amber} />
+    </div>
+  );
+}
+
+// ── PART 2: Water Slide B ──────────────────────────
+
+function P2WaterSlide() {
+  return (
+    <div style={{ width: "100%", height: "100%", background: C.dark, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "24px 60px 0" }}>
+        <Pill bg={C.amber}>PART 2</Pill>
+        <div style={{ marginTop: 12, fontSize: 13, fontWeight: 800, color: "#7EB8E0", letterSpacing: "0.1em" }}>💧 CSM 4.6.1  무상 생수 서비스 기준</div>
+        <Accent color={C.amber} style={{ marginTop: 10 }} />
+      </div>
+      <div style={{ flex: 1, padding: "16px 60px 22px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 24 }}>
+        <div style={{ background: "#1E1E1E", borderRadius: 14, padding: "32px 40px", borderTop: `4px solid ${C.amber}`, alignSelf: "center", width: "100%", maxWidth: 520, boxSizing: "border-box" }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: C.white, marginBottom: 16 }}>다. 기타 비정상 상황</div>
+          <div style={{ background: "#111", borderRadius: 10, padding: "20px 24px", borderLeft: `4px solid ${C.amber}` }}>
+            <div style={{ fontSize: 14, color: "#C8C8C8", lineHeight: 2.0 }}>비정상 상황 발생으로<br />무상 생수 제공이 필요하다고<br />판단되는 경우</div>
+          </div>
+        </div>
+        <div style={{ background: "#1A2A1A", border: "1px solid #2A4A2A", borderRadius: 10, padding: "14px 24px", alignSelf: "center", width: "100%", maxWidth: 520, boxSizing: "border-box" }}>
+          <div style={{ fontSize: 13, color: "#7ABF7A", lineHeight: 1.85 }}>🔗 PART 1의 케이스들 중<br />이 조문이 적용될 수 있는 상황이 있었나요?</div>
+        </div>
+      </div>
+      <Bar color={C.amber} />
+    </div>
+  );
+}
+
+// ── PART 2: Discussion Slide C ─────────────────────
+
+function P2DiscussSlide() {
+  const totalSec = 15 * 60;
+  const { elapsed, running, setRunning, fmt, reset, pct } = useTimer(totalSec);
+  const remaining = totalSec - elapsed;
+  const tc = remaining < 120 ? "#FF4444" : remaining < 300 ? "#FFA500" : C.amber;
+  const qs = [
+    { emoji: "👨‍✈️", text: "PART 1의 케이스 중 사무장 권한으로 해결 가능한 상황은 어떤 것인가?" },
+    { emoji: "⚖️",   text: '"판단 하에 제공"과 "무조건 제공"의 차이는 무엇인가?' },
+    { emoji: "🔄",   text: "사무장마다 판단이 다르다면 승객 입장에서는 어떻게 느껴지는가?" },
+  ];
+  return (
+    <div style={{ width: "100%", height: "100%", background: C.white, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "20px 60px 0" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8, flexWrap: "wrap" }}>
+              <Pill bg={C.amber}>PART 2 · 조별 토의 🗣️</Pill>
+              <Tag color={C.green}>15분</Tag>
+            </div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: C.dark, lineHeight: 1.3 }}>우리 조가 생각하는 판단의 기준은?</div>
+          </div>
+          <div style={{ textAlign: "center", background: C.dark, borderRadius: 14, padding: "14px 20px", flexShrink: 0 }}>
+            <div style={{ fontSize: 44, fontWeight: 900, color: tc, fontVariantNumeric: "tabular-nums", letterSpacing: "-0.03em", lineHeight: 1 }}>{fmt(remaining)}</div>
+            <div style={{ position: "relative", height: 5, width: 130, background: "#2A2A2A", borderRadius: 4, margin: "8px auto" }}>
+              <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${(1 - pct) * 100}%`, background: tc, borderRadius: 4, transition: "width 1s linear" }} />
+            </div>
+            <div style={{ display: "flex", gap: 6, justifyContent: "center", marginTop: 8 }}>
+              <button onClick={() => setRunning(r => !r)} style={{ background: running ? "#444" : C.amber, color: C.white, border: "none", borderRadius: 6, padding: "5px 13px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                {running ? "⏸ 일시정지" : elapsed === 0 ? "▶ 시작" : "▶ 재개"}
+              </button>
+              <button onClick={reset} style={{ background: "#333", color: "#888", border: "none", borderRadius: 6, padding: "5px 9px", fontSize: 11, cursor: "pointer" }}>↺</button>
+            </div>
+          </div>
+        </div>
+        <Accent color={C.amber} style={{ marginTop: 12 }} />
+      </div>
+      <div style={{ flex: 1, padding: "12px 60px 22px", display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ fontSize: 9, fontWeight: 800, color: C.amber, letterSpacing: "0.18em" }}>조별 토의 질문</div>
+        {qs.map((q, i) => (
+          <div key={i} style={{ background: C.grayLight, borderRadius: 12, padding: "16px 20px", borderLeft: `5px solid ${C.amber}`, display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
+            <span style={{ fontSize: 10, fontWeight: 900, color: C.amber, minWidth: 22, background: C.amber + "18", borderRadius: 4, padding: "2px 6px", textAlign: "center" }}>Q{i + 1}</span>
+            <span style={{ fontSize: 20, flexShrink: 0 }}>{q.emoji}</span>
+            <span style={{ fontSize: 13.5, color: C.dark, lineHeight: 1.65 }}>{q.text}</span>
+          </div>
+        ))}
+      </div>
+      <Bar color={C.amber} />
+    </div>
+  );
+}
+
+// ── PART 3: Interview Slide ────────────────────────
+
+function P3InterviewSlide() {
+  return (
+    <div style={{ width: "100%", height: "100%", background: C.dark, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "24px 60px 0" }}>
+        <Pill bg={C.red}>PART 3</Pill>
+        <div style={{ marginTop: 12, fontSize: 12, fontWeight: 800, color: "#CC8888", letterSpacing: "0.12em" }}>🎙️ 신입승무원 인터뷰</div>
+        <Accent color={C.red} style={{ marginTop: 10 }} />
+      </div>
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 60px 28px" }}>
+        <div style={{ background: "#111", borderRadius: 16, padding: "36px 44px", borderLeft: `5px solid ${C.red}`, maxWidth: 680, width: "100%" }}>
+          <div style={{ fontSize: 32, color: C.red, lineHeight: 1, marginBottom: 16, opacity: 0.5 }}>"</div>
+          <div style={{ fontSize: 14.5, color: "#C8C8C8", lineHeight: 2.1, whiteSpace: "pre-line" }}>{"첫 비행, 솔직히 말하면 많이 긴장됐어요.\n\n교육에서 배운 것들이 있는데\n현장에서는 다르게 적용되는 경우가 많았고,\n\n선배마다 하는 방식이 달라서\n어떤 게 맞는 건지 잘 모르겠더라고요."}</div>
+          <div style={{ marginTop: 20, fontSize: 11, color: "#555", fontStyle: "italic" }}>— 입사 6개월 차 신입승무원</div>
+        </div>
+      </div>
+      <Bar color={C.red} />
+    </div>
+  );
+}
+
+// ── PART 3: Flight Timeline Slide ─────────────────
+
+function P3FlightTimelineSlide() {
+  const steps = [
+    { icon: "🚪", label: "보딩" },
+    { icon: "🛫", label: "이륙" },
+    { icon: "🍱", label: "기내식" },
+    { icon: "🛍️", label: "면세" },
+    { icon: "🚨", label: "비정상" },
+  ];
+  return (
+    <div style={{ width: "100%", height: "100%", background: C.dark, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "24px 60px 0" }}>
+        <Pill bg={C.red}>PART 3</Pill>
+        <div style={{ marginTop: 12, fontSize: 22, fontWeight: 900, color: C.white }}>✈️  ICN → NRT  오늘의 비행</div>
+        <Accent color={C.red} style={{ marginTop: 10 }} />
+      </div>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 60px 28px", gap: 28 }}>
+        <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
+          {steps.map((s, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", flex: 1 }}>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 68, height: 68, borderRadius: "50%", background: "#1E1E1E", border: `2px solid ${C.red}55`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>
+                  {s.icon}
+                </div>
+                <div style={{ fontSize: 11, color: "#888", fontWeight: 600, textAlign: "center" }}>{s.label}</div>
+              </div>
+              {i < steps.length - 1 && (
+                <div style={{ width: 36, height: 2, background: `linear-gradient(90deg,${C.red}66,${C.red}11)`, flexShrink: 0, marginBottom: 20 }} />
+              )}
+            </div>
+          ))}
+        </div>
+        <div style={{ background: "#1A1A2A", border: `1px solid ${C.red}22`, borderRadius: 10, padding: "14px 28px" }}>
+          <div style={{ fontSize: 12.5, color: "#8888CC", lineHeight: 1.7 }}>이 비행에서 신입의 눈에 포착된 장면들이 있습니다.</div>
+        </div>
+      </div>
+      <Bar color={C.red} />
+    </div>
+  );
+}
+
+// ── PART 3: Scene Slide (reusable) ────────────────
+
+function P3SceneSlide({ sceneNum, sceneIcon, sceneTitle, dark, situation, thought, violations }) {
+  const [open, setOpen] = useState(false);
+  const bg = dark ? C.dark : C.white;
+  const textMain = dark ? C.white : C.dark;
+  const textSub = dark ? "#B8B8B8" : "#555";
+  const sceneBg = dark ? "#111" : C.grayLight;
+  const thoughtBg = dark ? "#1A1A2A" : "#F0F4FF";
+  const thoughtColor = dark ? "#8888CC" : "#4455AA";
+  return (
+    <div style={{ width: "100%", height: "100%", background: bg, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "18px 60px 0" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
+          <Pill bg={C.red}>PART 3</Pill>
+          <span style={{ background: C.red + "22", color: C.red, border: `1px solid ${C.red}44`, borderRadius: 4, padding: "2px 12px", fontSize: 11, fontWeight: 800 }}>{sceneNum} {sceneIcon}</span>
+        </div>
+        <div style={{ fontSize: 20, fontWeight: 900, color: textMain, marginBottom: 8 }}>{sceneTitle}</div>
+        <Accent color={C.red} />
+      </div>
+      <div style={{ flex: 1, padding: "10px 60px 16px", display: "flex", flexDirection: "column", gap: 10, overflow: "hidden" }}>
+        <div style={{ background: sceneBg, borderRadius: 12, padding: "14px 22px", flexShrink: 0 }}>
+          <div style={{ fontSize: 9, fontWeight: 800, color: C.red, letterSpacing: "0.18em", marginBottom: 8 }}>SCENARIO</div>
+          <div style={{ fontSize: 12.5, color: textSub, lineHeight: 1.85, whiteSpace: "pre-line" }}>{situation}</div>
+        </div>
+        <div style={{ background: thoughtBg, borderRadius: 10, padding: "11px 20px", flexShrink: 0 }}>
+          <span style={{ fontSize: 12, color: thoughtColor, lineHeight: 1.7 }}>💭 신입의 생각 — <span style={{ whiteSpace: "pre-line" }}>{thought}</span></span>
+        </div>
+        {!open ? (
+          <button
+            onClick={() => setOpen(true)}
+            style={{ background: C.red, color: C.white, border: "none", borderRadius: 8, padding: "11px 24px", fontSize: 13, fontWeight: 800, cursor: "pointer", alignSelf: "flex-start", letterSpacing: "0.04em" }}
+          >
+            🔍 위반 포인트 확인하기
+          </button>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1, overflowY: "auto" }}>
+            {violations.map((v, i) => (
+              <div key={i} style={{ background: v.color + "14", border: `1px solid ${v.color}44`, borderRadius: 10, padding: "12px 18px", display: "flex", alignItems: "flex-start", gap: 10 }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>{v.icon}</span>
+                <span style={{ fontSize: 12.5, color: v.color, lineHeight: 1.75, fontWeight: 600 }}>{v.text}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <Bar color={C.red} />
+    </div>
+  );
+}
+
+// ── PART 3: Scene Data ─────────────────────────────
+
+const SCENE1 = {
+  sceneNum: "SCENE 1", sceneIcon: "🚪", sceneTitle: "도어 클로즈 1분 전", dark: false,
+  situation: `도어 클로즈까지 1분이 채 남지 않았다.\n운송직원은 이미 보이지 않는 상태.\n\n사무장이 Aisle에서 승객에게 말하고 있다.\n\n사무장  "이번만 해드리는 거예요~\n          자리 바꾸셔도 됩니다!"`,
+  thought: `"운송직원도 없는데 좌석 변경을 해드려도 되는 건가?\n뭔가 이상한 것 같은데... 선배한테 물어봐도 될까?"`,
+  violations: [
+    { icon: "🔴", color: "#D63B3B", text: "도어 클로즈 전 좌석 변경은 반드시 운송직원 확인 후 처리" },
+    { icon: "🔴", color: "#D63B3B", text: "운송직원 부재 상태의 임의 좌석 변경은 탑승 매니페스트 오류로 이어질 수 있으며 보안·안전 규정 위반에 해당한다" },
+  ],
+};
+
+const SCENE2 = {
+  sceneNum: "SCENE 2", sceneIcon: "🍱", sceneTitle: "사전기내식 서비스 — 뭔가 다르다", dark: true,
+  situation: `① 카트 없이 개별 트레이로 진행\n   선임  "난기류도 없으니까 그냥 들고 나가자"\n② 한국어 방송만 끝나자마자 바로 시작\n   선임  "새벽이니까 얼른 끝내자"\n③ 선임 FR이 신입에게\n   선임  "2인 1조 안 해도 돼, 그냥 혼자 나가"\n④ 갤리 브리핑 없이 바로 시작`,
+  thought: `"다들 이렇게 하는 건가?\n내가 배운 것들이랑 너무 다른데..."`,
+  violations: [
+    { icon: "🔴", color: "#D63B3B", text: "① 카트 미사용 — 뜨거운 음식의 카트 외 운반 금지" },
+    { icon: "🔴", color: "#D63B3B", text: "② 외국어 방송 생략 — 전 노선 한·영 방송 의무, 새벽이라는 이유로 생략 불가" },
+    { icon: "🔴", color: "#D63B3B", text: "③ 2인 1조 위반 — 사전기내식 서비스는 반드시 2인 1조" },
+    { icon: "🔴", color: "#D63B3B", text: "④ 갤리 브리핑 미실시 — 서비스 전 갤리 브리핑 절차상 필수" },
+  ],
+};
+
+const SCENE3 = {
+  sceneNum: "SCENE 3", sceneIcon: "🛍️", sceneTitle: "기내 면세 서비스 — 세 가지가 빠졌다", dark: false,
+  situation: `① DP가 부두티인 줄 모르는 상황\n   AL  "사무장님, 저 OOO님이랑 같이 할게요"\n   → 확인 없이 그냥 진행\n② 탑승권 확인 없이 결제 처리\n   AL  "손님, 명의 카드 맞으시죠?"\n   → 탑승권 확인 없이 바로 결제\n      (5월 기내 면세 강조사항 — 탑승권 확인 필수)\n③ 100ml 액체류 구매 승객에게\n   환승 여부를 묻지 않고 판매 완료`,
+  thought: `"다들 바빠서 그런 건지...\n이렇게 해도 되는 건지 모르겠어."`,
+  violations: [
+    { icon: "🟠", color: "#FF8533", text: "① 듀티 미확인 — 서비스 전 담당 듀티 확인은 기본 절차" },
+    { icon: "🟠", color: "#FF8533", text: "② 탑승권 미확인 — 5월 기내 면세 강조사항 위반, 신분 확인 없는 결제 처리 불가" },
+    { icon: "🟠", color: "#FF8533", text: "③ 액체류 환승 확인 누락 — 환승 승객의 액체류 구매는 목적지 통관 문제 발생 가능, 반드시 환승 여부 확인 후 판매" },
+  ],
+};
+
+const SCENE4 = {
+  sceneNum: "SCENE 4", sceneIcon: "🚨", sceneTitle: "회항 결정 — 방송은 누가 하나요?", dark: true,
+  situation: `기장으로부터 회항 결정이 통보되었다.\n\n사무장이 AL에게 말했다.\n사무장  "방송 등급이 높으니까 네가 해줘."\nAL      "...네?"\n\n이후 15분이 지나도록 추가 방송 없음.\n승객들이 술렁이기 시작했다.\n\n사무장  "기장님이 정보를 안 주시네.\n          정확한 정보로 해주세요."`,
+  thought: `"방송 등급이 높으면 AL이 해야 하는 건가?\n회항인데 방송이 이렇게 늦어도 되는 건가?"`,
+  violations: [
+    { icon: "🔴", color: "#D63B3B", text: "① 비정상 상황 방송 주체 오류 — 비정상 상황 방송은 사무장이 직접 실시. '방송 등급이 높다'는 이유로 AL에게 위임 불가. 방송 능숙도와 규정 주체는 별개의 문제" },
+    { icon: "🔴", color: "#D63B3B", text: "② 10분 방송 규정 위반 — 비정상 상황 발생 시 10분마다 승객 안내 방송 의무. 15분 경과 후에도 추가 방송 없음 — 명백한 위반. '기장이 정보를 안 준다'는 방송 지연의 이유가 될 수 없다" },
+  ],
+};
+
+// ── PART 4: Quote Grid Slide A ─────────────────────
+
+function P4QuoteGridSlide() {
+  const quotes = [
+    "우리 편에서만\n이렇게 하자",
+    "바쁘니까\n이번만",
+    "원래 다들\n이렇게 해",
+    "선배한테\n배운 대로",
+  ];
+  return (
+    <div style={{ width: "100%", height: "100%", background: C.dark, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "24px 60px 0" }}>
+        <Pill bg={C.green}>PART 4</Pill>
+        <div style={{ marginTop: 12, fontSize: 14, fontWeight: 800, color: "#AAA", letterSpacing: "0.1em" }}>🤔 낯설지 않은 말들</div>
+        <Accent color={C.green} style={{ marginTop: 10 }} />
+      </div>
+      <div style={{ flex: 1, padding: "14px 60px 22px", display: "flex", flexDirection: "column", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, flex: 1 }}>
+          {quotes.map((q, i) => (
+            <div key={i} style={{ background: "#1E1E1E", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px 28px", border: "1px solid #2A2A2A" }}>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "#777", textAlign: "center", lineHeight: 1.75, whiteSpace: "pre-line" }}>{q}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ background: "#0D1A0D", border: "1px solid #1A3A1A", borderRadius: 10, padding: "14px 28px" }}>
+          <div style={{ fontSize: 13, color: "#6A9A6A", lineHeight: 2.0 }}>
+            이 말들이 쌓이면<br />
+            누군가는 눈치를 보고<br />
+            누군가는 불편함을 참고<br />
+            누군가는 잘못된 걸 맞는 걸로 배운다.
+          </div>
+        </div>
+      </div>
+      <Bar color={C.green} />
+    </div>
+  );
+}
+
+// ── PART 4: Core Message Slide B ──────────────────
+
+function P4CoreMessageSlide() {
+  return (
+    <div style={{ width: "100%", height: "100%", background: C.white, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "24px 60px 0" }}>
+        <Pill bg={C.green}>PART 4</Pill>
+        <Accent color={C.green} style={{ marginTop: 12 }} />
+      </div>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 60px 28px", gap: 22 }}>
+        <div style={{ fontSize: 34, fontWeight: 900, color: C.dark, lineHeight: 1.3 }}>
+          사람마다 다른 비행이 아닌<br />
+          <span style={{ color: C.green }}>누가 해도 동일한 비행</span>
+        </div>
+        <div style={{ width: 56, height: 4, background: C.green, borderRadius: 2 }} />
+        <div style={{ fontSize: 14, color: "#555", lineHeight: 2.1 }}>
+          어떤 편조가 타도, 어떤 선배를 만나도<br />
+          승객이 경험하는 안전과 서비스의 수준이 같아야 한다.<br /><br />
+          그게 시스템이고<br />
+          그게 곧 문화다. ✈️
+        </div>
+      </div>
+      <Bar color={C.green} />
+    </div>
+  );
+}
+
+// ── PART 4: Closing Slide C ───────────────────────
+
+function P4ClosingSlide() {
+  return (
+    <div style={{ width: "100%", height: "100%", background: C.dark, display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", right: -80, top: -80, width: 400, height: 400, borderRadius: "50%", background: `radial-gradient(circle,${C.green}14 0%,transparent 65%)` }} />
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 80px", zIndex: 2, gap: 24 }}>
+        <Pill bg={C.green}>PART 4</Pill>
+        <div style={{ fontSize: 21, fontWeight: 900, color: C.white, lineHeight: 1.8 }}>
+          올바른 문화는<br />
+          특별한 누군가가 만드는 것이 아니라<br /><br />
+          지금 이 자리에 있는<br />
+          우리 각자가<br />
+          매 비행에서 만들어가는 것입니다. 🌟
+        </div>
+        <div style={{ width: "100%", height: 1, background: "#2A2A2A" }} />
+        <div style={{ fontSize: 13, color: "#555", lineHeight: 1.9 }}>
+          오후 세션에서 오늘 이야기한 것들이<br />
+          다른 언어로 다시 등장합니다.<br />
+          그때 연결해보세요. 🔗
+        </div>
+      </div>
+      <Bar color={C.green} />
+    </div>
+  );
+}
+
 // ── Slide Registry ─────────────────────────────────
 
 const SLIDES = [
@@ -502,9 +864,21 @@ const SLIDES = [
   { id: "p1-c6a",   part: 1, label: "케이스 6 — 시나리오", Comp: () => <CaseScenarioSlide data={CASES[5]} /> },
   { id: "p1-c6b",   part: 1, label: "케이스 6 — 토의",    Comp: () => <CaseDiscussSlide data={CASES[5]} /> },
   { id: "p1-share", part: 1, label: "전체 공유",            Comp: ShareSlide },
-  { id: "p2-open",  part: 2, label: "PART 2 오프너",       Comp: () => <SectionOpener part={2} /> },
-  { id: "p3-open",  part: 3, label: "PART 3 오프너",       Comp: () => <SectionOpener part={3} /> },
-  { id: "p4-open",  part: 4, label: "PART 4 오프너",       Comp: () => <SectionOpener part={4} /> },
+  { id: "p2-open",  part: 2, label: "PART 2 오프너",          Comp: () => <SectionOpener part={2} /> },
+  { id: "p2-a",     part: 2, label: "PART 2 — CSM 권한",     Comp: P2CSMCardSlide },
+  { id: "p2-b",     part: 2, label: "PART 2 — 무상 생수",    Comp: P2WaterSlide },
+  { id: "p2-c",     part: 2, label: "PART 2 — 조별 토의",    Comp: P2DiscussSlide },
+  { id: "p3-open",  part: 3, label: "PART 3 오프너",          Comp: () => <SectionOpener part={3} /> },
+  { id: "p3-intro", part: 3, label: "PART 3 — 신입 인터뷰",  Comp: P3InterviewSlide },
+  { id: "p3-tl",    part: 3, label: "PART 3 — 비행 타임라인", Comp: P3FlightTimelineSlide },
+  { id: "p3-s1",    part: 3, label: "SCENE 1 — 도어 클로즈", Comp: () => <P3SceneSlide {...SCENE1} /> },
+  { id: "p3-s2",    part: 3, label: "SCENE 2 — 사전기내식",  Comp: () => <P3SceneSlide {...SCENE2} /> },
+  { id: "p3-s3",    part: 3, label: "SCENE 3 — 기내 면세",   Comp: () => <P3SceneSlide {...SCENE3} /> },
+  { id: "p3-s4",    part: 3, label: "SCENE 4 — 회항 방송",   Comp: () => <P3SceneSlide {...SCENE4} /> },
+  { id: "p4-open",  part: 4, label: "PART 4 오프너",          Comp: () => <SectionOpener part={4} /> },
+  { id: "p4-a",     part: 4, label: "PART 4 — 낯선 말들",    Comp: P4QuoteGridSlide },
+  { id: "p4-b",     part: 4, label: "PART 4 — 핵심 메시지",  Comp: P4CoreMessageSlide },
+  { id: "p4-c",     part: 4, label: "PART 4 — 클로징",       Comp: P4ClosingSlide },
 ];
 
 // ── App ────────────────────────────────────────────
