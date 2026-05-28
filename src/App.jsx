@@ -51,8 +51,35 @@ function useTimer(totalSec) {
     else clearInterval(ref.current);
     return () => clearInterval(ref.current);
   }, [running, totalSec]);
+  useEffect(() => {
+    if (!running) return;
+    const remaining = totalSec - elapsed;
+    if (elapsed === totalSec) {
+      const utt = new SpeechSynthesisUtterance("타임 오버");
+      utt.lang = "ko-KR";
+      utt.rate = 0.9;
+      utt.pitch = 1.1;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utt);
+    } else if (remaining <= 10 && remaining > 0) {
+      try {
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 880;
+        osc.type = "sine";
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.08);
+        osc.onended = () => ctx.close();
+      } catch (_) {}
+    }
+  }, [elapsed, running, totalSec]);
   const fmt = s => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
-  const reset = () => { setElapsed(0); setRunning(false); };
+  const reset = () => { setElapsed(0); setRunning(false); speechSynthesis.cancel(); };
   return { elapsed, running, setRunning, fmt, reset, pct: elapsed / totalSec };
 }
 
@@ -327,7 +354,7 @@ function CaseScenarioSlide({ data }) {
 // ── PART 1: Case Discussion Slide (light + timer) ──
 
 function CaseDiscussSlide({ data }) {
-  const totalSec = 15 * 60;
+  const totalSec = 5 * 60;
   const { elapsed, running, setRunning, fmt, reset, pct } = useTimer(totalSec);
   const remaining = totalSec - elapsed;
   const tc = remaining < 120 ? "#FF4444" : remaining < 300 ? "#FFA500" : C.orange;
@@ -543,7 +570,7 @@ function P2WaterSlide() {
 // ── PART 2: Discussion Slide C ─────────────────────
 
 function P2DiscussSlide() {
-  const totalSec = 15 * 60;
+  const totalSec = 5 * 60;
   const { elapsed, running, setRunning, fmt, reset, pct } = useTimer(totalSec);
   const remaining = totalSec - elapsed;
   const tc = remaining < 120 ? "#FF4444" : remaining < 300 ? "#FFA500" : C.amber;
@@ -667,6 +694,8 @@ function P3SceneSlide({ sceneNum, sceneIcon, sceneTitle, dark, situation, though
   const sceneBg = dark ? "#111" : C.grayLight;
   const thoughtBg = dark ? "#1A1A2A" : "#F0F4FF";
   const thoughtColor = dark ? "#8888CC" : "#4455AA";
+  const vColor = violations[0]?.color ?? C.red;
+  const panelBg = vColor === "#D63B3B" ? "#2A0A0A" : "#2A1200";
   return (
     <div style={{ width: "100%", height: "100%", background: bg, display: "flex", flexDirection: "column" }}>
       <div style={{ padding: "18px 60px 0" }}>
@@ -678,30 +707,62 @@ function P3SceneSlide({ sceneNum, sceneIcon, sceneTitle, dark, situation, though
         <Accent color={C.red} />
       </div>
       <div style={{ flex: 1, padding: "10px 60px 16px", display: "flex", flexDirection: "column", gap: 10, overflow: "hidden" }}>
-        <div style={{ background: sceneBg, borderRadius: 12, padding: "14px 22px", flexShrink: 0 }}>
-          <div style={{ fontSize: 9, fontWeight: 800, color: C.red, letterSpacing: "0.18em", marginBottom: 8 }}>SCENARIO</div>
-          <div style={{ fontSize: 12.5, color: textSub, lineHeight: 1.85, whiteSpace: "pre-line" }}>{situation}</div>
-        </div>
-        <div style={{ background: thoughtBg, borderRadius: 10, padding: "11px 20px", flexShrink: 0 }}>
-          <span style={{ fontSize: 12, color: thoughtColor, lineHeight: 1.7 }}>💭 신입의 생각 — <span style={{ whiteSpace: "pre-line" }}>{thought}</span></span>
-        </div>
-        {!open ? (
-          <button
-            onClick={() => setOpen(true)}
-            style={{ background: C.red, color: C.white, border: "none", borderRadius: 8, padding: "11px 24px", fontSize: 13, fontWeight: 800, cursor: "pointer", alignSelf: "flex-start", letterSpacing: "0.04em" }}
-          >
-            🔍 위반 포인트 확인하기
-          </button>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1, overflowY: "auto" }}>
-            {violations.map((v, i) => (
-              <div key={i} style={{ background: v.color + "14", border: `1px solid ${v.color}44`, borderRadius: 10, padding: "12px 18px", display: "flex", alignItems: "flex-start", gap: 10 }}>
-                <span style={{ fontSize: 16, flexShrink: 0 }}>{v.icon}</span>
-                <span style={{ fontSize: 12.5, color: v.color, lineHeight: 1.75, fontWeight: 600 }}>{v.text}</span>
-              </div>
-            ))}
-          </div>
+        {!open && (
+          <>
+            <div style={{ background: sceneBg, borderRadius: 12, padding: "14px 22px", flexShrink: 0 }}>
+              <div style={{ fontSize: 9, fontWeight: 800, color: C.red, letterSpacing: "0.18em", marginBottom: 8 }}>SCENARIO</div>
+              <div style={{ fontSize: 12.5, color: textSub, lineHeight: 1.85, whiteSpace: "pre-line" }}>{situation}</div>
+            </div>
+            <div style={{ background: thoughtBg, borderRadius: 10, padding: "11px 20px", flexShrink: 0 }}>
+              <span style={{ fontSize: 12, color: thoughtColor, lineHeight: 1.7 }}>💭 신입의 생각 — <span style={{ whiteSpace: "pre-line" }}>{thought}</span></span>
+            </div>
+          </>
         )}
+        <button
+          onClick={() => setOpen(o => !o)}
+          style={{
+            background: open ? "transparent" : vColor,
+            color: open ? vColor : C.white,
+            border: `2px solid ${vColor}`,
+            borderRadius: 8,
+            padding: "8px 20px",
+            fontSize: 13,
+            fontWeight: 800,
+            cursor: "pointer",
+            alignSelf: "flex-start",
+            letterSpacing: "0.04em",
+            transition: "all 0.3s ease",
+            flexShrink: 0,
+          }}
+        >
+          {open ? "▲ 위반 포인트 닫기" : "🔍 위반 포인트 확인하기"}
+        </button>
+        <div style={{
+          maxHeight: open ? "600px" : "0px",
+          opacity: open ? 1 : 0,
+          overflow: "hidden",
+          transition: "max-height 0.4s ease, opacity 0.4s ease",
+          flexShrink: 0,
+        }}>
+          <div style={{ background: panelBg, border: `1.5px solid ${vColor}55`, borderRadius: 12, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
+            {violations.map((v, i) => {
+              const dashIdx = v.text.indexOf(" — ");
+              const title = dashIdx >= 0 ? v.text.slice(0, dashIdx) : v.text;
+              const desc = dashIdx >= 0 ? v.text.slice(dashIdx + 3) : "";
+              return (
+                <div key={i} style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontSize: 16, flexShrink: 0 }}>{v.icon}</span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: v.color }}>{title}</span>
+                  </div>
+                  {desc && (
+                    <div style={{ fontSize: 13, color: "#EEEEEE", lineHeight: 1.8, paddingLeft: 30 }}>{desc}</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
       <Bar color={C.red} />
     </div>
