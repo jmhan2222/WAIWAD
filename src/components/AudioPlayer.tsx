@@ -17,21 +17,27 @@ const GENDER_CODE: Record<Gender, string> = {
   female: 'f',
 }
 
+// 시도 순서: wav → mp3 → m4a
+const EXTS = ['wav', 'mp3', 'm4a'] as const
+type Ext = typeof EXTS[number]
+
 export function AudioPlayer({ scriptId }: Props) {
-  const [gender, setGender]     = useState<Gender>('female')
-  const [ext, setExt]           = useState<'wav' | 'mp3'>('wav')
+  const [gender, setGender]       = useState<Gender>('female')
+  const [extIndex, setExtIndex]   = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [progress, setProgress] = useState(0)
+  const [progress, setProgress]   = useState(0)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
+  const ext: Ext = EXTS[extIndex]
   const audioSrc = `/audio/${scriptId}-model-${GENDER_CODE[gender]}.${ext}`
 
-  // scriptId 또는 gender 변경 시 재생 상태 초기화
+  // scriptId 또는 gender 변경 시 초기화
   useEffect(() => {
-    if (audioRef.current) audioRef.current.pause()
+    const el = audioRef.current
+    if (el) el.pause()
     setIsPlaying(false)
     setProgress(0)
-    setExt('wav')
+    setExtIndex(0)
   }, [scriptId, gender])
 
   const handleGenderChange = useCallback((g: Gender) => {
@@ -49,14 +55,21 @@ export function AudioPlayer({ scriptId }: Props) {
     setProgress(0)
   }, [])
 
-  // .wav 없으면 .mp3 로 fallback
+  // 포맷 fallback: wav → mp3 → m4a 순으로 시도
+  // fallback 시 재생 중이었으면 새 포맷으로 즉시 재개
   const handleError = useCallback(() => {
-    if (ext === 'wav') {
-      setExt('mp3')
+    const nextIndex = extIndex + 1
+    if (nextIndex < EXTS.length) {
+      setExtIndex(nextIndex)
+      if (isPlaying && audioRef.current) {
+        const newSrc = `/audio/${scriptId}-model-${GENDER_CODE[gender]}.${EXTS[nextIndex]}`
+        audioRef.current.src = newSrc
+        audioRef.current.play().catch(() => setIsPlaying(false))
+      }
     } else {
       setIsPlaying(false)
     }
-  }, [ext])
+  }, [extIndex, isPlaying, scriptId, gender])
 
   const togglePlay = useCallback(() => {
     const el = audioRef.current
