@@ -1,19 +1,42 @@
-import { useState, useRef, useCallback } from 'react'
-import { Play, Pause } from 'lucide-react'
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { Play, Pause, User, Users } from 'lucide-react'
 
 interface Props {
-  scriptId: string
+  scriptId: string   // "{announcementId}-{lang}"  예: "2-3-ko"
 }
 
-type VoiceVersion = 'instructor' | 'voice'
+type Gender = 'male' | 'female'
+
+const GENDER_LABELS: Record<Gender, string> = {
+  male: '남성 보이스',
+  female: '여성 보이스',
+}
+
+const GENDER_CODE: Record<Gender, string> = {
+  male: 'm',
+  female: 'f',
+}
 
 export function AudioPlayer({ scriptId }: Props) {
-  const [version, setVersion] = useState<VoiceVersion>('instructor')
+  const [gender, setGender]     = useState<Gender>('female')
+  const [ext, setExt]           = useState<'wav' | 'mp3'>('wav')
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  const audioSrc = `/audio/${scriptId}-${version}.mp3`
+  const audioSrc = `/audio/${scriptId}-model-${GENDER_CODE[gender]}.${ext}`
+
+  // scriptId 또는 gender 변경 시 재생 상태 초기화
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.pause()
+    setIsPlaying(false)
+    setProgress(0)
+    setExt('wav')
+  }, [scriptId, gender])
+
+  const handleGenderChange = useCallback((g: Gender) => {
+    setGender(g)
+  }, [])
 
   const handleTimeUpdate = useCallback(() => {
     const el = audioRef.current
@@ -25,6 +48,15 @@ export function AudioPlayer({ scriptId }: Props) {
     setIsPlaying(false)
     setProgress(0)
   }, [])
+
+  // .wav 없으면 .mp3 로 fallback
+  const handleError = useCallback(() => {
+    if (ext === 'wav') {
+      setExt('mp3')
+    } else {
+      setIsPlaying(false)
+    }
+  }, [ext])
 
   const togglePlay = useCallback(() => {
     const el = audioRef.current
@@ -42,33 +74,26 @@ export function AudioPlayer({ scriptId }: Props) {
     const el = audioRef.current
     if (!el || !el.duration) return
     const rect = e.currentTarget.getBoundingClientRect()
-    const pct = (e.clientX - rect.left) / rect.width
-    el.currentTime = pct * el.duration
-    setProgress(pct * 100)
-  }, [])
-
-  const handleError = useCallback(() => {
-    setIsPlaying(false)
+    el.currentTime = ((e.clientX - rect.left) / rect.width) * el.duration
+    setProgress((el.currentTime / el.duration) * 100)
   }, [])
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4">
+      {/* 성별 토글 */}
       <div className="flex gap-2 mb-4">
-        {(['instructor', 'voice'] as const).map(v => (
+        {(['female', 'male'] as Gender[]).map(g => (
           <button
-            key={v}
-            onClick={() => {
-              setVersion(v)
-              setIsPlaying(false)
-              setProgress(0)
-            }}
-            className={`px-3 py-1 text-sm rounded-full border transition-colors ${
-              version === v
+            key={g}
+            onClick={() => handleGenderChange(g)}
+            className={`flex items-center gap-1.5 px-3 py-1 text-sm rounded-full border transition-colors ${
+              gender === g
                 ? 'bg-[#E8361E] text-white border-[#E8361E]'
                 : 'text-gray-600 border-gray-300 hover:border-gray-400'
             }`}
           >
-            {v === 'instructor' ? '강사 버전' : '모델 보이스'}
+            {g === 'female' ? <Users size={13} /> : <User size={13} />}
+            {GENDER_LABELS[g]}
           </button>
         ))}
       </div>
@@ -81,6 +106,7 @@ export function AudioPlayer({ scriptId }: Props) {
         onError={handleError}
       />
 
+      {/* 재생 컨트롤 */}
       <div className="flex items-center gap-3">
         <button
           onClick={togglePlay}
@@ -101,7 +127,7 @@ export function AudioPlayer({ scriptId }: Props) {
 
       {progress === 0 && !isPlaying && (
         <p className="text-xs text-gray-400 mt-3 text-center">
-          샘플 보이스 준비 중 — 탭을 눌러 재생해보세요
+          모델 보이스 — 버튼을 눌러 재생해보세요
         </p>
       )}
     </div>
