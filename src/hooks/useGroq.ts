@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import type { FeedbackResult } from '../types'
+import type { FeedbackResult, MarkupSegment, SegmentType } from '../types'
 
 type Lang = 'ko' | 'en' | 'ja' | 'ca'
 
@@ -192,6 +192,159 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
       '最终确认：请确保good、improve、drill、summary、nextStep的所有文本值均为纯中文后再回答。',
     ].join('\n'),
   }
+}
+
+// ── 마크업 생성 ────────────────────────────────────────────────────────────────
+
+const VALID_TYPES = new Set<SegmentType>([
+  'break-long', 'break-short', 'stress', 'slow', 'up', 'down', 'flat', 'normal',
+])
+
+interface RawSegment { text: string; type: string; tip?: string }
+
+function buildMarkupPrompt(plainText: string, lang: Lang, title: string) {
+  if (lang === 'ko') return {
+    system: '당신은 제주항공 기내방송 억양 분석 전문가입니다. 유효한 JSON만 반환하세요.',
+    user: [
+      `[제목] ${title}`,
+      `[방송문]\n${plainText}`,
+      '',
+      '위 방송문을 의미 단위 세그먼트로 나누어 억양 마크업을 생성하세요.',
+      '',
+      '[타입]',
+      '- break-long: 문장 끝/의미 전환 — text 반드시 ""',
+      '- break-short: 절 사이 짧은 호흡 — text 반드시 ""',
+      '- stress: 핵심 정보(항공사명/목적지/안전/시간)',
+      '- slow: 천천히 읽기(감사 인사/안전 지시)',
+      '- up: 올림 억양(인사/기대감)',
+      '- down: 내림 억양(지시 마무리/작별)',
+      '- flat: 평탄(호칭/안내 도입)',
+      '- normal: 일반 텍스트',
+      '',
+      '[규칙] 세그먼트 text를 모두 이어붙이면 원본과 정확히 동일해야 합니다. break 타입은 text가 반드시 "".',
+      '',
+      '{"segments":[{"text":"...","type":"...","tip":"(선택)"},...]} 형식으로만 응답.',
+    ].join('\n'),
+  }
+  if (lang === 'en') return {
+    system: 'You are a Jeju Air cabin announcement intonation specialist. Return ONLY valid JSON.',
+    user: [
+      `[Title] ${title}`,
+      `[Script]\n${plainText}`,
+      '',
+      'Generate intonation markup by splitting the text into meaning-unit segments.',
+      '',
+      '[Types]',
+      '- break-long: end of sentence / major shift — text must be ""',
+      '- break-short: clause pause — text must be ""',
+      '- stress: key info (airline / destination / safety / time)',
+      '- slow: read slowly (thanks / safety instructions)',
+      '- up: rising intonation (greetings / anticipation)',
+      '- down: falling intonation (closing / farewell)',
+      '- flat: level tone (addressing passengers)',
+      '- normal: regular text',
+      '',
+      '[Rule] Concatenated segment texts must equal the original exactly. Break types must have text: "".',
+      '',
+      'Respond ONLY with: {"segments":[{"text":"...","type":"...","tip":"(optional)"},...]}',
+    ].join('\n'),
+  }
+  if (lang === 'ja') return {
+    system: 'あなたは済州航空機内放送のイントネーション専門家です。有効なJSONのみ返してください。',
+    user: [
+      `[タイトル] ${title}`,
+      `[放送文]\n${plainText}`,
+      '',
+      '放送文を意味単位のセグメントに分けてイントネーションマークアップを生成してください。',
+      '',
+      '[タイプ]',
+      '- break-long: 文末/意味転換 — textは必ず""',
+      '- break-short: 節間ポーズ — textは必ず""',
+      '- stress: 重要情報(航空会社/目的地/安全/時間)',
+      '- slow: ゆっくり読む(感謝/安全指示)',
+      '- up: 上昇調(挨拶/期待感)',
+      '- down: 下降調(指示終了/別れ)',
+      '- flat: 平坦(呼びかけ)',
+      '- normal: 通常テキスト',
+      '',
+      '[規則] セグメントのtextを結合すると原文と完全一致すること。breakタイプはtext必ず""。',
+      '',
+      '{"segments":[{"text":"...","type":"...","tip":"(任意)"},...]} のみで回答。',
+    ].join('\n'),
+  }
+  // ca (中文)
+  return {
+    system: '您是济州航空机舱广播语调专家。请仅返回有效的JSON。',
+    user: [
+      `[标题] ${title}`,
+      `[广播文]\n${plainText}`,
+      '',
+      '将广播文按意义单位分段生成语调标记。',
+      '',
+      '[类型]',
+      '- break-long: 句末/意义转换 — text必须为""',
+      '- break-short: 分句停顿 — text必须为""',
+      '- stress: 关键信息(航空公司/目的地/安全/时间)',
+      '- slow: 缓读(致谢/安全指示)',
+      '- up: 升调(问候/期待)',
+      '- down: 降调(指示结束/道别)',
+      '- flat: 平调(称呼/引导)',
+      '- normal: 普通文本',
+      '',
+      '[规则] 所有segment的text拼接后须与原文完全相同。break类型text必须为""。',
+      '',
+      '仅以{"segments":[{"text":"...","type":"...","tip":"(可选)"},...]}格式回答。',
+    ].join('\n'),
+  }
+}
+
+function normalizeSegments(raw: RawSegment[], originalText: string): MarkupSegment[] {
+  const segments: MarkupSegment[] = raw
+    .filter(s => typeof s.text === 'string' && typeof s.type === 'string')
+    .map(s => ({
+      text: s.text,
+      types: [VALID_TYPES.has(s.type as SegmentType) ? (s.type as SegmentType) : 'normal'],
+      ...(s.tip ? { tip: s.tip } : {}),
+    }))
+
+  const joined = segments.map(s => s.text).join('')
+  if (!joined || !originalText) return [{ text: originalText, types: ['normal'] }]
+  const ratio = joined.length / originalText.length
+  if (ratio < 0.7 || ratio > 1.4) return [{ text: originalText, types: ['normal'] }]
+
+  return segments
+}
+
+export async function generateMarkup(
+  plainText: string,
+  lang: Lang,
+  title: string,
+): Promise<MarkupSegment[]> {
+  const { system, user } = buildMarkupPrompt(plainText, lang, title)
+
+  const res = await fetchWithRetry('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${GROQ_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: user },
+      ],
+      temperature: 0.2,
+      response_format: { type: 'json_object' },
+    }),
+  })
+
+  if (!res.ok) throw classifyError(res.status)
+
+  const data = await res.json() as { choices: { message: { content: string } }[] }
+  const parsed = JSON.parse(data.choices[0].message.content) as { segments: RawSegment[] }
+
+  return normalizeSegments(Array.isArray(parsed.segments) ? parsed.segments : [], plainText)
 }
 
 // ── LLaMA 호출 (단일) ─────────────────────────────────────────────────────────

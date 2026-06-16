@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, BookOpen, Volume2, Mic, Zap, CheckSquare, Square } from 'lucide-react'
 import { useAnnouncements } from '../hooks/useAnnouncements'
+import { useMarkup } from '../hooks/useMarkup'
 import { AudioPlayer } from '../components/AudioPlayer'
 import { Recorder } from '../components/Recorder'
 import { FeedbackView } from '../components/FeedbackView'
 import { DrillView } from '../components/DrillView'
 import { JapaneseScript } from '../components/JapaneseScript'
+import { MarkupScript } from '../components/MarkupScript'
 import type { FeedbackResult } from '../types'
 
 type Lang = 'ko' | 'en' | 'ja' | 'ca'
@@ -58,6 +60,17 @@ export function StudyPage() {
   const [feedback, setFeedback] = useState<FeedbackResult | null>(null)
   const [showDrill, setShowDrill] = useState(false)
 
+  // 훅은 조건부 실행 불가 — announcement 로드 전/후 모두 안전하게 처리
+  const announcement = announcements.find(a => a.id === id) ?? null
+  const lang: Lang = (selectedLang ?? announcement?.evalLang[0] ?? 'ko') as Lang
+  const plainText = announcement ? (announcement[lang] ?? '') : ''
+
+  const {
+    segments: markupSegments,
+    loading: markupLoading,
+    error: markupError,
+  } = useMarkup(announcement?.id ?? '', lang, plainText, announcement?.title ?? '')
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -69,8 +82,6 @@ export function StudyPage() {
     )
   }
 
-  const announcement = announcements.find(a => a.id === id)
-
   if (!announcement) {
     return (
       <div className="text-center py-12 text-gray-500">
@@ -81,9 +92,6 @@ export function StudyPage() {
       </div>
     )
   }
-
-  const lang: Lang = selectedLang ?? announcement.evalLang[0]
-  const plainText = announcement[lang] ?? ''
 
   const handleLangChange = (l: Lang) => {
     setSelectedLang(l)
@@ -173,8 +181,25 @@ export function StudyPage() {
             <div className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
               {lang === 'ja' ? (
                 <JapaneseScript text={plainText} />
+              ) : markupLoading ? (
+                <div className="flex items-center gap-2.5 py-2">
+                  <div
+                    className="w-4 h-4 rounded-full animate-spin flex-shrink-0"
+                    style={{ border: '2px solid #E5E5EA', borderTopColor: '#E8361E' }}
+                  />
+                  <span className="text-xs text-[#6E6E73]">억양을 분석하는 중...</span>
+                </div>
+              ) : markupSegments ? (
+                <MarkupScript segments={markupSegments} />
               ) : (
-                <p className="text-sm text-[#1D1D1F] leading-relaxed whitespace-pre-wrap">{plainText}</p>
+                <>
+                  {markupError && (
+                    <p className="text-[10px] text-[#8E8E93] mb-2">
+                      마크업을 불러올 수 없어 원문을 표시합니다.
+                    </p>
+                  )}
+                  <p className="text-sm text-[#1D1D1F] leading-relaxed whitespace-pre-wrap">{plainText}</p>
+                </>
               )}
             </div>
 
