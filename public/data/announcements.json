@@ -54,6 +54,64 @@
       ]
     },
     {
+      "id": "2-2-1",
+      "chapter": 2,
+      "chapterName": "On Ground",
+      "section": "2.2.1",
+      "title": "Door Close (마지막 승객 탑승 직후)",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "2-2-2",
+      "chapter": 2,
+      "chapterName": "On Ground",
+      "section": "2.2.2",
+      "title": "항공기 출발 전 승객 착석 요청",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "2-2-3",
+      "chapter": 2,
+      "chapterName": "On Ground",
+      "section": "2.2.3",
+      "title": "Door Slide CHK",
+      "evalLang": [
+        "en"
+      ],
+      "en": ""
+    },
+    {
+      "id": "2-2-4",
+      "chapter": 2,
+      "chapterName": "On Ground",
+      "section": "2.2.4",
+      "title": "괌_사이판 군집 방지 안내 (Armed Position 변경 후)",
+      "evalLang": [
+        "ko",
+        "en"
+      ],
+      "ko": "",
+      "en": ""
+    },
+    {
       "id": "2-3",
       "chapter": 2,
       "chapterName": "On Ground",
@@ -204,6 +262,36 @@
       ]
     },
     {
+      "id": "2-6-1",
+      "chapter": 2,
+      "chapterName": "On Ground",
+      "section": "2.6.1",
+      "title": "Light Control_ 이륙 전",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "2-6-3",
+      "chapter": 2,
+      "chapterName": "On Ground",
+      "section": "2.6.3",
+      "title": "Take-Off",
+      "evalLang": [
+        "en",
+        "ca"
+      ],
+      "en": "",
+      "ca": ""
+    },
+    {
       "id": "3-1",
       "chapter": 3,
       "chapterName": "En-Route",
@@ -225,6 +313,19 @@
       ]
     },
     {
+      "id": "3-2",
+      "chapter": 3,
+      "chapterName": "En-Route",
+      "section": "3.2",
+      "title": "기내 에티켓 안내",
+      "evalLang": [
+        "ko",
+        "en"
+      ],
+      "ko": "",
+      "en": ""
+    },
+    {
       "id": "3-3",
       "chapter": 3,
       "chapterName": "En-Route",
@@ -243,6 +344,32 @@
         "입국 서류",
         "[국가]"
       ]
+    },
+    {
+      "id": "3-4-1",
+      "chapter": 3,
+      "chapterName": "En-Route",
+      "section": "3.4.1",
+      "title": "사전기내식_에어카페 사전 주문 서비스",
+      "evalLang": [
+        "ko",
+        "en"
+      ],
+      "ko": "",
+      "en": ""
+    },
+    {
+      "id": "3-4-2",
+      "chapter": 3,
+      "chapterName": "En-Route",
+      "section": "3.4.2",
+      "title": "에어카페 + 기내 면세 (PUS-FUK)",
+      "evalLang": [
+        "ko",
+        "en"
+      ],
+      "ko": "",
+      "en": ""
     },
     {
       "id": "3-4-3",
@@ -287,6 +414,23 @@
       ]
     },
     {
+      "id": "3-4-5",
+      "chapter": 3,
+      "chapterName": "En-Route",
+      "section": "3.4.5",
+      "title": "에어카페_기내 면세 미실시",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
       "id": "3-5-1",
       "chapter": 3,
       "chapterName": "En-Route",
@@ -306,6 +450,85 @@
         "기류 불안정",
         "화장실 제한"
       ]
+    },
+    {
+      "id": "3-5-2",
+      "chapter": 3,
+      "chapterName": "En-Route",
+      "section": "3.5.2",
+      "title": "Turbulence 지속 시",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "3-5-3",
+      "chapter": 3,
+      "chapterName": "En-Route",
+      "section": "3.5.3",
+      "title": "Fasten Seatbelt Sign On 이나 흔들리지 않는 경우",
+      "evalLang": [
+        "en",
+        "ja",
+        "ca"
+      ],
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "3-6-1",
+      "chapter": 3,
+      "chapterName": "En-Route",
+      "section": "3.6.1",
+      "title": "서비스리프레시타임(주간중거리인도네시아노선)",
+      "evalLang": [
+        "ko",
+        "en"
+      ],
+      "ko": "",
+      "en": ""
+    },
+    {
+      "id": "3-6-2",
+      "chapter": 3,
+      "chapterName": "En-Route",
+      "section": "3.6.2",
+      "title": "서비스 지연",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "3-6-3",
+      "chapter": 3,
+      "chapterName": "En-Route",
+      "section": "3.6.3",
+      "title": "서비스 불가",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
     },
     {
       "id": "3-7",
@@ -332,6 +555,19 @@
         "화장실 위치",
         "금연"
       ]
+    },
+    {
+      "id": "3-8",
+      "chapter": 3,
+      "chapterName": "En-Route",
+      "section": "3.8",
+      "title": "서비스 종료방송TOD시점 (영어_남)",
+      "evalLang": [
+        "ko",
+        "en"
+      ],
+      "ko": "",
+      "en": ""
     },
     {
       "id": "3-9-1",
@@ -407,6 +643,34 @@
       ]
     },
     {
+      "id": "3-11-1",
+      "chapter": 3,
+      "chapterName": "En-Route",
+      "section": "3.11.1",
+      "title": "Light Control_착륙 전",
+      "evalLang": [
+        "ko",
+        "en",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ca": ""
+    },
+    {
+      "id": "3-11-3",
+      "chapter": 3,
+      "chapterName": "En-Route",
+      "section": "3.11.3",
+      "title": "Landing",
+      "evalLang": [
+        "en",
+        "ca"
+      ],
+      "en": "",
+      "ca": ""
+    },
+    {
       "id": "4-1-1",
       "chapter": 4,
       "chapterName": "After Landing",
@@ -436,6 +700,128 @@
       ]
     },
     {
+      "id": "4-1-2",
+      "chapter": 4,
+      "chapterName": "After Landing",
+      "section": "4.1.2",
+      "title": "Farewell_지연 (15분 초과)",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "4-2-1",
+      "chapter": 4,
+      "chapterName": "After Landing",
+      "section": "4.2.1",
+      "title": "감염병 무료 진단 검사",
+      "evalLang": [
+        "ko",
+        "en"
+      ],
+      "ko": "",
+      "en": ""
+    },
+    {
+      "id": "4-2-2",
+      "chapter": 4,
+      "chapterName": "After Landing",
+      "section": "4.2.2",
+      "title": "중국 세관 건강 신고 안내",
+      "evalLang": [
+        "ko"
+      ],
+      "ko": ""
+    },
+    {
+      "id": "4-3-1",
+      "chapter": 4,
+      "chapterName": "After Landing",
+      "section": "4.3.1",
+      "title": "승객 착석 요청",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "4-3-2",
+      "chapter": 4,
+      "chapterName": "After Landing",
+      "section": "4.3.2",
+      "title": "주기 지연",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "4-4-1",
+      "chapter": 4,
+      "chapterName": "After Landing",
+      "section": "4.4.1",
+      "title": "Boarding Bridge_Steps 연결 대기",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "4-4-2",
+      "chapter": 4,
+      "chapterName": "After Landing",
+      "section": "4.4.2",
+      "title": "Ramp Bus 준비",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "4-4-3",
+      "chapter": 4,
+      "chapterName": "After Landing",
+      "section": "4.4.3",
+      "title": "중국 랜덤 PCR 검사 안내",
+      "evalLang": [
+        "ko",
+        "ca"
+      ],
+      "ko": "",
+      "ca": ""
+    },
+    {
       "id": "4-5",
       "chapter": 4,
       "chapterName": "After Landing",
@@ -462,6 +848,38 @@
         "분실물 확인",
         "다음 탑승 기대"
       ]
+    },
+    {
+      "id": "5-1-1",
+      "chapter": 5,
+      "chapterName": "On Ground IRRE",
+      "section": "5.1.1",
+      "title": "출발 지연_General",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "5-1-2",
+      "chapter": 5,
+      "chapterName": "On Ground IRRE",
+      "section": "5.1.2",
+      "title": "출발 추가 지연",
+      "evalLang": [
+        "en",
+        "ja",
+        "ca"
+      ],
+      "en": "",
+      "ja": "",
+      "ca": ""
     },
     {
       "id": "5-1-3-1",
@@ -503,6 +921,40 @@
         "이륙 허가 대기",
         "이륙 순서"
       ]
+    },
+    {
+      "id": "5-1-4-1",
+      "chapter": 5,
+      "chapterName": "On Ground IRRE",
+      "section": "5.1.4.1",
+      "title": "De-Icing을 위한 항공기 이동",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "5-1-4-2",
+      "chapter": 5,
+      "chapterName": "On Ground IRRE",
+      "section": "5.1.4.2",
+      "title": "De-lcing_Snow Removal",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
     },
     {
       "id": "5-1-5",
@@ -570,6 +1022,23 @@
       ]
     },
     {
+      "id": "5-2-2",
+      "chapter": 5,
+      "chapterName": "On Ground IRRE",
+      "section": "5.2.2",
+      "title": "탑승하지 않은 (자발적 하기) 승객의 수하물 하기",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
       "id": "5-2-3",
       "chapter": 5,
       "chapterName": "On Ground IRRE",
@@ -612,6 +1081,23 @@
       ]
     },
     {
+      "id": "5-4-1",
+      "chapter": 5,
+      "chapterName": "On Ground IRRE",
+      "section": "5.4.1",
+      "title": "Return to Ramp",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
       "id": "5-4-2",
       "chapter": 5,
       "chapterName": "On Ground IRRE",
@@ -631,6 +1117,40 @@
         "추가 안내 예정",
         "착석 대기"
       ]
+    },
+    {
+      "id": "5-5",
+      "chapter": 5,
+      "chapterName": "On Ground IRRE",
+      "section": "5.5",
+      "title": "항공기 재급유",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "5-6-1",
+      "chapter": 5,
+      "chapterName": "On Ground IRRE",
+      "section": "5.6.1",
+      "title": "항공기 교체",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
     },
     {
       "id": "5-6-2",
@@ -654,6 +1174,40 @@
       ]
     },
     {
+      "id": "5-6-3",
+      "chapter": 5,
+      "chapterName": "On Ground IRRE",
+      "section": "5.6.3",
+      "title": "운항, 객실승무원 전원 교체",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "5-7",
+      "chapter": 5,
+      "chapterName": "On Ground IRRE",
+      "section": "5.7",
+      "title": "운항 취소",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
       "id": "5-8-1",
       "chapter": 5,
       "chapterName": "On Ground IRRE",
@@ -673,6 +1227,40 @@
         "안전",
         "착석 대기"
       ]
+    },
+    {
+      "id": "5-8-2",
+      "chapter": 5,
+      "chapterName": "On Ground IRRE",
+      "section": "5.8.2",
+      "title": "이륙 중단_운항승무원에게 연락이 있을 경우",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "5-9",
+      "chapter": 5,
+      "chapterName": "On Ground IRRE",
+      "section": "5.9",
+      "title": "전자기기 사용제한 안내",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
     },
     {
       "id": "6-1",
@@ -697,6 +1285,23 @@
       ]
     },
     {
+      "id": "6-2-1",
+      "chapter": 6,
+      "chapterName": "En-Route IRRE",
+      "section": "6.2.1",
+      "title": "Go-Around_운항승무원에게 연락이 없을 경우",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
       "id": "6-2-2",
       "chapter": 6,
       "chapterName": "En-Route IRRE",
@@ -715,6 +1320,32 @@
         "복행 이유",
         "재착륙 준비"
       ]
+    },
+    {
+      "id": "6-3",
+      "chapter": 6,
+      "chapterName": "En-Route IRRE",
+      "section": "6.3",
+      "title": "회항_General",
+      "evalLang": [
+        "en"
+      ],
+      "en": ""
+    },
+    {
+      "id": "6-3-1",
+      "chapter": 6,
+      "chapterName": "En-Route IRRE",
+      "section": "6.3.1",
+      "title": "회항_General",
+      "evalLang": [
+        "ko",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "ja": "",
+      "ca": ""
     },
     {
       "id": "6-3-2",
@@ -738,6 +1369,104 @@
       ]
     },
     {
+      "id": "6-4-1",
+      "chapter": 6,
+      "chapterName": "En-Route IRRE",
+      "section": "6.4.1",
+      "title": "Doctor Paging",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "6-4-2",
+      "chapter": 6,
+      "chapterName": "En-Route IRRE",
+      "section": "6.4.2",
+      "title": "Doctor Paging 후 상황 진행 안내",
+      "evalLang": [
+        "ja",
+        "ca"
+      ],
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "6-5",
+      "chapter": 6,
+      "chapterName": "En-Route IRRE",
+      "section": "6.5",
+      "title": "금연 안내_기내 흡연 승객 발생 시",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "6-6",
+      "chapter": 6,
+      "chapterName": "En-Route IRRE",
+      "section": "6.6",
+      "title": "화장실 고장",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "6-7-1",
+      "chapter": 6,
+      "chapterName": "En-Route IRRE",
+      "section": "6.7.1",
+      "title": "번개로 인한 충격",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "6-7-2",
+      "chapter": 6,
+      "chapterName": "En-Route IRRE",
+      "section": "6.7.2",
+      "title": "번개로 인한 충격 후 회항",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
       "id": "6-8-1",
       "chapter": 6,
       "chapterName": "En-Route IRRE",
@@ -758,6 +1487,23 @@
         "해결 노력",
         "접촉 금지"
       ]
+    },
+    {
+      "id": "6-8-2",
+      "chapter": 6,
+      "chapterName": "En-Route IRRE",
+      "section": "6.8.2",
+      "title": "반려동물 (Pet) Irre. 상황 진압 후",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
     },
     {
       "id": "6-9",
@@ -785,6 +1531,68 @@
       ]
     },
     {
+      "id": "7-1",
+      "chapter": 7,
+      "chapterName": "After Landing IRRE",
+      "section": "7.1",
+      "title": "임시 착륙 후 Farewell",
+      "evalLang": [
+        "en"
+      ],
+      "en": ""
+    },
+    {
+      "id": "7-1-1",
+      "chapter": 7,
+      "chapterName": "After Landing IRRE",
+      "section": "7.1.1",
+      "title": "Farewell 임시 착륙",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "7-1-2",
+      "chapter": 7,
+      "chapterName": "After Landing IRRE",
+      "section": "7.1.2",
+      "title": "임시 착륙 후 주기장 도착",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "7-1-3",
+      "chapter": 7,
+      "chapterName": "After Landing IRRE",
+      "section": "7.1.3",
+      "title": "목적지까지 육로수송 결정 후 안내",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
       "id": "7-2",
       "chapter": 7,
       "chapterName": "After Landing IRRE",
@@ -807,6 +1615,249 @@
       ]
     },
     {
+      "id": "7-3-1",
+      "chapter": 7,
+      "chapterName": "After Landing IRRE",
+      "section": "7.3.1",
+      "title": "우선 하기 승객 안내",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "7-3-2",
+      "chapter": 7,
+      "chapterName": "After Landing IRRE",
+      "section": "7.3.2",
+      "title": "순차적 하기 안내",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "7-4-1",
+      "chapter": 7,
+      "chapterName": "After Landing IRRE",
+      "section": "7.4.1",
+      "title": "여권 또는 탑승권 준비 안내",
+      "evalLang": [
+        "en",
+        "ja",
+        "ca"
+      ],
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "7-4-2",
+      "chapter": 7,
+      "chapterName": "After Landing IRRE",
+      "section": "7.4.2",
+      "title": "기내 여권 검사",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "7-4-3",
+      "chapter": 7,
+      "chapterName": "After Landing IRRE",
+      "section": "7.4.3",
+      "title": "기내 검역 실시",
+      "evalLang": [
+        "en",
+        "ja",
+        "ca"
+      ],
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "7-4-4",
+      "chapter": 7,
+      "chapterName": "After Landing IRRE",
+      "section": "7.4.4",
+      "title": "기내 체온 측정",
+      "evalLang": [
+        "ca"
+      ],
+      "ca": ""
+    },
+    {
+      "id": "8-1",
+      "chapter": 8,
+      "chapterName": "Vocabulary",
+      "section": "8.1",
+      "title": "목적지 및 공항 공식 명칭",
+      "evalLang": [
+        "ja",
+        "ca"
+      ],
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "8-2-1",
+      "chapter": 8,
+      "chapterName": "Vocabulary",
+      "section": "8.2.1",
+      "title": "승객 관련_서류",
+      "evalLang": [
+        "ja",
+        "ca"
+      ],
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "8-2-2",
+      "chapter": 8,
+      "chapterName": "Vocabulary",
+      "section": "8.2.2",
+      "title": "공항 운영_CIQ_당국 요청",
+      "evalLang": [
+        "ja",
+        "ca"
+      ],
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "8-2-3",
+      "chapter": 8,
+      "chapterName": "Vocabulary",
+      "section": "8.2.3",
+      "title": "연결편_주기장_급유",
+      "evalLang": [
+        "ja",
+        "ca"
+      ],
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "8-2-4",
+      "chapter": 8,
+      "chapterName": "Vocabulary",
+      "section": "8.2.4",
+      "title": "관제탑_활주로",
+      "evalLang": [
+        "ja",
+        "ca"
+      ],
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "8-2-5",
+      "chapter": 8,
+      "chapterName": "Vocabulary",
+      "section": "8.2.5",
+      "title": "항공기 정비",
+      "evalLang": [
+        "ja",
+        "ca"
+      ],
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "8-2-6",
+      "chapter": 8,
+      "chapterName": "Vocabulary",
+      "section": "8.2.6",
+      "title": "기상 관련",
+      "evalLang": [
+        "ja",
+        "ca"
+      ],
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "8-2-7",
+      "chapter": 8,
+      "chapterName": "Vocabulary",
+      "section": "8.2.7",
+      "title": "기타",
+      "evalLang": [
+        "ja",
+        "ca"
+      ],
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "8-2-8",
+      "chapter": 8,
+      "chapterName": "Vocabulary",
+      "section": "8.2.8",
+      "title": "비정상_비상_긴급 상황",
+      "evalLang": [
+        "ja",
+        "ca"
+      ],
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "별표1",
+      "chapter": 0,
+      "chapterName": "별표",
+      "section": "별표1",
+      "title": "정정 안내 방송",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "별표2",
+      "chapter": 0,
+      "chapterName": "별표",
+      "section": "별표2",
+      "title": "Passenger Paging",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
       "id": "별표3-분실물",
       "chapter": 0,
       "chapterName": "별표",
@@ -826,6 +1877,131 @@
         "[분실물]",
         "승무원 통보"
       ]
+    },
+    {
+      "id": "별표4-1",
+      "chapter": 0,
+      "chapterName": "별표",
+      "section": "별표4-1",
+      "title": "감압",
+      "evalLang": [
+        "ko",
+        "en"
+      ],
+      "ko": "",
+      "en": ""
+    },
+    {
+      "id": "별표4-2",
+      "chapter": 0,
+      "chapterName": "별표",
+      "section": "별표4-2",
+      "title": "감압 발생 후 객실 점검",
+      "evalLang": [
+        "ko",
+        "en"
+      ],
+      "ko": "",
+      "en": ""
+    },
+    {
+      "id": "별표5-1",
+      "chapter": 0,
+      "chapterName": "별표",
+      "section": "별표5-1",
+      "title": "기내 화재 및 연기",
+      "evalLang": [
+        "ko",
+        "en"
+      ],
+      "ko": "",
+      "en": ""
+    },
+    {
+      "id": "별표5-2",
+      "chapter": 0,
+      "chapterName": "별표",
+      "section": "별표5-2",
+      "title": "기내 화재 및 연기 진압 후",
+      "evalLang": [
+        "ko",
+        "en"
+      ],
+      "ko": "",
+      "en": ""
+    },
+    {
+      "id": "별표6",
+      "chapter": 0,
+      "chapterName": "별표",
+      "section": "별표6",
+      "title": "슬라이드 오작동",
+      "evalLang": [
+        "ko",
+        "en"
+      ],
+      "ko": "",
+      "en": ""
+    },
+    {
+      "id": "별표7-1",
+      "chapter": 0,
+      "chapterName": "별표",
+      "section": "별표7-1",
+      "title": "난동 승객",
+      "evalLang": [
+        "ko",
+        "en"
+      ],
+      "ko": "",
+      "en": ""
+    },
+    {
+      "id": "별표7-2",
+      "chapter": 0,
+      "chapterName": "별표",
+      "section": "별표7-2",
+      "title": "난동 승객",
+      "evalLang": [
+        "ko",
+        "en"
+      ],
+      "ko": "",
+      "en": ""
+    },
+    {
+      "id": "별표8-1",
+      "chapter": 0,
+      "chapterName": "별표",
+      "section": "별표8-1",
+      "title": "비정상_긴급_비상 상황 발생 시",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
+    },
+    {
+      "id": "별표8-2",
+      "chapter": 0,
+      "chapterName": "별표",
+      "section": "별표8-2",
+      "title": "비정상_긴급_비상 상황 처리 후",
+      "evalLang": [
+        "ko",
+        "en",
+        "ja",
+        "ca"
+      ],
+      "ko": "",
+      "en": "",
+      "ja": "",
+      "ca": ""
     }
   ]
 }

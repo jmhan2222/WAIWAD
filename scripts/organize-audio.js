@@ -48,12 +48,17 @@ function folderToGender(name) {
 
 /**
  * 파일명에서 섹션 문자열 추출.
- * - 별표:  "[별표 3] 분실물..."  → "별표3"
- * - 일반:  "2.4.1 Safety..."    → "2.4.1"
- *          "3.10 Approach..."   → "3.10"
+ * - 별표(서브번호): "[별표 4] 4-1. 감압..."  → "별표4-1"
+ * - 별표:           "[별표 3] 분실물..."      → "별표3"
+ * - 일반:           "2.4.1 Safety..."         → "2.4.1"
+ *                   "3.10 Approach..."        → "3.10"
  */
 function extractSection(filename) {
-  // 별표 패턴
+  // 별표 + 서브번호 패턴: [별표 N] N-M. 제목
+  const starSubMatch = filename.match(/^\[별표\s*(\d+)\]\s+\1-(\d+)\./)
+  if (starSubMatch) return `별표${starSubMatch[1]}-${starSubMatch[2]}`
+
+  // 별표 기본 패턴
   const starMatch = filename.match(/^\[별표\s*(\d+)\]/)
   if (starMatch) return `별표${starMatch[1]}`
 
@@ -72,7 +77,7 @@ function scanDir(dir) {
     const fullPath = path.join(dir, entry.name)
     if (entry.isDirectory()) {
       results.push(...scanDir(fullPath))
-    } else if (/\.(wav|mp3)$/i.test(entry.name)) {
+    } else if (/\.(wav|mp3|m4a)$/i.test(entry.name)) {
       results.push(fullPath)
     }
   }

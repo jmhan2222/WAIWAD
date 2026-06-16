@@ -3,3 +3,6 @@ dist
 .DS_Store
 .env.local
 .env*.local
+
+# 원본 음성 파일 원본 (로컬 백업용, 커밋 제외)
+public/audio/raw-upload/
