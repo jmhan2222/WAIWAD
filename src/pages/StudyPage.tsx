@@ -37,11 +37,11 @@ function ChecklistItem({ label }: { label: string }) {
     <label className="flex items-start gap-3 cursor-pointer">
       <button onClick={() => setChecked(v => !v)} className="flex-shrink-0 mt-0.5">
         {checked
-          ? <CheckSquare size={16} className="text-[#1D9E75]" />
-          : <Square size={16} className="text-gray-300" />
+          ? <CheckSquare size={16} className="text-[#34C759]" />
+          : <Square size={16} className="text-[#8E8E93]" />
         }
       </button>
-      <span className={`text-sm ${checked ? 'text-[#1D9E75] line-through' : 'text-gray-700'}`}>
+      <span className={`text-sm leading-snug ${checked ? 'text-[#34C759] line-through' : 'text-[#1D1D1F]'}`}>
         {label}
       </span>
     </label>
@@ -118,13 +118,13 @@ export function StudyPage() {
       <div className="flex items-center gap-2">
         <button
           onClick={() => navigate('/')}
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-[#E5E5EA] hover:bg-[#F5F5F7] transition-colors flex-shrink-0"
         >
-          <ChevronLeft size={20} className="text-gray-600" />
+          <ChevronLeft size={18} className="text-[#1D1D1F]" />
         </button>
         <div className="flex-1 min-w-0">
-          <span className="text-xs text-gray-400 font-mono">{announcement.section}</span>
-          <p className="font-semibold text-gray-900 truncate">{announcement.title}</p>
+          <span className="text-[10px] text-[#6E6E73] font-mono">{announcement.section}</span>
+          <p className="font-semibold text-[#1D1D1F] truncate text-sm">{announcement.title}</p>
         </div>
       </div>
 
@@ -137,8 +137,8 @@ export function StudyPage() {
               onClick={() => handleLangChange(l)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                 lang === l
-                  ? 'bg-[#185FA5] text-white border-[#185FA5]'
-                  : 'text-gray-500 border-gray-200 hover:border-gray-400 bg-white'
+                  ? 'bg-[#007AFF] text-white border-[#007AFF]'
+                  : 'text-[#6E6E73] border-[#E5E5EA] hover:border-[#8E8E93] bg-white'
               }`}
             >
               {LANG_LABELS[l]}
@@ -147,16 +147,16 @@ export function StudyPage() {
         </div>
       )}
 
-      {/* Content tabs */}
-      <div className="flex border-b border-gray-200 overflow-x-auto">
+      {/* Content tabs — pill style */}
+      <div className="bg-[#E5E5EA] rounded-xl p-1 flex gap-1 overflow-x-auto scrollbar-hide">
         {TABS.map(tab => (
           <button
             key={tab.id}
             onClick={() => handleTabChange(tab.id)}
-            className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium whitespace-nowrap border-b-2 transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium whitespace-nowrap rounded-lg transition-all flex-shrink-0 ${
               activeTab === tab.id
-                ? 'border-[#E8361E] text-[#E8361E]'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'bg-white text-[#1D1D1F] shadow-sm'
+                : 'text-[#6E6E73] hover:text-[#1D1D1F]'
             }`}
           >
             {tab.icon}
@@ -169,25 +169,25 @@ export function StudyPage() {
       <div className="pb-6">
         {/* Tab 1: 방송문 학습 */}
         {activeTab === 'study' && (
-          <div className="space-y-4">
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="space-y-3">
+            <div className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
               {lang === 'ja' ? (
                 <JapaneseScript text={plainText} />
               ) : (
-                <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{plainText}</p>
+                <p className="text-sm text-[#1D1D1F] leading-relaxed whitespace-pre-wrap">{plainText}</p>
               )}
             </div>
 
             {announcement.checkpoints && announcement.checkpoints.length > 0 && (
-              <div className="bg-gray-50 rounded-xl border border-gray-100 p-4">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">체크포인트</p>
-                <div className="space-y-2">
+              <div className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
+                <p className="text-[10px] font-semibold text-[#6E6E73] uppercase tracking-widest mb-3">체크포인트</p>
+                <div className="space-y-2.5">
                   {announcement.checkpoints.map((cp, i) => (
                     <div key={i} className="flex gap-2.5">
-                      <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#E8361E] text-white text-[10px] flex items-center justify-center font-bold mt-0.5">
+                      <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#1D1D1F] text-white text-[10px] flex items-center justify-center font-bold mt-0.5">
                         {i + 1}
                       </span>
-                      <p className="text-sm text-gray-700 leading-relaxed">{cp}</p>
+                      <p className="text-sm text-[#1D1D1F] leading-relaxed">{cp}</p>
                     </div>
                   ))}
                 </div>
@@ -199,7 +199,7 @@ export function StudyPage() {
                 markComplete(announcement.id, 'study')
                 handleTabChange('audio')
               }}
-              className="w-full py-3 bg-[#E8361E] text-white rounded-xl font-medium hover:bg-[#c82d18] transition-colors"
+              className="w-full py-3.5 bg-[#E8361E] text-white rounded-2xl font-semibold text-sm hover:bg-[#c82d18] transition-all active:scale-[0.98]"
             >
               다음 — 샘플 보이스 듣기
             </button>
@@ -208,14 +208,14 @@ export function StudyPage() {
 
         {/* Tab 2: 샘플 보이스 */}
         {activeTab === 'audio' && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <AudioPlayer scriptId={`${announcement.id}-${lang}`} />
-            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-              <p className="text-xs text-gray-400 mb-2">방송문 전체</p>
+            <div className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
+              <p className="text-[10px] text-[#6E6E73] font-medium mb-2 uppercase tracking-widest">방송문 전체</p>
               {lang === 'ja' ? (
                 <JapaneseScript text={plainText} />
               ) : (
-                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{plainText}</p>
+                <p className="text-sm text-[#1D1D1F] leading-relaxed whitespace-pre-wrap">{plainText}</p>
               )}
             </div>
             <button
@@ -223,7 +223,7 @@ export function StudyPage() {
                 markComplete(announcement.id, 'audio')
                 handleTabChange('record')
               }}
-              className="w-full py-3 bg-[#E8361E] text-white rounded-xl font-medium hover:bg-[#c82d18] transition-colors"
+              className="w-full py-3.5 bg-[#E8361E] text-white rounded-2xl font-semibold text-sm hover:bg-[#c82d18] transition-all active:scale-[0.98]"
             >
               다음 — 직접 녹음하기
             </button>
@@ -248,12 +248,12 @@ export function StudyPage() {
 
         {/* Tab 4: 개선 학습 */}
         {activeTab === 'drill' && feedback && showDrill && (
-          <div className="space-y-5">
+          <div className="space-y-4">
             <DrillView result={feedback} onRetry={handleRetry} />
 
             {announcement.checkpoints && announcement.checkpoints.length > 0 && (
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">방송 체크포인트</p>
+              <div className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
+                <p className="text-[10px] font-semibold text-[#6E6E73] uppercase tracking-widest mb-3">방송 체크포인트</p>
                 <div className="space-y-2.5">
                   {announcement.checkpoints.map((cp, i) => (
                     <ChecklistItem key={i} label={cp} />
@@ -265,12 +265,12 @@ export function StudyPage() {
         )}
 
         {activeTab === 'drill' && (!feedback || !showDrill) && (
-          <div className="text-center py-12 text-gray-400">
-            <Zap size={32} className="mx-auto mb-3 opacity-30" />
-            <p className="text-sm">먼저 녹음 피드백을 완료하면<br />개인 맞춤 드릴이 생성됩니다.</p>
+          <div className="text-center py-14 text-[#6E6E73]">
+            <Zap size={32} className="mx-auto mb-3 opacity-25" />
+            <p className="text-sm leading-relaxed">먼저 녹음 피드백을 완료하면<br />개인 맞춤 드릴이 생성됩니다.</p>
             <button
               onClick={() => handleTabChange('record')}
-              className="mt-4 text-[#E8361E] text-sm font-medium"
+              className="mt-4 text-[#E8361E] text-sm font-semibold"
             >
               녹음 탭으로 이동 →
             </button>

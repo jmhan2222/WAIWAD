@@ -92,20 +92,20 @@ export function AudioPlayer({ scriptId }: Props) {
   }, [])
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
+    <div className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
       {/* 성별 토글 */}
       <div className="flex gap-2 mb-4">
         {(['female', 'male'] as Gender[]).map(g => (
           <button
             key={g}
             onClick={() => handleGenderChange(g)}
-            className={`flex items-center gap-1.5 px-3 py-1 text-sm rounded-full border transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border transition-all active:scale-95 ${
               gender === g
                 ? 'bg-[#E8361E] text-white border-[#E8361E]'
-                : 'text-gray-600 border-gray-300 hover:border-gray-400'
+                : 'text-[#6E6E73] border-[#E5E5EA] hover:border-[#8E8E93] bg-white'
             }`}
           >
-            {g === 'female' ? <Users size={13} /> : <User size={13} />}
+            {g === 'female' ? <Users size={12} /> : <User size={12} />}
             {GENDER_LABELS[g]}
           </button>
         ))}
@@ -123,12 +123,12 @@ export function AudioPlayer({ scriptId }: Props) {
       <div className="flex items-center gap-3">
         <button
           onClick={togglePlay}
-          className="w-10 h-10 flex items-center justify-center rounded-full bg-[#E8361E] text-white flex-shrink-0 hover:bg-[#c82d18] transition-colors"
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-[#E8361E] text-white flex-shrink-0 hover:bg-[#c82d18] transition-all active:scale-95"
         >
-          {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+          {isPlaying ? <Pause size={15} /> : <Play size={15} />}
         </button>
         <div
-          className="flex-1 h-2 bg-gray-200 rounded-full cursor-pointer"
+          className="flex-1 h-1.5 bg-[#E5E5EA] rounded-full cursor-pointer"
           onClick={handleSeek}
         >
           <div
@@ -139,7 +139,7 @@ export function AudioPlayer({ scriptId }: Props) {
       </div>
 
       {progress === 0 && !isPlaying && (
-        <p className="text-xs text-gray-400 mt-3 text-center">
+        <p className="text-xs text-[#8E8E93] mt-3 text-center">
           모델 보이스 — 버튼을 눌러 재생해보세요
         </p>
       )}

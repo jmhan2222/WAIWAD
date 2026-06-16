@@ -77,54 +77,56 @@ export function DrillView({ result, onRetry }: Props) {
   const allChecked = checked.every(Boolean)
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <div>
-        <h3 className="font-semibold text-gray-900">{drill.title}</h3>
-        <p className="text-xs text-gray-400 mt-0.5">
-          약점 부문: <span className="font-medium text-[#E8361E]">{result.categories[result.weakest]?.improve}</span>
+        <h3 className="font-semibold text-[#1D1D1F]">{drill.title}</h3>
+        <p className="text-xs text-[#6E6E73] mt-0.5 leading-relaxed">
+          {result.categories[result.weakest]?.improve}
         </p>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {drill.exercises.map((ex, i) => (
-          <div key={i} className="bg-white rounded-xl border border-gray-200 p-4">
+          <div key={i} className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
             <div className="flex gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#E8361E] text-white text-xs flex items-center justify-center font-semibold">
+              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#1D1D1F] text-white text-xs flex items-center justify-center font-semibold">
                 {i + 1}
               </span>
-              <p className="text-sm text-gray-700 leading-relaxed">{ex}</p>
+              <p className="text-sm text-[#1D1D1F] leading-relaxed">{ex}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-        <p className="text-xs text-gray-500 font-medium mb-3">자가 체크리스트</p>
-        <div className="space-y-2.5">
+      <div className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
+        <p className="text-xs font-semibold text-[#6E6E73] mb-3">자가 체크리스트</p>
+        <div className="space-y-3">
           {drill.checklist.map((item, i) => (
             <label key={i} className="flex items-start gap-3 cursor-pointer">
               <input
                 type="checkbox"
                 checked={checked[i]}
                 onChange={() => toggle(i)}
-                className="mt-0.5 w-4 h-4 rounded accent-[#1D9E75] flex-shrink-0"
+                className="mt-0.5 w-4 h-4 rounded accent-[#34C759] flex-shrink-0"
               />
-              <span className={`text-sm ${checked[i] ? 'text-[#1D9E75] line-through' : 'text-gray-700'}`}>
+              <span className={`text-sm leading-snug ${checked[i] ? 'text-[#34C759] line-through' : 'text-[#1D1D1F]'}`}>
                 {item}
               </span>
             </label>
           ))}
         </div>
         {allChecked && (
-          <p className="text-xs text-[#1D9E75] font-medium mt-3">모든 항목 완료! 다시 녹음해보세요.</p>
+          <p className="text-xs text-[#34C759] font-medium mt-3">
+            모든 항목 완료! 이제 다시 녹음해보세요. 훨씬 나아질 거예요.
+          </p>
         )}
       </div>
 
       <button
         onClick={onRetry}
-        className="w-full py-3 bg-[#E8361E] text-white rounded-xl font-medium hover:bg-[#c82d18] transition-colors flex items-center justify-center gap-2"
+        className="w-full py-3.5 bg-[#E8361E] text-white rounded-2xl font-semibold text-sm transition-all active:scale-[0.98] hover:bg-[#c82d18] flex items-center justify-center gap-2"
       >
-        <RotateCcw size={16} />
+        <RotateCcw size={15} />
         다시 녹음하기
       </button>
     </div>

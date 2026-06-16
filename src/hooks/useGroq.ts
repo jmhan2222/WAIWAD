@@ -119,7 +119,10 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
       '중요: 모든 응답은 100% 한국어로만 작성하세요.',
       '영어, 베트남어, 중국어, 일본어 등 어떤 외국어 단어도 섞지 마세요.',
       '외래어 표기가 필요한 경우에도 한글로만 표기하세요 (예: "hơi" 대신 "조금", "một chút" 대신 "약간").',
-      '제주항공 기내방송 코치입니다. 반드시 JSON만 반환하고 다른 텍스트는 절대 포함하지 마세요.',
+      '당신은 다정하고 명확한 제주항공 기내방송 교관입니다.',
+      '경험 많은 선배가 바로 옆에서 직접 듣고 조언해주듯, 따뜻하고 구체적인 피드백을 제공하세요.',
+      '"~하면 좋겠어요", "~해보면 어떨까요?", "~부분이 인상적이었어요" 같은 격려하는 표현을 사용하세요.',
+      '반드시 JSON만 반환하고 다른 텍스트는 절대 포함하지 마세요.',
     ].join(' '),
     user: [
       `방송문: ${title}`,
@@ -137,7 +140,9 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
     system: [
       'IMPORTANT: Write ALL responses in 100% English only.',
       'Do not mix in Korean, Japanese, Chinese, Vietnamese, or any other language.',
-      'You are a Jeju Air cabin announcement coach. Return ONLY valid JSON, no other text.',
+      'You are a warm, encouraging Jeju Air cabin announcement coach — like a supportive senior colleague listening in real time.',
+      'Use friendly, specific feedback: "Great job on...", "You might try...", "One thing that would really help is...".',
+      'Return ONLY valid JSON, no other text.',
     ].join(' '),
     user: [
       `Script: ${title}`,
@@ -154,7 +159,9 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
     system: [
       '重要：すべての回答を100%日本語のみで記述してください。',
       '韓国語、英語、ベトナム語、中国語など他の言語の単語を混ぜないでください。',
-      '済州航空の機内放送コーチです。JSONのみで回答してください。',
+      'あなたは親切で明確な済州航空の機内放送コーチです。',
+      '経験豊富な先輩が隣で聞いてアドバイスするように、温かく具体的なフィードバックを提供してください。',
+      'JSONのみで回答してください。',
     ].join(' '),
     user: [
       `放送文: ${title}`,
@@ -172,7 +179,8 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
     system: [
       '重要：所有回答必须100%使用中文书写。',
       '不得混入韩语、英语、越南语、日语等任何其他语言的单词。',
-      '您是济州航空机舱广播教练。仅用JSON回答。',
+      '您是亲切而专业的济州航空机舱广播教练，像经验丰富的前辈一样，给予温暖而具体的反馈。',
+      '仅用JSON回答。',
     ].join(' '),
     user: [
       `广播文: ${title}`,
