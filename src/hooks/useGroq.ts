@@ -42,14 +42,64 @@ async function fetchWithRetry(url: string, options: RequestInit): Promise<Respon
 
     if (res.status !== 429) return res
 
-    // 429: 마지막 시도였으면 에러 throw
     if (attempt === RETRY_DELAYS.length) throw classifyError(429)
 
     await sleep(RETRY_DELAYS[attempt])
   }
-  // unreachable — TypeScript를 위해
   throw classifyError(429)
 }
+
+// ── 언어 혼입 감지 ────────────────────────────────────────────────────────────
+
+// 항공 약어 등 허용 영문 목록
+const KO_ALLOW_LIST = new Set([
+  'CIQ', 'PUS', 'FUK', 'GMP', 'ICN', 'DP', 'ATC', 'DEMO', 'AI',
+  'JSON', 'OK', 'VIP', 'PA', 'FCL',
+])
+
+// 3자 이상 연속 알파벳이 허용 목록에 없으면 외국어 혼입으로 판정
+function detectForeignWords(text: string, lang: Lang): boolean {
+  if (lang === 'ko') {
+    const matches = text.match(/[a-zA-Z]{3,}/g)
+    if (!matches) return false
+    return matches.some(m => !KO_ALLOW_LIST.has(m.toUpperCase()))
+  }
+  if (lang === 'ja') {
+    // 일본어 응답에 한글이 섞이면 혼입으로 판정
+    return /[가-힣]/.test(text)
+  }
+  if (lang === 'ca') {
+    // 중국어 응답에 한글이 섞이면 혼입으로 판정
+    return /[가-힣]/.test(text)
+  }
+  return false
+}
+
+function extractTextFields(result: FeedbackResult): string[] {
+  const { categories, summary, nextStep } = result
+  return [
+    categories.fluency.good,
+    categories.fluency.improve,
+    categories.fluency.drill,
+    categories.voice.good,
+    categories.voice.improve,
+    categories.voice.drill,
+    categories.intonation.good,
+    categories.intonation.improve,
+    categories.intonation.drill,
+    categories.pronunciation.good,
+    categories.pronunciation.improve,
+    categories.pronunciation.drill,
+    summary,
+    nextStep,
+  ]
+}
+
+function hasForeignMixture(result: FeedbackResult, lang: Lang): boolean {
+  return extractTextFields(result).some(field => detectForeignWords(field, lang))
+}
+
+// ── 프롬프트 빌더 ─────────────────────────────────────────────────────────────
 
 function buildPrompt(lang: Lang, title: string, originalText: string, transcription: string) {
   const jsonSchema = `{
@@ -65,30 +115,108 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
 }`
 
   if (lang === 'ko') return {
-    system: '제주항공 기내방송 코치입니다. 반드시 JSON만 반환하고 다른 텍스트는 절대 포함하지 마세요.',
-    user: `방송문: ${title}\n평가기준: 유창성(30점)/분위기목소리(25점)/억양(25점)/발음(20점)\n원본: ${originalText}\n전사본: ${transcription}\nJSON만 응답:\n${jsonSchema}`,
+    system: [
+      '중요: 모든 응답은 100% 한국어로만 작성하세요.',
+      '영어, 베트남어, 중국어, 일본어 등 어떤 외국어 단어도 섞지 마세요.',
+      '외래어 표기가 필요한 경우에도 한글로만 표기하세요 (예: "hơi" 대신 "조금", "một chút" 대신 "약간").',
+      '제주항공 기내방송 코치입니다. 반드시 JSON만 반환하고 다른 텍스트는 절대 포함하지 마세요.',
+    ].join(' '),
+    user: [
+      `방송문: ${title}`,
+      `평가기준: 유창성(30점)/분위기목소리(25점)/억양(25점)/발음(20점)`,
+      `원본: ${originalText}`,
+      `전사본: ${transcription}`,
+      `JSON만 응답:\n${jsonSchema}`,
+      '',
+      '다시 한번 확인: 응답에 한국어가 아닌 단어가 하나라도 포함되면 안 됩니다.',
+      'JSON의 모든 텍스트 값(good, improve, drill, summary, nextStep)이 순수 한국어 문장인지 확인 후 응답하세요.',
+    ].join('\n'),
   }
 
   if (lang === 'en') return {
-    system: 'You are a Jeju Air cabin announcement coach. Return ONLY valid JSON, no other text.',
-    user: `Script: ${title}\nCriteria: Fluency(30pts)/Voice&Atmosphere(25pts)/Intonation(25pts)/Pronunciation(20pts)\nOriginal: ${originalText}\nTranscription: ${transcription}\nRespond in JSON only (use 상/중/하 for scores):\n${jsonSchema}`,
+    system: [
+      'IMPORTANT: Write ALL responses in 100% English only.',
+      'Do not mix in Korean, Japanese, Chinese, Vietnamese, or any other language.',
+      'You are a Jeju Air cabin announcement coach. Return ONLY valid JSON, no other text.',
+    ].join(' '),
+    user: [
+      `Script: ${title}`,
+      `Criteria: Fluency(30pts)/Voice&Atmosphere(25pts)/Intonation(25pts)/Pronunciation(20pts)`,
+      `Original: ${originalText}`,
+      `Transcription: ${transcription}`,
+      `Respond in JSON only (use 상/중/하 for scores):\n${jsonSchema}`,
+      '',
+      'Final check: Every text value (good, improve, drill, summary, nextStep) must be in English only. No other language.',
+    ].join('\n'),
   }
 
   if (lang === 'ja') return {
-    system: '済州航空の機内放送コーチです。JSONのみで回答してください。',
-    user: `放送文: ${title}\n評価基準: 流暢さ(30点)/雰囲気・声(25点)/イントネーション(25点)/発音(25点)\n元の文: ${originalText}\n書き起こし: ${transcription}\nJSONのみで回答 (스코어는 상/중/하 사용):\n${jsonSchema}`,
+    system: [
+      '重要：すべての回答を100%日本語のみで記述してください。',
+      '韓国語、英語、ベトナム語、中国語など他の言語の単語を混ぜないでください。',
+      '済州航空の機内放送コーチです。JSONのみで回答してください。',
+    ].join(' '),
+    user: [
+      `放送文: ${title}`,
+      `評価基準: 流暢さ(30点)/雰囲気・声(25点)/イントネーション(25点)/発音(20点)`,
+      `元の文: ${originalText}`,
+      `書き起こし: ${transcription}`,
+      `JSONのみで回答 (スコアは상/중/하を使用):\n${jsonSchema}`,
+      '',
+      '最終確認：good、improve、drill、summary、nextStepのすべてのテキスト値が日本語のみであることを確認してから回答してください。',
+    ].join('\n'),
   }
 
+  // ca (中文)
   return {
-    system: '您是济州航空机舱广播教练。仅用JSON回答。',
-    user: `广播文: ${title}\n评分标准: 流利度(30分)/氛围声音(25分)/语调(25分)/发音(20分)\n原文: ${originalText}\n转录: ${transcription}\n仅用JSON回答 (评分使用상/중/하):\n${jsonSchema}`,
+    system: [
+      '重要：所有回答必须100%使用中文书写。',
+      '不得混入韩语、英语、越南语、日语等任何其他语言的单词。',
+      '您是济州航空机舱广播教练。仅用JSON回答。',
+    ].join(' '),
+    user: [
+      `广播文: ${title}`,
+      `评分标准: 流利度(30分)/氛围声音(25分)/语调(25分)/发音(20分)`,
+      `原文: ${originalText}`,
+      `转录: ${transcription}`,
+      `仅用JSON回答 (评分使用상/중/하):\n${jsonSchema}`,
+      '',
+      '最终确认：请确保good、improve、drill、summary、nextStep的所有文本值均为纯中文后再回答。',
+    ].join('\n'),
   }
 }
 
+// ── LLaMA 호출 (단일) ─────────────────────────────────────────────────────────
+
+async function callLlama(system: string, user: string): Promise<FeedbackResult> {
+  const res = await fetchWithRetry('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${GROQ_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: user },
+      ],
+      temperature: 0.3,
+      response_format: { type: 'json_object' },
+    }),
+  })
+
+  if (!res.ok) throw classifyError(res.status)
+  const data = await res.json() as { choices: { message: { content: string } }[] }
+  return JSON.parse(data.choices[0].message.content) as FeedbackResult
+}
+
+// ── React Hook ────────────────────────────────────────────────────────────────
+
 export function useGroq() {
   const [isTranscribing, setIsTranscribing] = useState(false)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [isAnalyzing, setIsAnalyzing]       = useState(false)
+  const [error, setError]                   = useState<string | null>(null)
 
   const transcribeAudio = useCallback(async (audioBlob: Blob, lang: Lang): Promise<string> => {
     setIsTranscribing(true)
@@ -129,26 +257,43 @@ export function useGroq() {
     try {
       const { system, user } = buildPrompt(lang, scriptName, originalText, transcription)
 
-      const res = await fetchWithRetry('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${GROQ_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [
-            { role: 'system', content: system },
-            { role: 'user', content: user },
-          ],
-          temperature: 0.3,
-          response_format: { type: 'json_object' },
-        }),
-      })
+      // 1차 시도
+      let result = await callLlama(system, user)
 
-      if (!res.ok) throw classifyError(res.status)
-      const data = await res.json() as { choices: { message: { content: string } }[] }
-      return JSON.parse(data.choices[0].message.content) as FeedbackResult
+      // 언어 혼입 감지 → 1회 재시도
+      if (hasForeignMixture(result, lang)) {
+        console.warn('[useGroq] 언어 혼입 감지 — 재시도합니다.', lang)
+        result = await callLlama(system, user)
+
+        // 재시도 후에도 혼입이 있으면 해당 필드에 오류 표시
+        if (hasForeignMixture(result, lang)) {
+          console.warn('[useGroq] 재시도 후에도 언어 혼입 감지 — 필드 오류 표시')
+          const FALLBACK = '[표현 오류 - 다시 시도해주세요]'
+          const fix = (field: string) =>
+            detectForeignWords(field, lang) ? FALLBACK : field
+
+          const fixCategory = (cat: FeedbackResult['categories']['fluency']) => ({
+            ...cat,
+            good:    fix(cat.good),
+            improve: fix(cat.improve),
+            drill:   fix(cat.drill),
+          })
+
+          result = {
+            ...result,
+            categories: {
+              fluency:       fixCategory(result.categories.fluency),
+              voice:         fixCategory(result.categories.voice),
+              intonation:    fixCategory(result.categories.intonation),
+              pronunciation: fixCategory(result.categories.pronunciation),
+            },
+            summary:  fix(result.summary),
+            nextStep: fix(result.nextStep),
+          }
+        }
+      }
+
+      return result
     } catch (e) {
       const err = e instanceof GroqError ? e : new GroqError('네트워크 오류가 발생했습니다. 연결을 확인해 주세요.', false)
       setError(err.message)
