@@ -6,7 +6,7 @@ import type { FeedbackResult } from '../types'
 
 interface Props {
   plain: string
-  lang: 'ko' | 'en'
+  lang: 'ko' | 'en' | 'ja' | 'ca'
   scriptName: string
   onFeedback: (result: FeedbackResult) => void
 }

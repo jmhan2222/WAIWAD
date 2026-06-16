@@ -1,21 +1,91 @@
 import { useState, useCallback } from 'react'
 import type { FeedbackResult } from '../types'
 
+type Lang = 'ko' | 'en' | 'ja' | 'ca'
+
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY
+
+const WHISPER_LANG: Record<Lang, string> = {
+  ko: 'ko',
+  en: 'en',
+  ja: 'ja',
+  ca: 'zh',
+}
+
+function buildPrompt(lang: Lang, title: string, originalText: string, transcription: string): { system: string; user: string } {
+  const jsonSchema = `{
+  "categories": {
+    "fluency": {"score":"상|중|하","good":"내용","improve":"내용","drill":"내용"},
+    "voice": {"score":"상|중|하","good":"내용","improve":"내용","drill":"내용"},
+    "intonation": {"score":"상|중|하","good":"내용","improve":"내용","drill":"내용"},
+    "pronunciation": {"score":"상|중|하","good":"내용","improve":"내용","drill":"내용"}
+  },
+  "summary": "전체 총평",
+  "weakest": "fluency|voice|intonation|pronunciation",
+  "nextStep": "다음 집중 포인트"
+}`
+
+  if (lang === 'ko') {
+    return {
+      system: '제주항공 기내방송 코치입니다. 반드시 JSON만 반환하고 다른 텍스트는 절대 포함하지 마세요.',
+      user: `방송문: ${title}
+평가기준: 유창성(30점)/분위기목소리(25점)/억양(25점)/발음(20점)
+원본: ${originalText}
+전사본: ${transcription}
+JSON만 응답:
+${jsonSchema}`,
+    }
+  }
+
+  if (lang === 'en') {
+    return {
+      system: 'You are a Jeju Air cabin announcement coach. Return ONLY valid JSON, no other text.',
+      user: `Script: ${title}
+Criteria: Fluency(30pts)/Voice&Atmosphere(25pts)/Intonation(25pts)/Pronunciation(20pts)
+Original: ${originalText}
+Transcription: ${transcription}
+Respond in JSON only (use 상/중/하 for scores):
+${jsonSchema}`,
+    }
+  }
+
+  if (lang === 'ja') {
+    return {
+      system: '済州航空の機内放送コーチです。JSONのみで回答してください。',
+      user: `放送文: ${title}
+評価基準: 流暢さ(30点)/雰囲気・声(25点)/イントネーション(25点)/発音(25点)
+元の文: ${originalText}
+書き起こし: ${transcription}
+JSONのみで回答 (스코어는 상/중/하 사용):
+${jsonSchema}`,
+    }
+  }
+
+  // ca (Cantonese/Chinese)
+  return {
+    system: '您是济州航空机舱广播教练。仅用JSON回答。',
+    user: `广播文: ${title}
+评分标准: 流利度(30分)/氛围声音(25分)/语调(25分)/发音(20分)
+原文: ${originalText}
+转录: ${transcription}
+仅用JSON回答 (评分使用상/중/하):
+${jsonSchema}`,
+  }
+}
 
 export function useGroq() {
   const [isTranscribing, setIsTranscribing] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const transcribeAudio = useCallback(async (audioBlob: Blob, lang: 'ko' | 'en'): Promise<string> => {
+  const transcribeAudio = useCallback(async (audioBlob: Blob, lang: Lang): Promise<string> => {
     setIsTranscribing(true)
     setError(null)
     try {
       const formData = new FormData()
       formData.append('file', audioBlob, 'recording.webm')
       formData.append('model', 'whisper-large-v3')
-      formData.append('language', lang === 'ko' ? 'ko' : 'en')
+      formData.append('language', WHISPER_LANG[lang])
       formData.append('response_format', 'json')
 
       const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
@@ -35,57 +105,13 @@ export function useGroq() {
   const generateFeedback = useCallback(async (
     originalText: string,
     transcription: string,
-    lang: 'ko' | 'en',
+    lang: Lang,
     scriptName: string,
   ): Promise<FeedbackResult> => {
     setIsAnalyzing(true)
     setError(null)
     try {
-      const systemPrompt = lang === 'ko'
-        ? `당신은 항공사 객실승무원 기내방송 훈련 전문 코치입니다. 반드시 JSON만 반환하고 다른 텍스트는 절대 포함하지 마세요.`
-        : `You are an expert airline cabin crew PA announcement training coach. Return ONLY valid JSON, no other text.`
-
-      const userPrompt = lang === 'ko'
-        ? `방송문 제목: ${scriptName}
-원본 방송문:
-${originalText}
-
-훈련생 발음 전사본:
-${transcription}
-
-아래 JSON 형식으로만 평가해주세요. 평가기준: 유창성(30점)/분위기목소리(25점)/억양(25점)/발음(20점). 각 부문을 상/중/하로 평가.
-
-{
-  "categories": {
-    "fluency": {"score":"상|중|하","good":"잘한점","improve":"개선점","drill":"연습법"},
-    "voice": {"score":"상|중|하","good":"잘한점","improve":"개선점","drill":"연습법"},
-    "intonation": {"score":"상|중|하","good":"잘한점","improve":"개선점","drill":"연습법"},
-    "pronunciation": {"score":"상|중|하","good":"잘한점","improve":"개선점","drill":"연습법"}
-  },
-  "summary": "전체 총평",
-  "weakest": "fluency|voice|intonation|pronunciation",
-  "nextStep": "다음 집중 포인트"
-}`
-        : `Script: ${scriptName}
-Original text:
-${originalText}
-
-Trainee transcription:
-${transcription}
-
-Evaluate in this exact JSON format only. Criteria: Fluency(30)/Voice(25)/Intonation(25)/Pronunciation(20). Score each as high/medium/low.
-
-{
-  "categories": {
-    "fluency": {"score":"high|medium|low","good":"what was good","improve":"what to improve","drill":"drill method"},
-    "voice": {"score":"high|medium|low","good":"what was good","improve":"what to improve","drill":"drill method"},
-    "intonation": {"score":"high|medium|low","good":"what was good","improve":"what to improve","drill":"drill method"},
-    "pronunciation": {"score":"high|medium|low","good":"what was good","improve":"what to improve","drill":"drill method"}
-  },
-  "summary": "overall summary",
-  "weakest": "fluency|voice|intonation|pronunciation",
-  "nextStep": "next focus point"
-}`
+      const { system, user } = buildPrompt(lang, scriptName, originalText, transcription)
 
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
@@ -96,8 +122,8 @@ Evaluate in this exact JSON format only. Criteria: Fluency(30)/Voice(25)/Intonat
         body: JSON.stringify({
           model: 'llama-3.3-70b-versatile',
           messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt },
+            { role: 'system', content: system },
+            { role: 'user', content: user },
           ],
           temperature: 0.3,
           response_format: { type: 'json_object' },

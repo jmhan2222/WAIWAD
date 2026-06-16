@@ -22,29 +22,32 @@ export interface LearningPoint {
   desc: string
 }
 
-export interface Script {
-  id: string
-  number: string
-  name: string
-  quarter: 1 | 2 | 3 | 4
-  lang: 'ko' | 'en'
-  plain: string
-  segments: MarkupSegment[]
-  points: LearningPoint[]
+export interface AnnouncementData {
+  revVersion: string
+  updatedAt: string
+  announcements: Announcement[]
 }
 
 export interface Announcement {
   id: string
-  number: string
-  name: string
-  quarter: 1 | 2 | 3 | 4
-  scripts: Script[]
+  chapter: number
+  chapterName: string
+  section: string
+  title: string
+  evalLang: ('ko' | 'en' | 'ja' | 'ca')[]
+  quarters_ko_en?: string[]
+  quarters_ja_ca?: string[]
+  ko?: string
+  en?: string
+  ja?: string
+  ca?: string
+  checkpoints?: string[]
 }
 
 export type FeedbackScore = '상' | '중' | '하'
 
-export interface FeedbackCategory {
-  score: FeedbackScore
+export interface CategoryFeedback {
+  score: '상' | '중' | '하'
   good: string
   improve: string
   drill: string
@@ -52,10 +55,10 @@ export interface FeedbackCategory {
 
 export interface FeedbackResult {
   categories: {
-    fluency: FeedbackCategory
-    voice: FeedbackCategory
-    intonation: FeedbackCategory
-    pronunciation: FeedbackCategory
+    fluency: CategoryFeedback
+    voice: CategoryFeedback
+    intonation: CategoryFeedback
+    pronunciation: CategoryFeedback
   }
   summary: string
   weakest: 'fluency' | 'voice' | 'intonation' | 'pronunciation'
