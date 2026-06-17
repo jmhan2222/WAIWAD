@@ -103,21 +103,22 @@ interface ValidationResult {
   isValid: boolean
   reason: 'too_short' | 'unrelated_content' | 'mostly_silent' | 'ok'
   partial: boolean
+  lengthRatio: number
 }
 
 function validateTranscription(transcription: string, originalText: string): ValidationResult {
   const trimmed = transcription.trim()
 
   if (trimmed.length < 10) {
-    return { isValid: false, reason: 'mostly_silent', partial: false }
+    return { isValid: false, reason: 'mostly_silent', partial: false, lengthRatio: 0 }
   }
 
   const lengthRatio = trimmed.length / (originalText.trim().length || 1)
   if (lengthRatio < 0.3) {
-    return { isValid: false, reason: 'too_short', partial: false }
+    return { isValid: false, reason: 'too_short', partial: false, lengthRatio }
   }
 
-  return { isValid: true, reason: 'ok', partial: lengthRatio < 0.7 }
+  return { isValid: true, reason: 'ok', partial: lengthRatio < 0.7, lengthRatio }
 }
 
 async function checkRelevance(originalText: string, transcription: string): Promise<boolean> {
@@ -144,11 +145,15 @@ async function checkRelevance(originalText: string, transcription: string): Prom
         max_tokens: 10,
       }),
     })
-    if (!res.ok) return true // 실패 시 관대하게 통과
+    if (!res.ok) {
+      console.warn('[checkRelevance] API 실패로 fail-open 처리됨', res.status)
+      return true
+    }
     const data = await res.json() as { choices: { message: { content: string } }[] }
     return !data.choices[0].message.content.trim().toUpperCase().includes('UNRELATED')
-  } catch {
-    return true // 네트워크 오류 시 통과
+  } catch (e) {
+    console.warn('[checkRelevance] API 실패로 fail-open 처리됨', e)
+    return true
   }
 }
 
@@ -554,7 +559,7 @@ export function useGroq() {
         }
       }
 
-      return { ...result, ...(validation.partial ? { partial: true } : {}) }
+      return { ...result, ...(validation.partial ? { partial: Math.round(validation.lengthRatio * 100) } : {}) }
     } catch (e) {
       if (e instanceof ValidationError) throw e
       const err = e instanceof GroqError ? e : new GroqError('네트워크 오류가 발생했습니다. 연결을 확인해 주세요.', false)

@@ -69,7 +69,8 @@ export function FeedbackView({ result, onDrill }: Props) {
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 flex gap-3 items-start">
           <AlertCircle size={15} className="text-amber-500 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-amber-800 leading-relaxed">
-            방송문의 일부만 읽으신 것 같아요. 읽으신 부분에 대해서만 피드백을 드릴게요.
+            방송문의 일부만 읽으신 것 같아요. 읽으신 부분에 대해서만 피드백을 드릴게요.{' '}
+            전체 방송문 중 약 {result.partial}% 정도를 읽으신 것으로 보여요.{' '}
             전체 평가를 받으려면 방송문 전체를 읽어주세요.
           </p>
         </div>
