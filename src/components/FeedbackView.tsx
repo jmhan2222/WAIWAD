@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronUp, MessageSquare, Search, ArrowRight, AlertCircle } from 'lucide-react'
+import { ChevronDown, ChevronUp, MessageSquare, Search, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react'
 import type { FeedbackResult } from '../types'
 
 interface Props {
   result: FeedbackResult
   onDrill: () => void
+  onReeval?: (category: string) => Promise<void>
+  isReanalyzing?: boolean
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -55,9 +57,20 @@ function CircleGauge({ score }: { score: string }) {
   )
 }
 
-export function FeedbackView({ result, onDrill }: Props) {
+export function FeedbackView({ result, onDrill, onReeval, isReanalyzing }: Props) {
   const { categories, summary, weakest, nextStep } = result
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+  const [reevalingKey, setReevalingKey] = useState<string | null>(null)
+
+  const handleReeval = async (key: string) => {
+    if (!onReeval || reevalingKey) return
+    setReevalingKey(key)
+    try {
+      await onReeval(key)
+    } finally {
+      setReevalingKey(null)
+    }
+  }
 
   const toggle = (key: string) =>
     setExpanded(prev => ({ ...prev, [key]: !prev[key] }))
@@ -97,6 +110,33 @@ export function FeedbackView({ result, onDrill }: Props) {
       <div className="space-y-2">
         {(Object.entries(categories) as [keyof typeof categories, typeof categories[keyof typeof categories]][]).map(([key, cat]) => {
           const isOpen = !!expanded[key]
+          const needsReeval = result.needsReeval?.includes(key) ?? false
+          const isThisReevaling = reevalingKey === key
+
+          if (needsReeval) {
+            return (
+              <div key={key} className="bg-white rounded-2xl border border-amber-200 overflow-hidden">
+                <div className="flex items-center gap-3 px-4 py-3.5">
+                  <CircleGauge score={cat.score} />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-[#1D1D1F] text-sm">{CATEGORY_LABELS[key]}</p>
+                    <p className="text-xs text-amber-600 mt-0.5">이 부분은 다시 평가가 필요해요</p>
+                  </div>
+                  {onReeval && (
+                    <button
+                      onClick={() => handleReeval(key)}
+                      disabled={!!reevalingKey || isReanalyzing}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors disabled:opacity-50 flex-shrink-0"
+                    >
+                      <RefreshCw size={11} className={isThisReevaling ? 'animate-spin' : ''} />
+                      {isThisReevaling ? '평가 중…' : '재평가'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            )
+          }
+
           return (
             <div key={key} className="bg-white rounded-2xl border border-[#E5E5EA] overflow-hidden">
               <button

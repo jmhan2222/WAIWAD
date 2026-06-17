@@ -181,13 +181,14 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
   if (lang === 'ko') return {
     system: [
       '중요: 모든 응답은 100% 한국어로만 작성하세요.',
-      '영어, 베트남어, 중국어, 일본어 등 어떤 외국어 단어도 섞지 마세요.',
-      '외래어 표기가 필요한 경우에도 한글로만 표기하세요.',
+      '영어, 베트남어, 중국어, 일본어, 한자, 병음 등 어떤 외국어/외래 문자도 섞지 마세요.',
       '당신은 다정하지만 명확한 제주항공 기내방송 코치입니다.',
       '모호한 피드백("조금 더 좋아질 것 같아요")은 절대 금지합니다.',
       'passengerImpression: 승객 입장에서 이 방송을 들었을 때 어떤 느낌인지 구체적 상황으로 묘사.',
-      'specificIssue: "어디서" 무엇이 어땠는지 막연한 평가어 대신 관찰된 사실 위주로.',
-      'actionGuide: 추상적 조언 금지, 숫자나 구체적 동작 포함. 나쁜 예: "더 친절하게 말해보세요" / 좋은 예: "문장 끝 바랍니다에서 0.5초 더 끌어보세요".',
+      'specificIssue: 반드시 원본 방송문에서 실제 문구를 인용부호("  ")로 표시하세요. 나쁜 예: "문장 끝부분에서 음조가 내려갔습니다" / 좋은 예: "\"보관하시기 바랍니다\"에서 음조가 평탄하게 끝났어요".',
+      'actionGuide: 원본 방송문의 실제 문구를 인용하면서 구체적 동작 지침 제시. 나쁜 예: "억양을 올리는 연습을 합니다" / 좋은 예: "\"바랍니다\"의 \"다\" 음절에서 음을 살짝 올려보세요".',
+      'pronunciation 카테고리 특별 지시: 한자·병음·IPA 표기 절대 금지. 어떤 음소/받침/모음이 문제인지 원본의 실제 단어를 인용하여 한글로만 설명하세요.',
+      'intonation 카테고리 특별 지시: 원본 방송문에서 최소 2개의 실제 문장/구절을 인용하고, 각각 어떤 억양 패턴(상승/하강/평탄)이 적합한지 설명하세요.',
       'drills: weakest 카테고리의 actionGuide를 바탕으로 실현 가능한 연습 3개. 방송문 전체 암기를 요구하는 드릴은 절대 포함하지 마세요.',
       '반드시 JSON만 반환하고 다른 텍스트는 절대 포함하지 마세요.',
     ].join(' '),
@@ -205,13 +206,13 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
 
   if (lang === 'en') return {
     system: [
-      '중요: 평가 대상 발화가 영어여도, 모든 피드백 텍스트(passengerImpression, specificIssue, actionGuide, summary, nextStep, drills)는 반드시 100% 한국어로만 작성하세요.',
-      '예: "Great job" 대신 "발음이 좋았어요", "Focus on intonation" 대신 "억양에 집중해보세요".',
+      '중요: 평가 대상 발화가 영어여도, 모든 피드백 텍스트는 반드시 100% 한국어로만 작성하세요. 한자·병음 금지.',
       '당신은 명확하고 구체적인 제주항공 기내방송 코치입니다.',
-      '모호한 피드백("조금 더 좋아질 것 같아요") 금지.',
-      'passengerImpression: 승객 관점에서 이 방송을 들었을 때의 구체적 인상, 한국어로.',
-      'specificIssue: 어디서 무엇이 어땠는지 관찰 사실 위주, 한국어로.',
-      'actionGuide: 숫자나 구체적 동작 포함한 행동 지침, 한국어로.',
+      '모호한 피드백 금지.',
+      'specificIssue: 원본 방송문에서 실제 문구를 인용부호로 표시하세요. 나쁜 예: "문장 끝부분에서 음조가 내려갔습니다" / 좋은 예: "please fasten에서 음조가 평탄하게 끝났어요".',
+      'actionGuide: 원본 문구를 인용하면서 구체적 동작 지침 제시, 한국어로.',
+      'pronunciation 카테고리: 한자·병음·IPA 절대 금지. 원본 단어를 인용하여 한글로만 발음 설명.',
+      'intonation 카테고리: 원본에서 최소 2개 실제 문장 인용, 각각 상승/하강/평탄 패턴 설명.',
       'drills: weakest 카테고리 기반 실현 가능한 연습 3개, 암기 요구 금지, 한국어로.',
       '유효한 JSON만 반환하세요.',
     ].join(' '),
@@ -228,13 +229,13 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
 
   if (lang === 'ja') return {
     system: [
-      '중요: 평가 대상 발화가 일본어여도, 모든 피드백 텍스트(passengerImpression, specificIssue, actionGuide, summary, nextStep, drills)는 반드시 100% 한국어로만 작성하세요.',
-      '일본어 피드백 금지. 모든 설명은 한국어로 작성합니다.',
+      '중요: 평가 대상 발화가 일본어여도, 모든 피드백 텍스트는 반드시 100% 한국어로만 작성하세요. 한자·병음 금지.',
       '당신은 명확하고 구체적인 제주항공 기내방송 코치입니다.',
       '모호한 피드백 금지.',
-      'passengerImpression: 승객 관점에서 이 방송을 들었을 때의 구체적 인상, 한국어로.',
-      'specificIssue: 어디서 무엇이 어땠는지 관찰 사실 위주, 한국어로.',
-      'actionGuide: 숫자나 구체적 동작 포함한 행동 지침, 한국어로.',
+      'specificIssue: 원본 방송문에서 실제 문구를 인용부호로 표시하세요, 한국어로 설명.',
+      'actionGuide: 원본 문구를 인용하면서 구체적 동작 지침 제시, 한국어로.',
+      'pronunciation 카테고리: 한자·병음·IPA 절대 금지. 원본 단어를 인용하여 한글로만 발음 설명.',
+      'intonation 카테고리: 원본에서 최소 2개 실제 문장 인용, 각각 상승/하강/평탄 패턴 설명.',
       'drills: weakest 카테고리 기반 실현 가능한 연습 3개, 암기 요구 금지, 한국어로.',
       '유효한 JSON만 반환하세요.',
     ].join(' '),
@@ -252,13 +253,13 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
   // ca (中文)
   return {
     system: [
-      '중요: 평가 대상 발화가 중국어여도, 모든 피드백 텍스트(passengerImpression, specificIssue, actionGuide, summary, nextStep, drills)는 반드시 100% 한국어로만 작성하세요.',
-      '중국어 피드백 금지. 모든 설명은 한국어로 작성합니다.',
+      '중요: 평가 대상 발화가 중국어여도, 모든 피드백 텍스트는 반드시 100% 한국어로만 작성하세요. 한자·병음 절대 금지.',
       '당신은 명확하고 구체적인 제주항공 기내방송 코치입니다.',
       '모호한 피드백 금지.',
-      'passengerImpression: 승객 관점에서 이 방송을 들었을 때의 구체적 인상, 한국어로.',
-      'specificIssue: 어디서 무엇이 어땠는지 관찰 사실 위주, 한국어로.',
-      'actionGuide: 숫자나 구체적 동작 포함한 행동 지침, 한국어로.',
+      'specificIssue: 원본 방송문에서 실제 문구를 인용부호로 표시하세요, 한국어로 설명.',
+      'actionGuide: 원본 문구를 인용하면서 구체적 동작 지침 제시, 한국어로.',
+      'pronunciation 카테고리: 한자·병음·IPA 절대 금지. 원본 단어를 인용하여 한글로만 발음 설명.',
+      'intonation 카테고리: 원본에서 최소 2개 실제 문장 인용, 각각 상승/하강/평탄 패턴 설명.',
       'drills: weakest 카테고리 기반 실현 가능한 연습 3개, 암기 요구 금지, 한국어로.',
       '유효한 JSON만 반환하세요.',
     ].join(' '),
@@ -431,7 +432,7 @@ export async function generateMarkup(
 
 // ── LLaMA 호출 (단일) ─────────────────────────────────────────────────────────
 
-async function callLlama(system: string, user: string): Promise<FeedbackResult> {
+async function callLlama(system: string, user: string, temperature = 0.3): Promise<FeedbackResult> {
   const res = await fetchWithRetry('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -444,7 +445,7 @@ async function callLlama(system: string, user: string): Promise<FeedbackResult> 
         { role: 'system', content: system },
         { role: 'user', content: user },
       ],
-      temperature: 0.3,
+      temperature,
       response_format: { type: 'json_object' },
     }),
   })
@@ -453,6 +454,9 @@ async function callLlama(system: string, user: string): Promise<FeedbackResult> 
   const data = await res.json() as { choices: { message: { content: string } }[] }
   return JSON.parse(data.choices[0].message.content) as FeedbackResult
 }
+
+// 한자 혼입 재시도 시 추가되는 강화 지시문
+const ANTI_KANJI = '방금 응답에 한자/한문이 포함되어 거부되었습니다. 한자를 단 한 글자도 쓰지 마세요. 발음을 설명할 때도 한글로만 표기하세요. 예: "认真" 대신 "진지하게", "发音" 대신 "발음"으로.'
 
 // ── React Hook ────────────────────────────────────────────────────────────────
 
@@ -524,39 +528,30 @@ export function useGroq() {
         )
       }
 
-      // ── 3단계: 피드백 생성 ────────────────────────────────────────────────────
+      // ── 3단계: 피드백 생성 (최대 3회 재시도) ────────────────────────────────────
       const { system, user } = buildPrompt(lang, scriptName, originalText, transcription)
-      let result = await callLlama(system, user)
+      let result = await callLlama(system, user, 0.3)
 
-      // 한국어 혼입 감지 → 1회 재시도
       if (hasForeignMixture(result)) {
-        console.warn('[useGroq] 언어 혼입 감지 — 재시도합니다.')
-        result = await callLlama(system, user)
+        console.warn('[generateFeedback] 1차 언어 혼입 감지 — 2차 재시도 (anti-kanji 프롬프트)')
+        result = await callLlama(system + ' ' + ANTI_KANJI, user, 0.3)
+      }
 
-        if (hasForeignMixture(result)) {
-          console.warn('[useGroq] 재시도 후에도 언어 혼입 감지 — 필드 오류 표시')
-          const FALLBACK = '[표현 오류 - 다시 시도해주세요]'
-          const fix = (field: string) => detectForeignWords(field) ? FALLBACK : field
+      if (hasForeignMixture(result)) {
+        console.warn('[generateFeedback] 2차 언어 혼입 감지 — 3차 재시도 (temperature 0.1)')
+        result = await callLlama(system + ' ' + ANTI_KANJI, user, 0.1)
+      }
 
-          const fixCategory = (cat: FeedbackResult['categories']['fluency']) => ({
-            ...cat,
-            passengerImpression: fix(cat.passengerImpression),
-            specificIssue:       fix(cat.specificIssue),
-            actionGuide:         fix(cat.actionGuide),
-          })
-
-          result = {
-            ...result,
-            categories: {
-              fluency:       fixCategory(result.categories.fluency),
-              voice:         fixCategory(result.categories.voice),
-              intonation:    fixCategory(result.categories.intonation),
-              pronunciation: fixCategory(result.categories.pronunciation),
-            },
-            summary:  fix(result.summary),
-            nextStep: fix(result.nextStep),
-          }
+      if (hasForeignMixture(result)) {
+        console.error('[generateFeedback] 3회 재시도 모두 실패 — needsReeval 처리', result)
+        const needsReeval: string[] = []
+        for (const key of ['fluency', 'voice', 'intonation', 'pronunciation'] as const) {
+          const cat = result.categories[key]
+          const hasIssue = [cat.passengerImpression, cat.specificIssue, cat.actionGuide]
+            .some(f => detectForeignWords(f))
+          if (hasIssue) needsReeval.push(key)
         }
+        if (needsReeval.length > 0) result = { ...result, needsReeval }
       }
 
       return { ...result, ...(validation.partial ? { partial: Math.round(validation.lengthRatio * 100) } : {}) }
@@ -570,5 +565,64 @@ export function useGroq() {
     }
   }, [])
 
-  return { transcribeAudio, generateFeedback, isTranscribing, isAnalyzing, error }
+  const regenerateCategory = useCallback(async (
+    category: keyof FeedbackResult['categories'],
+    originalText: string,
+    transcription: string,
+    lang: Lang,
+    scriptName: string,
+  ): Promise<import('../types').CategoryFeedback> => {
+    setIsAnalyzing(true)
+    try {
+      const CATEGORY_KO: Record<string, string> = {
+        fluency: '유창성', voice: '분위기·목소리', intonation: '억양', pronunciation: '발음',
+      }
+      const catSchema = `{"score":"상|중|하","passengerImpression":"...","specificIssue":"...","actionGuide":"..."}`
+      const { system } = buildPrompt(lang, scriptName, originalText, transcription)
+      const strongSystem = system + ' ' + ANTI_KANJI
+
+      const userPrompt = [
+        `방송문: ${scriptName}`,
+        `원본: ${originalText}`,
+        `전사본: ${transcription}`,
+        `"${CATEGORY_KO[category] ?? category}" 카테고리만 평가하여 JSON으로 응답:`,
+        catSchema,
+      ].join('\n')
+
+      const callForCat = async (temperature: number) => {
+        const res = await fetchWithRetry('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${GROQ_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            messages: [
+              { role: 'system', content: strongSystem },
+              { role: 'user', content: userPrompt },
+            ],
+            temperature,
+            response_format: { type: 'json_object' },
+          }),
+        })
+        if (!res.ok) throw classifyError(res.status)
+        const data = await res.json() as { choices: { message: { content: string } }[] }
+        return JSON.parse(data.choices[0].message.content) as import('../types').CategoryFeedback
+      }
+
+      let cat = await callForCat(0.3)
+      const hasIssue = (c: import('../types').CategoryFeedback) =>
+        [c.passengerImpression, c.specificIssue, c.actionGuide].some(f => detectForeignWords(f))
+
+      if (hasIssue(cat)) cat = await callForCat(0.1)
+
+      return cat
+    } catch (e) {
+      const err = e instanceof GroqError ? e : new GroqError('재평가 중 오류가 발생했습니다.', false)
+      setError(err.message)
+      throw err
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }, [])
+
+  return { transcribeAudio, generateFeedback, regenerateCategory, isTranscribing, isAnalyzing, error }
 }

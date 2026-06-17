@@ -65,4 +65,5 @@ export interface FeedbackResult {
   nextStep: string
   drills?: string[]
   partial?: number
+  needsReeval?: string[]
 }

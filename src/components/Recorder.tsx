@@ -8,7 +8,7 @@ interface Props {
   plain: string
   lang: 'ko' | 'en' | 'ja' | 'ca'
   scriptName: string
-  onFeedback: (result: FeedbackResult) => void
+  onFeedback: (result: FeedbackResult, transcription: string) => void
 }
 
 interface RecorderError {
@@ -36,7 +36,7 @@ export function Recorder({ plain, lang, scriptName, onFeedback }: Props) {
     try {
       const transcription = await transcribeAudio(audioBlob, lang)
       const result = await generateFeedback(plain, transcription, lang, scriptName)
-      onFeedback(result)
+      onFeedback(result, transcription)
     } catch (e) {
       if (e instanceof ValidationError) {
         setRecorderError({ message: e.message, isRateLimit: false, validationReason: e.reason })

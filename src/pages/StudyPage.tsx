@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, BookOpen, Volume2, Mic, Zap, CheckSquare, Square } from 'lucide-react'
 import { useAnnouncements } from '../hooks/useAnnouncements'
 import { useMarkup } from '../hooks/useMarkup'
+import { useGroq } from '../hooks/useGroq'
 import { AudioPlayer } from '../components/AudioPlayer'
 import { Recorder } from '../components/Recorder'
 import { FeedbackView } from '../components/FeedbackView'
@@ -58,7 +59,10 @@ export function StudyPage() {
   const [activeTab, setActiveTab] = useState<Tab>('study')
   const [selectedLang, setSelectedLang] = useState<Lang | null>(null)
   const [feedback, setFeedback] = useState<FeedbackResult | null>(null)
+  const [transcription, setTranscription] = useState<string | null>(null)
   const [showDrill, setShowDrill] = useState(false)
+
+  const { regenerateCategory, isAnalyzing: isReanalyzing } = useGroq()
 
   // 훅은 조건부 실행 불가 — announcement 로드 전/후 모두 안전하게 처리
   const announcement = announcements.find(a => a.id === id) ?? null
@@ -96,6 +100,7 @@ export function StudyPage() {
   const handleLangChange = (l: Lang) => {
     setSelectedLang(l)
     setFeedback(null)
+    setTranscription(null)
     setShowDrill(false)
   }
 
@@ -104,9 +109,33 @@ export function StudyPage() {
     if (tab !== 'record') setShowDrill(false)
   }
 
-  const handleFeedback = (result: FeedbackResult) => {
+  const handleFeedback = (result: FeedbackResult, tx: string) => {
     setFeedback(result)
+    setTranscription(tx)
     markComplete(announcement.id, 'record')
+  }
+
+  const handleReeval = async (category: string) => {
+    if (!feedback || !transcription) return
+    try {
+      const updatedCat = await regenerateCategory(
+        category as keyof FeedbackResult['categories'],
+        plainText,
+        transcription,
+        lang,
+        announcement.title,
+      )
+      setFeedback(prev => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          categories: { ...prev.categories, [category]: updatedCat },
+          needsReeval: (prev.needsReeval ?? []).filter(c => c !== category),
+        }
+      })
+    } catch {
+      // error already shown via useGroq error state
+    }
   }
 
   const handleDrill = () => {
@@ -117,6 +146,7 @@ export function StudyPage() {
   const handleRetry = () => {
     setActiveTab('record')
     setFeedback(null)
+    setTranscription(null)
     setShowDrill(false)
   }
 
@@ -270,7 +300,12 @@ export function StudyPage() {
                 onFeedback={handleFeedback}
               />
             ) : (
-              <FeedbackView result={feedback} onDrill={handleDrill} />
+              <FeedbackView
+                result={feedback}
+                onDrill={handleDrill}
+                onReeval={handleReeval}
+                isReanalyzing={isReanalyzing}
+              />
             )}
           </div>
         )}
