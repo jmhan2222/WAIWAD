@@ -1,25 +1,24 @@
 import { useState } from 'react'
 import { RotateCcw } from 'lucide-react'
-import type { FeedbackResult } from '../types'
+import type { FeedbackResult, MarkupSegment } from '../types'
+import { MarkupScript } from './MarkupScript'
+import { AudioPlayer } from './AudioPlayer'
+import { MiniRecorder } from './MiniRecorder'
 
 interface Props {
   result: FeedbackResult
   onRetry: () => void
+  scriptId: string
+  segments: MarkupSegment[] | null
+  announcementId: string
 }
 
 const CATEGORY_TITLES: Record<string, string> = {
-  fluency: '유창성 집중 드릴',
-  voice: '분위기·목소리 집중 드릴',
-  intonation: '억양 집중 드릴',
-  pronunciation: '발음 집중 드릴',
+  fluency: '유창성',
+  voice: '분위기·목소리',
+  intonation: '억양',
+  pronunciation: '발음',
 }
-
-const FALLBACK_DRILLS = [
-  '방송문을 보면서, 끊어읽기 표시(|)가 있는 곳에서만 의식적으로 쉬어가며 3번 읽어보세요.',
-  'AI 피드백에서 지적된 문장 1개만 골라서, 그 문장만 10번 반복해서 읽어보세요.',
-  '방송문을 보면서 읽되, 핵심 강조 단어(노란 표시)에서만 목소리를 또렷하게 내는 데 집중해보세요.',
-  '전체를 다시 읽고 녹음해서, 이전 녹음과 비교해보세요.',
-]
 
 const CATEGORY_CHECKLISTS: Record<string, string[]> = {
   fluency: [
@@ -48,43 +47,122 @@ const CATEGORY_CHECKLISTS: Record<string, string[]> = {
   ],
 }
 
-export function DrillView({ result, onRetry }: Props) {
-  const [checked, setChecked] = useState<boolean[]>([false, false, false, false])
+function getSegmentsForFocus(allSegments: MarkupSegment[] | null, focusText: string): MarkupSegment[] {
+  if (!allSegments || !focusText) return [{ text: focusText, types: ['normal'] }]
 
+  const fullText = allSegments.map(s => s.text).join('')
+  const normalized = focusText.trim()
+  const idx = fullText.indexOf(normalized)
+
+  if (idx === -1) return [{ text: focusText, types: ['normal'] }]
+
+  const end = idx + normalized.length
+  let pos = 0
+  const filtered: MarkupSegment[] = []
+
+  for (const seg of allSegments) {
+    const segStart = pos
+    pos += seg.text.length
+    if (pos > idx && segStart < end) filtered.push(seg)
+  }
+
+  return filtered.length > 0 ? filtered : [{ text: focusText, types: ['normal'] }]
+}
+
+export function DrillView({ result, onRetry, scriptId, segments, announcementId }: Props) {
   const weakest = result.weakest ?? 'fluency'
-  const title = CATEGORY_TITLES[weakest] ?? '집중 드릴'
-  const exercises = result.drills?.length ? result.drills : FALLBACK_DRILLS
   const checklist = CATEGORY_CHECKLISTS[weakest] ?? CATEGORY_CHECKLISTS.fluency
+  const focusSegment = result.focusSegment
   const actionGuide = result.categories[weakest]?.actionGuide
+
+  const localKey = `drill_attempts_${announcementId}_${weakest}`
+  const [attempts, setAttempts] = useState(() => parseInt(localStorage.getItem(localKey) ?? '0', 10))
+  const [checked, setChecked] = useState<boolean[]>(checklist.map(() => false))
+
+  const handleAttempt = () => {
+    setAttempts(prev => {
+      const n = prev + 1
+      localStorage.setItem(localKey, String(n))
+      return n
+    })
+  }
 
   const toggle = (i: number) => {
     setChecked(prev => prev.map((v, idx) => idx === i ? !v : v))
   }
 
   const allChecked = checked.every(Boolean)
+  const focusSegments = focusSegment ? getSegmentsForFocus(segments, focusSegment.text) : null
 
   return (
     <div className="space-y-4">
+      {/* 헤더 */}
       <div>
-        <h3 className="font-semibold text-[#1D1D1F]">{title}</h3>
+        <h3 className="font-semibold text-[#1D1D1F]">{CATEGORY_TITLES[weakest] ?? '약점'} 집중 드릴</h3>
         {actionGuide && (
           <p className="text-xs text-[#6E6E73] mt-0.5 leading-relaxed">{actionGuide}</p>
         )}
       </div>
 
-      <div className="space-y-2">
-        {exercises.map((ex, i) => (
-          <div key={i} className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
-            <div className="flex gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#1D1D1F] text-white text-xs flex items-center justify-center font-semibold">
-                {i + 1}
-              </span>
-              <p className="text-sm text-[#1D1D1F] leading-relaxed">{ex}</p>
-            </div>
+      {/* Section A: 집중 연습 구간 */}
+      {focusSegment && (
+        <div className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-semibold text-[#6E6E73] uppercase tracking-widest">집중 연습 구간</p>
+            <span className="text-[10px] text-[#8E8E93] bg-[#F5F5F7] px-2 py-0.5 rounded-full">
+              이 구간 연습: {attempts}회
+            </span>
           </div>
-        ))}
+          <p className="text-xs text-[#8E8E93] mb-3 leading-relaxed">{focusSegment.reason}</p>
+          <div className="bg-[#F5F5F7] rounded-xl p-3">
+            {focusSegments ? (
+              <MarkupScript segments={focusSegments} compact />
+            ) : (
+              <p className="text-sm text-[#1D1D1F] leading-relaxed">{focusSegment.text}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Section B: 모델 보이스 */}
+      <div>
+        <p className="text-[10px] font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 px-1">
+          모델 보이스 듣기
+        </p>
+        <AudioPlayer scriptId={scriptId} />
+        {focusSegment && (
+          <p className="text-xs text-[#8E8E93] mt-2 px-1 leading-relaxed">
+            전체 방송 중 위 집중 구간을 특히 집중해서 들어보세요.
+          </p>
+        )}
       </div>
 
+      {/* Section C: 미니 녹음 */}
+      {focusSegment && (
+        <MiniRecorder
+          targetText={focusSegment.text}
+          attempts={attempts}
+          onAttempt={handleAttempt}
+        />
+      )}
+
+      {/* focusSegment 없을 때 AI 드릴 목록 fallback */}
+      {!focusSegment && result.drills && result.drills.length > 0 && (
+        <div className="space-y-2">
+          {result.drills.map((ex, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
+              <div className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#1D1D1F] text-white text-xs flex items-center justify-center font-semibold">
+                  {i + 1}
+                </span>
+                <p className="text-sm text-[#1D1D1F] leading-relaxed">{ex}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Section D: 체크리스트 */}
       <div className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
         <p className="text-xs font-semibold text-[#6E6E73] mb-3">자가 체크리스트</p>
         <div className="space-y-3">
@@ -104,17 +182,18 @@ export function DrillView({ result, onRetry }: Props) {
         </div>
         {allChecked && (
           <p className="text-xs text-[#34C759] font-medium mt-3">
-            모든 항목 완료! 이제 다시 녹음해보세요. 훨씬 나아질 거예요.
+            모든 항목 완료! 이제 전체 방송문을 다시 녹음해보세요. 훨씬 나아질 거예요.
           </p>
         )}
       </div>
 
+      {/* Section E: 전체 다시 녹음 */}
       <button
         onClick={onRetry}
         className="w-full py-3.5 bg-[#E8361E] text-white rounded-2xl font-semibold text-sm transition-all active:scale-[0.98] hover:bg-[#c82d18] flex items-center justify-center gap-2"
       >
         <RotateCcw size={15} />
-        다시 녹음하기
+        전체 방송문 다시 녹음하기
       </button>
     </div>
   )

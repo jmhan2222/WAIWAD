@@ -4,6 +4,7 @@ import { MarkupLegend } from './MarkupLegend'
 
 interface Props {
   segments: MarkupSegment[]
+  compact?: boolean
 }
 
 // ── 끊어읽기 막대 ────────────────────────────────────────────────────────────
@@ -162,11 +163,11 @@ function GuideCard({ segments }: { segments: MarkupSegment[] }) {
 
 // ── 메인 컴포넌트 ─────────────────────────────────────────────────────────────
 
-export function MarkupScript({ segments }: Props) {
+export function MarkupScript({ segments, compact = false }: Props) {
   return (
     <div>
-      <GuideCard segments={segments} />
-      <MarkupLegend />
+      {!compact && <GuideCard segments={segments} />}
+      {!compact && <MarkupLegend />}
       <p style={{ lineHeight: 2.6, fontSize: 15, color: '#1D1D1F', letterSpacing: '0.01em' }}>
         {segments.map((seg, i) => (
           <Segment key={i} seg={seg} />

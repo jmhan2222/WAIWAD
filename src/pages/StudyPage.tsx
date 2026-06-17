@@ -313,7 +313,13 @@ export function StudyPage() {
         {/* Tab 4: 개선 학습 */}
         {activeTab === 'drill' && feedback && showDrill && (
           <div className="space-y-4">
-            <DrillView result={feedback} onRetry={handleRetry} />
+            <DrillView
+              result={feedback}
+              onRetry={handleRetry}
+              scriptId={`${announcement.id}-${lang}`}
+              segments={markupSegments ?? null}
+              announcementId={announcement.id}
+            />
 
             {announcement.checkpoints && announcement.checkpoints.length > 0 && (
               <div className="bg-white rounded-2xl border border-[#E5E5EA] p-4">

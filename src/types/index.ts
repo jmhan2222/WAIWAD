@@ -53,6 +53,11 @@ export interface CategoryFeedback {
   actionGuide: string
 }
 
+export interface FocusSegment {
+  text: string
+  reason: string
+}
+
 export interface FeedbackResult {
   categories: {
     fluency: CategoryFeedback
@@ -66,4 +71,5 @@ export interface FeedbackResult {
   drills?: string[]
   partial?: number
   needsReeval?: string[]
+  focusSegment?: FocusSegment
 }

@@ -76,7 +76,7 @@ function detectForeignWords(text: string): boolean {
 }
 
 function extractTextFields(result: FeedbackResult): string[] {
-  const { categories, summary, nextStep, drills } = result
+  const { categories, summary, nextStep, drills, focusSegment } = result
   const catFields = (cat: FeedbackResult['categories']['fluency']) => [
     cat.passengerImpression,
     cat.specificIssue,
@@ -90,11 +90,20 @@ function extractTextFields(result: FeedbackResult): string[] {
     summary,
     nextStep,
     ...(drills ?? []),
+    ...(focusSegment?.reason ? [focusSegment.reason] : []),
   ]
 }
 
 function hasForeignMixture(result: FeedbackResult): boolean {
   return extractTextFields(result).some(field => detectForeignWords(field))
+}
+
+function findEmptyCategories(result: FeedbackResult): string[] {
+  const tooShort = (s: string) => !s || s.trim().length < 15
+  return (['fluency', 'voice', 'intonation', 'pronunciation'] as const).filter(key => {
+    const cat = result.categories?.[key]
+    return !cat || tooShort(cat.specificIssue) || tooShort(cat.actionGuide)
+  })
 }
 
 // ── 녹음 검증 ─────────────────────────────────────────────────────────────────
@@ -175,7 +184,8 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
   "summary": "손님이 전체 방송을 들었을 때의 인상 2~3문장",
   "weakest": "fluency|voice|intonation|pronunciation",
   "nextStep": "다음 녹음에서 딱 한 가지만 고친다면 무엇을, 어떻게",
-  "drills": ["실현 가능한 구체적 연습 1", "연습 2", "연습 3"]
+  "drills": ["실현 가능한 구체적 연습 1", "연습 2", "연습 3"],
+  "focusSegment": {"text":"원본 방송문에서 weakest 관련 가장 연습이 필요한 구절 5~15단어 원문 그대로","reason":"왜 이 구간인지 한 문장 한국어"}
 }`
 
   if (lang === 'ko') return {
@@ -185,11 +195,13 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
       '당신은 다정하지만 명확한 제주항공 기내방송 코치입니다.',
       '모호한 피드백("조금 더 좋아질 것 같아요")은 절대 금지합니다.',
       'passengerImpression: 승객 입장에서 이 방송을 들었을 때 어떤 느낌인지 구체적 상황으로 묘사.',
-      'specificIssue: 반드시 원본 방송문에서 실제 문구를 인용부호("  ")로 표시하세요. 나쁜 예: "문장 끝부분에서 음조가 내려갔습니다" / 좋은 예: "\"보관하시기 바랍니다\"에서 음조가 평탄하게 끝났어요".',
-      'actionGuide: 원본 방송문의 실제 문구를 인용하면서 구체적 동작 지침 제시. 나쁜 예: "억양을 올리는 연습을 합니다" / 좋은 예: "\"바랍니다\"의 \"다\" 음절에서 음을 살짝 올려보세요".',
+      'specificIssue: 반드시 원본 방송문에서 실제 문구를 인용부호로 표시하세요. 관찰 사실만 기술. 나쁜 예: "문장 끝부분에서 음조가 내려갔습니다" / 좋은 예: "\"보관하시기 바랍니다\"에서 음조가 평탄하게 끝났어요".',
+      'actionGuide: specificIssue와 절대 같은 내용을 반복하면 안 됩니다. 반드시 다음 중 하나 이상 포함: ①신체적 동작("숨을 들이쉬고 1초 멈춘 후 시작") ②정확한 위치("\"있습니다\"의 \"다\" 음절에서 톤을 낮추세요") ③수치화("0.5초 더", "20% 느리게") ④비교 예시("일상 대화에서 문장 끝맺을 때처럼"). "~연습을 해보세요"/"~신경써보세요" 같은 막연한 마무리만 있는 actionGuide는 절대 금지.',
+      'fluency 평가 5가지 기준: ①끊어읽기(의미 단위마다 자연스럽게 멈춤) ②속도 조절(너무 빠르거나 느리지 않게) ③핵심 단어 강조(또렷하게) ④문안 숙지도(막히거나 더듬지 않게) ⑤말하는 듯 자연스러운 연출(로봇식 낭독 금지).',
       'pronunciation 카테고리 특별 지시: 한자·병음·IPA 표기 절대 금지. 어떤 음소/받침/모음이 문제인지 원본의 실제 단어를 인용하여 한글로만 설명하세요.',
       'intonation 카테고리 특별 지시: 원본 방송문에서 최소 2개의 실제 문장/구절을 인용하고, 각각 어떤 억양 패턴(상승/하강/평탄)이 적합한지 설명하세요.',
       'drills: weakest 카테고리의 actionGuide를 바탕으로 실현 가능한 연습 3개. 방송문 전체 암기를 요구하는 드릴은 절대 포함하지 마세요.',
+      'focusSegment.text: weakest 카테고리와 관련해서 원본 방송문에서 5~15단어의 구절을 원문 그대로 발췌하세요. 의역·변형 금지, 원본에 실제로 존재하는 연속된 텍스트여야 합니다. focusSegment.reason은 한국어 한 문장으로.',
       '반드시 JSON만 반환하고 다른 텍스트는 절대 포함하지 마세요.',
     ].join(' '),
     user: [
@@ -209,11 +221,13 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
       '중요: 평가 대상 발화가 영어여도, 모든 피드백 텍스트는 반드시 100% 한국어로만 작성하세요. 한자·병음 금지.',
       '당신은 명확하고 구체적인 제주항공 기내방송 코치입니다.',
       '모호한 피드백 금지.',
-      'specificIssue: 원본 방송문에서 실제 문구를 인용부호로 표시하세요. 나쁜 예: "문장 끝부분에서 음조가 내려갔습니다" / 좋은 예: "please fasten에서 음조가 평탄하게 끝났어요".',
-      'actionGuide: 원본 문구를 인용하면서 구체적 동작 지침 제시, 한국어로.',
+      'specificIssue: 원본 방송문에서 실제 문구를 인용부호로 표시하세요. 관찰 사실만 기술. 나쁜 예: "문장 끝부분에서 음조가 내려갔습니다" / 좋은 예: "please fasten에서 음조가 평탄하게 끝났어요".',
+      'actionGuide: specificIssue와 절대 같은 내용을 반복하지 마세요. 반드시 다음 중 하나 이상 포함: ①신체적 동작("숨을 들이쉬고 1초 멈춘 후 시작") ②정확한 위치("\"seatbelt\"를 말할 때 강세를 2배로") ③수치화("0.5초 더", "20% 느리게") ④비교 예시("일상 대화에서 문장 끝맺을 때처럼"). "~연습을 해보세요"로만 끝내기 절대 금지.',
+      'fluency 평가 5가지 기준: ①끊어읽기(의미 단위 자연스럽게) ②속도 조절(너무 빠르거나 느리지 않게) ③핵심 단어 강조(또렷하게) ④문안 숙지도(막히거나 더듬지 않게) ⑤말하는 듯 자연스러운 연출(로봇식 낭독 금지). 이 5가지를 구체적으로 평가하세요.',
       'pronunciation 카테고리: 한자·병음·IPA 절대 금지. 원본 단어를 인용하여 한글로만 발음 설명.',
       'intonation 카테고리: 원본에서 최소 2개 실제 문장 인용, 각각 상승/하강/평탄 패턴 설명.',
       'drills: weakest 카테고리 기반 실현 가능한 연습 3개, 암기 요구 금지, 한국어로.',
+      'focusSegment.text: weakest 관련 원본에서 5~15단어 원문 그대로 발췌. 의역 금지. focusSegment.reason은 한국어 한 문장.',
       '유효한 JSON만 반환하세요.',
     ].join(' '),
     user: [
@@ -232,11 +246,13 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
       '중요: 평가 대상 발화가 일본어여도, 모든 피드백 텍스트는 반드시 100% 한국어로만 작성하세요. 한자·병음 금지.',
       '당신은 명확하고 구체적인 제주항공 기내방송 코치입니다.',
       '모호한 피드백 금지.',
-      'specificIssue: 원본 방송문에서 실제 문구를 인용부호로 표시하세요, 한국어로 설명.',
-      'actionGuide: 원본 문구를 인용하면서 구체적 동작 지침 제시, 한국어로.',
+      'specificIssue: 원본 방송문에서 실제 문구를 인용부호로 표시하세요, 관찰 사실만 한국어로 기술.',
+      'actionGuide: specificIssue와 절대 같은 내용을 반복하지 마세요. 반드시 다음 중 하나 이상 포함: ①신체적 동작("숨을 들이쉬고 1초 멈춘 후 시작") ②정확한 위치(특정 단어에서 어떻게) ③수치화("0.5초 더", "20% 느리게") ④비교 예시. "~연습을 해보세요"로만 끝내기 절대 금지.',
+      'fluency 평가 5가지 기준: ①끊어읽기(의미 단위 자연스럽게) ②속도 조절(너무 빠르거나 느리지 않게) ③핵심 단어 강조(또렷하게) ④문안 숙지도(막히거나 더듬지 않게) ⑤말하는 듯 자연스러운 연출(로봇식 낭독 금지). 이 5가지를 구체적으로 평가하세요.',
       'pronunciation 카테고리: 한자·병음·IPA 절대 금지. 원본 단어를 인용하여 한글로만 발음 설명.',
       'intonation 카테고리: 원본에서 최소 2개 실제 문장 인용, 각각 상승/하강/평탄 패턴 설명.',
       'drills: weakest 카테고리 기반 실현 가능한 연습 3개, 암기 요구 금지, 한국어로.',
+      'focusSegment.text: weakest 관련 원본에서 5~15단어 원문 그대로 발췌. 의역 금지. focusSegment.reason은 한국어 한 문장.',
       '유효한 JSON만 반환하세요.',
     ].join(' '),
     user: [
@@ -256,11 +272,13 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
       '중요: 평가 대상 발화가 중국어여도, 모든 피드백 텍스트는 반드시 100% 한국어로만 작성하세요. 한자·병음 절대 금지.',
       '당신은 명확하고 구체적인 제주항공 기내방송 코치입니다.',
       '모호한 피드백 금지.',
-      'specificIssue: 원본 방송문에서 실제 문구를 인용부호로 표시하세요, 한국어로 설명.',
-      'actionGuide: 원본 문구를 인용하면서 구체적 동작 지침 제시, 한국어로.',
+      'specificIssue: 원본 방송문에서 실제 문구를 인용부호로 표시하세요, 관찰 사실만 한국어로 기술.',
+      'actionGuide: specificIssue와 절대 같은 내용을 반복하지 마세요. 반드시 다음 중 하나 이상 포함: ①신체적 동작("숨을 들이쉬고 1초 멈춘 후 시작") ②정확한 위치(특정 단어에서 어떻게) ③수치화("0.5초 더", "20% 느리게") ④비교 예시. "~연습을 해보세요"로만 끝내기 절대 금지.',
+      'fluency 평가 5가지 기준: ①끊어읽기(의미 단위 자연스럽게) ②속도 조절(너무 빠르거나 느리지 않게) ③핵심 단어 강조(또렷하게) ④문안 숙지도(막히거나 더듬지 않게) ⑤말하는 듯 자연스러운 연출(로봇식 낭독 금지). 이 5가지를 구체적으로 평가하세요.',
       'pronunciation 카테고리: 한자·병음·IPA 절대 금지. 원본 단어를 인용하여 한글로만 발음 설명.',
       'intonation 카테고리: 원본에서 최소 2개 실제 문장 인용, 각각 상승/하강/평탄 패턴 설명.',
       'drills: weakest 카테고리 기반 실현 가능한 연습 3개, 암기 요구 금지, 한국어로.',
+      'focusSegment.text: weakest 관련 원본에서 5~15단어 원문 그대로 발췌. 의역 금지. focusSegment.reason은 한국어 한 문장.',
       '유효한 JSON만 반환하세요.',
     ].join(' '),
     user: [
@@ -552,6 +570,14 @@ export function useGroq() {
           if (hasIssue) needsReeval.push(key)
         }
         if (needsReeval.length > 0) result = { ...result, needsReeval }
+      }
+
+      // ── 4단계: 빈 필드 검증 ──────────────────────────────────────────────────
+      const emptyCategories = findEmptyCategories(result)
+      if (emptyCategories.length > 0) {
+        console.warn('[generateFeedback] 빈/부실 필드 감지 — needsReeval 추가:', emptyCategories)
+        const existing = result.needsReeval ?? []
+        result = { ...result, needsReeval: [...new Set([...existing, ...emptyCategories])] }
       }
 
       return { ...result, ...(validation.partial ? { partial: Math.round(validation.lengthRatio * 100) } : {}) }
