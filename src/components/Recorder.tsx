@@ -26,6 +26,7 @@ export function Recorder({ plain, lang, scriptName, onFeedback }: Props) {
   const { recordingState, audioURL, audioBlob, elapsedTime, startRecording, stopRecording, resetRecording } = useRecorder()
   const { transcribeAudio, generateFeedback, isTranscribing, isAnalyzing } = useGroq()
   const [apiError, setApiError] = useState<ApiError | null>(null)
+  const [audioPlayError, setAudioPlayError] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const handleFeedback = async () => {
@@ -101,8 +102,19 @@ export function Recorder({ plain, lang, scriptName, onFeedback }: Props) {
         {/* 녹음 완료 */}
         {!isProcessing && recordingState === 'stopped' && (
           <div className="space-y-3">
-            {audioURL && (
-              <audio ref={audioRef} src={audioURL} controls className="w-full h-9" />
+            {audioURL && !audioPlayError && (
+              <audio
+                ref={audioRef}
+                src={audioURL}
+                controls
+                className="w-full h-9"
+                onError={() => setAudioPlayError(true)}
+              />
+            )}
+            {audioPlayError && (
+              <p className="text-xs text-[#8E8E93] text-center py-2">
+                이 브라우저에서는 재생이 지원되지 않아요. 다른 브라우저로 시도해보세요.
+              </p>
             )}
 
             {/* 에러 박스 */}
@@ -145,7 +157,7 @@ export function Recorder({ plain, lang, scriptName, onFeedback }: Props) {
               )}
 
               <button
-                onClick={() => { setApiError(null); resetRecording() }}
+                onClick={() => { setApiError(null); setAudioPlayError(false); resetRecording() }}
                 className="w-full py-2.5 border border-gray-300 text-gray-600 rounded-xl text-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5"
               >
                 <RotateCcw size={14} />

@@ -76,22 +76,20 @@ function detectForeignWords(text: string, lang: Lang): boolean {
 }
 
 function extractTextFields(result: FeedbackResult): string[] {
-  const { categories, summary, nextStep } = result
+  const { categories, summary, nextStep, drills } = result
+  const catFields = (cat: FeedbackResult['categories']['fluency']) => [
+    cat.passengerImpression,
+    cat.specificIssue,
+    cat.actionGuide,
+  ]
   return [
-    categories.fluency.good,
-    categories.fluency.improve,
-    categories.fluency.drill,
-    categories.voice.good,
-    categories.voice.improve,
-    categories.voice.drill,
-    categories.intonation.good,
-    categories.intonation.improve,
-    categories.intonation.drill,
-    categories.pronunciation.good,
-    categories.pronunciation.improve,
-    categories.pronunciation.drill,
+    ...catFields(categories.fluency),
+    ...catFields(categories.voice),
+    ...catFields(categories.intonation),
+    ...catFields(categories.pronunciation),
     summary,
     nextStep,
+    ...(drills ?? []),
   ]
 }
 
@@ -104,24 +102,33 @@ function hasForeignMixture(result: FeedbackResult, lang: Lang): boolean {
 function buildPrompt(lang: Lang, title: string, originalText: string, transcription: string) {
   const jsonSchema = `{
   "categories": {
-    "fluency": {"score":"상|중|하","good":"내용","improve":"내용","drill":"내용"},
-    "voice": {"score":"상|중|하","good":"내용","improve":"내용","drill":"내용"},
-    "intonation": {"score":"상|중|하","good":"내용","improve":"내용","drill":"내용"},
-    "pronunciation": {"score":"상|중|하","good":"내용","improve":"내용","drill":"내용"}
+    "fluency": {
+      "score": "상|중|하",
+      "passengerImpression": "승객이 들었을 때의 구체적 인상",
+      "specificIssue": "어디서 무엇이 어땠는지 구체적 관찰",
+      "actionGuide": "지금 당장 할 수 있는 구체적 행동 지침"
+    },
+    "voice": {"score":"상|중|하","passengerImpression":"...","specificIssue":"...","actionGuide":"..."},
+    "intonation": {"score":"상|중|하","passengerImpression":"...","specificIssue":"...","actionGuide":"..."},
+    "pronunciation": {"score":"상|중|하","passengerImpression":"...","specificIssue":"...","actionGuide":"..."}
   },
-  "summary": "전체 총평",
+  "summary": "손님이 전체 방송을 들었을 때의 인상 2~3문장",
   "weakest": "fluency|voice|intonation|pronunciation",
-  "nextStep": "다음 집중 포인트"
+  "nextStep": "다음 녹음에서 딱 한 가지만 고친다면 무엇을, 어떻게",
+  "drills": ["실현 가능한 구체적 연습 1", "연습 2", "연습 3"]
 }`
 
   if (lang === 'ko') return {
     system: [
       '중요: 모든 응답은 100% 한국어로만 작성하세요.',
       '영어, 베트남어, 중국어, 일본어 등 어떤 외국어 단어도 섞지 마세요.',
-      '외래어 표기가 필요한 경우에도 한글로만 표기하세요 (예: "hơi" 대신 "조금", "một chút" 대신 "약간").',
-      '당신은 다정하고 명확한 제주항공 기내방송 교관입니다.',
-      '경험 많은 선배가 바로 옆에서 직접 듣고 조언해주듯, 따뜻하고 구체적인 피드백을 제공하세요.',
-      '"~하면 좋겠어요", "~해보면 어떨까요?", "~부분이 인상적이었어요" 같은 격려하는 표현을 사용하세요.',
+      '외래어 표기가 필요한 경우에도 한글로만 표기하세요.',
+      '당신은 다정하지만 명확한 제주항공 기내방송 코치입니다.',
+      '모호한 피드백("조금 더 좋아질 것 같아요")은 절대 금지합니다.',
+      'passengerImpression: 승객 입장에서 이 방송을 들었을 때 어떤 느낌인지 구체적 상황으로 묘사.',
+      'specificIssue: "어디서" 무엇이 어땠는지 막연한 평가어 대신 관찰된 사실 위주로.',
+      'actionGuide: 추상적 조언 금지, 숫자나 구체적 동작 포함. 나쁜 예: "더 친절하게 말해보세요" / 좋은 예: "문장 끝 바랍니다에서 0.5초 더 끌어보세요".',
+      'drills: weakest 카테고리의 actionGuide를 바탕으로 실현 가능한 연습 3개. 방송문 전체 암기를 요구하는 드릴은 절대 포함하지 마세요.',
       '반드시 JSON만 반환하고 다른 텍스트는 절대 포함하지 마세요.',
     ].join(' '),
     user: [
@@ -132,7 +139,7 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
       `JSON만 응답:\n${jsonSchema}`,
       '',
       '다시 한번 확인: 응답에 한국어가 아닌 단어가 하나라도 포함되면 안 됩니다.',
-      'JSON의 모든 텍스트 값(good, improve, drill, summary, nextStep)이 순수 한국어 문장인지 확인 후 응답하세요.',
+      'JSON의 모든 텍스트 값이 순수 한국어 문장인지 확인 후 응답하세요.',
     ].join('\n'),
   }
 
@@ -140,8 +147,12 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
     system: [
       'IMPORTANT: Write ALL responses in 100% English only.',
       'Do not mix in Korean, Japanese, Chinese, Vietnamese, or any other language.',
-      'You are a warm, encouraging Jeju Air cabin announcement coach — like a supportive senior colleague listening in real time.',
-      'Use friendly, specific feedback: "Great job on...", "You might try...", "One thing that would really help is...".',
+      'You are a clear, direct Jeju Air cabin announcement coach.',
+      'Never give vague feedback like "try to sound more natural". Instead be concrete and specific.',
+      'passengerImpression: describe how a passenger actually experienced this announcement (specific scenario).',
+      'specificIssue: state observed facts about where and what went wrong — avoid vague judgment words.',
+      'actionGuide: give a specific, actionable instruction with numbers or exact words. Bad: "speak more clearly". Good: "hold the word landing for 0.5 seconds longer".',
+      'drills: 3 achievable practice exercises based on the weakest category\'s actionGuide. Never require memorizing the full script.',
       'Return ONLY valid JSON, no other text.',
     ].join(' '),
     user: [
@@ -151,7 +162,7 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
       `Transcription: ${transcription}`,
       `Respond in JSON only (use 상/중/하 for scores):\n${jsonSchema}`,
       '',
-      'Final check: Every text value (good, improve, drill, summary, nextStep) must be in English only. No other language.',
+      'Final check: Every text value (passengerImpression, specificIssue, actionGuide, summary, nextStep, drills) must be in English only.',
     ].join('\n'),
   }
 
@@ -159,8 +170,12 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
     system: [
       '重要：すべての回答を100%日本語のみで記述してください。',
       '韓国語、英語、ベトナム語、中国語など他の言語の単語を混ぜないでください。',
-      'あなたは親切で明確な済州航空の機内放送コーチです。',
-      '経験豊富な先輩が隣で聞いてアドバイスするように、温かく具体的なフィードバックを提供してください。',
+      'あなたは明確で具体的な済州航空の機内放送コーチです。',
+      '曖昧なフィードバック（「もう少し良くなれば」）は絶対禁止です。',
+      'passengerImpression: 乗客がこの放送を聞いたときの具体的な印象を場面で描写。',
+      'specificIssue: どこで何が問題だったか、曖昧な評価語でなく観察した事実を中心に。',
+      'actionGuide: 抽象的なアドバイス禁止。数字や具体的な動作を含めること。',
+      'drills: weakestカテゴリのactionGuideを基に実現可能な練習3つ。全文暗記を要求するドリルは絶対含めないこと。',
       'JSONのみで回答してください。',
     ].join(' '),
     user: [
@@ -170,7 +185,7 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
       `書き起こし: ${transcription}`,
       `JSONのみで回答 (スコアは상/중/하を使用):\n${jsonSchema}`,
       '',
-      '最終確認：good、improve、drill、summary、nextStepのすべてのテキスト値が日本語のみであることを確認してから回答してください。',
+      '最終確認：すべてのテキスト値が日本語のみであることを確認してから回答してください。',
     ].join('\n'),
   }
 
@@ -179,7 +194,12 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
     system: [
       '重要：所有回答必须100%使用中文书写。',
       '不得混入韩语、英语、越南语、日语等任何其他语言的单词。',
-      '您是亲切而专业的济州航空机舱广播教练，像经验丰富的前辈一样，给予温暖而具体的反馈。',
+      '您是清晰、直接的济州航空机舱广播教练。',
+      '严禁模糊反馈（"再好一点就好了"）。',
+      'passengerImpression: 从乘客角度具体描述听到这段广播时的感受。',
+      'specificIssue: 具体说明在哪里出了什么问题，用观察到的事实代替模糊评价词。',
+      'actionGuide: 禁止抽象建议，包含数字或具体动作。',
+      'drills: 基于weakest类别的actionGuide，提供3个可实现的练习。不得要求背诵全文。',
       '仅用JSON回答。',
     ].join(' '),
     user: [
@@ -189,7 +209,7 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
       `转录: ${transcription}`,
       `仅用JSON回答 (评分使用상/중/하):\n${jsonSchema}`,
       '',
-      '最终确认：请确保good、improve、drill、summary、nextStep的所有文本值均为纯中文后再回答。',
+      '最终确认：请确保所有文本值均为纯中文后再回答。',
     ].join('\n'),
   }
 }
@@ -386,7 +406,10 @@ export function useGroq() {
     setError(null)
     try {
       const formData = new FormData()
-      formData.append('file', audioBlob, 'recording.webm')
+      const ext = audioBlob.type.startsWith('audio/mp4') ? 'mp4'
+        : audioBlob.type.startsWith('audio/ogg') ? 'ogg'
+        : 'webm'
+      formData.append('file', audioBlob, `recording.${ext}`)
       formData.append('model', 'whisper-large-v3')
       formData.append('language', WHISPER_LANG[lang])
       formData.append('response_format', 'json')
@@ -437,9 +460,9 @@ export function useGroq() {
 
           const fixCategory = (cat: FeedbackResult['categories']['fluency']) => ({
             ...cat,
-            good:    fix(cat.good),
-            improve: fix(cat.improve),
-            drill:   fix(cat.drill),
+            passengerImpression: fix(cat.passengerImpression),
+            specificIssue:       fix(cat.specificIssue),
+            actionGuide:         fix(cat.actionGuide),
           })
 
           result = {

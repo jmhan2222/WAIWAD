@@ -7,68 +7,55 @@ interface Props {
   onRetry: () => void
 }
 
-const DRILLS: Record<string, { title: string; exercises: string[]; checklist: string[] }> = {
-  fluency: {
-    title: '유창성 집중 드릴',
-    exercises: [
-      '방송문을 3번 읽되, 매번 막히는 부분 없이 끝까지 읽어보세요.',
-      '텍스트를 보지 않고 방송문 전체를 암기하여 읽어보세요.',
-      '30초 안에 방송문을 처음부터 끝까지 읽는 연습을 반복하세요.',
-    ],
-    checklist: [
-      '중간에 막히거나 멈추지 않았다',
-      '자연스러운 속도로 읽었다',
-      '전체 방송문을 한 호흡으로 연결했다',
-      '텍스트 없이도 읽을 수 있다',
-    ],
-  },
-  voice: {
-    title: '분위기·목소리 집중 드릴',
-    exercises: [
-      '가슴 공명을 활용해 낮고 안정된 목소리로 방송문을 읽어보세요.',
-      '실제 기내 방송처럼 미소를 유지하며 방송문을 읽어보세요.',
-      '마이크 거리를 일정하게 유지하며 균일한 음량으로 읽어보세요.',
-    ],
-    checklist: [
-      '목소리가 안정적이고 떨리지 않았다',
-      '처음부터 끝까지 일정한 음량을 유지했다',
-      '따뜻하고 전문적인 분위기를 전달했다',
-      '미소가 목소리에서 느껴졌다',
-    ],
-  },
-  intonation: {
-    title: '억양 집중 드릴',
-    exercises: [
-      '끊어읽기 마커(|)에서 완전히 멈추며 방송문을 읽어보세요.',
-      '올림(↗) 표시 단어에서 의도적으로 음을 높여 읽어보세요.',
-      '내림(↘) 표시 단어에서 자연스럽게 음을 내리며 마무리하세요.',
-    ],
-    checklist: [
-      '끊어읽기를 정확히 지켰다',
-      '올림 억양이 자연스럽게 표현됐다',
-      '문장 마지막에 자연스럽게 음이 내려갔다',
-      '단조롭지 않고 리듬감이 있었다',
-    ],
-  },
-  pronunciation: {
-    title: '발음 집중 드릴',
-    exercises: [
-      '어려운 단어만 10번씩 반복 발음 연습을 해보세요.',
-      '각 단어의 받침과 연음을 과장되게 발음하며 천천히 읽어보세요.',
-      '녹음 후 직접 들어보며 불명확한 단어를 체크하세요.',
-    ],
-    checklist: [
-      '모든 단어를 정확하게 발음했다',
-      '받침 발음이 명확했다',
-      '연음 처리가 자연스러웠다',
-      '외래어 발음이 명확했다',
-    ],
-  },
+const CATEGORY_TITLES: Record<string, string> = {
+  fluency: '유창성 집중 드릴',
+  voice: '분위기·목소리 집중 드릴',
+  intonation: '억양 집중 드릴',
+  pronunciation: '발음 집중 드릴',
+}
+
+const FALLBACK_DRILLS = [
+  '방송문을 보면서, 끊어읽기 표시(|)가 있는 곳에서만 의식적으로 쉬어가며 3번 읽어보세요.',
+  'AI 피드백에서 지적된 문장 1개만 골라서, 그 문장만 10번 반복해서 읽어보세요.',
+  '방송문을 보면서 읽되, 핵심 강조 단어(노란 표시)에서만 목소리를 또렷하게 내는 데 집중해보세요.',
+  '전체를 다시 읽고 녹음해서, 이전 녹음과 비교해보세요.',
+]
+
+const CATEGORY_CHECKLISTS: Record<string, string[]> = {
+  fluency: [
+    '끊어읽기 표시(|)를 보고 자연스럽게 쉬었다',
+    '중간에 막히거나 멈추지 않고 끝까지 읽었다',
+    '자연스러운 속도로 읽었다',
+    '강조 단어에서 목소리를 또렷하게 냈다',
+  ],
+  voice: [
+    '목소리가 안정적이고 떨리지 않았다',
+    '처음부터 끝까지 일정한 음량을 유지했다',
+    '따뜻하고 전문적인 분위기를 전달했다',
+    '강조 단어에서 목소리를 또렷하게 냈다',
+  ],
+  intonation: [
+    '끊어읽기 표시를 보고 자연스럽게 쉬었다',
+    '핵심 강조 단어에서 목소리를 또렷하게 냈다',
+    '문장 마지막에 자연스럽게 음이 내려갔다',
+    '단조롭지 않고 리듬감이 있었다',
+  ],
+  pronunciation: [
+    '모든 단어를 정확하게 발음했다',
+    '받침 발음이 명확했다',
+    '연음 처리가 자연스러웠다',
+    '강조 단어에서 목소리를 또렷하게 냈다',
+  ],
 }
 
 export function DrillView({ result, onRetry }: Props) {
   const [checked, setChecked] = useState<boolean[]>([false, false, false, false])
-  const drill = DRILLS[result.weakest] ?? DRILLS.fluency
+
+  const weakest = result.weakest ?? 'fluency'
+  const title = CATEGORY_TITLES[weakest] ?? '집중 드릴'
+  const exercises = result.drills?.length ? result.drills : FALLBACK_DRILLS
+  const checklist = CATEGORY_CHECKLISTS[weakest] ?? CATEGORY_CHECKLISTS.fluency
+  const actionGuide = result.categories[weakest]?.actionGuide
 
   const toggle = (i: number) => {
     setChecked(prev => prev.map((v, idx) => idx === i ? !v : v))
@@ -79,14 +66,14 @@ export function DrillView({ result, onRetry }: Props) {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="font-semibold text-[#1D1D1F]">{drill.title}</h3>
-        <p className="text-xs text-[#6E6E73] mt-0.5 leading-relaxed">
-          {result.categories[result.weakest]?.improve}
-        </p>
+        <h3 className="font-semibold text-[#1D1D1F]">{title}</h3>
+        {actionGuide && (
+          <p className="text-xs text-[#6E6E73] mt-0.5 leading-relaxed">{actionGuide}</p>
+        )}
       </div>
 
       <div className="space-y-2">
-        {drill.exercises.map((ex, i) => (
+        {exercises.map((ex, i) => (
           <div key={i} className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
             <div className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#1D1D1F] text-white text-xs flex items-center justify-center font-semibold">
@@ -101,7 +88,7 @@ export function DrillView({ result, onRetry }: Props) {
       <div className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
         <p className="text-xs font-semibold text-[#6E6E73] mb-3">자가 체크리스트</p>
         <div className="space-y-3">
-          {drill.checklist.map((item, i) => (
+          {checklist.map((item, i) => (
             <label key={i} className="flex items-start gap-3 cursor-pointer">
               <input
                 type="checkbox"

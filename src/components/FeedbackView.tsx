@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, MessageSquare, Search, ArrowRight } from 'lucide-react'
 import type { FeedbackResult } from '../types'
 
 interface Props {
@@ -85,7 +85,6 @@ export function FeedbackView({ result, onDrill }: Props) {
       <div className="space-y-2">
         {(Object.entries(categories) as [keyof typeof categories, typeof categories[keyof typeof categories]][]).map(([key, cat]) => {
           const isOpen = !!expanded[key]
-          const color = SCORE_COLOR[cat.score] ?? '#8E8E93'
           return (
             <div key={key} className="bg-white rounded-2xl border border-[#E5E5EA] overflow-hidden">
               <button
@@ -95,7 +94,7 @@ export function FeedbackView({ result, onDrill }: Props) {
                 <CircleGauge score={cat.score} />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-[#1D1D1F] text-sm">{CATEGORY_LABELS[key]}</p>
-                  <p className="text-xs text-[#6E6E73] mt-0.5 leading-snug line-clamp-1">{cat.good}</p>
+                  <p className="text-xs text-[#6E6E73] mt-0.5 leading-snug line-clamp-1">{cat.passengerImpression}</p>
                 </div>
                 {isOpen
                   ? <ChevronUp size={16} className="text-[#8E8E93] flex-shrink-0" />
@@ -105,17 +104,29 @@ export function FeedbackView({ result, onDrill }: Props) {
 
               {isOpen && (
                 <div className="px-4 pb-4 border-t border-[#F5F5F7] pt-3 space-y-2.5">
-                  <div className="flex gap-2.5">
-                    <span className="text-[#34C759] font-bold text-sm flex-shrink-0 mt-0.5">✓</span>
-                    <p className="text-sm text-[#1D1D1F] leading-relaxed">{cat.good}</p>
+                  {/* passengerImpression */}
+                  <div className="flex gap-2.5 items-start">
+                    <MessageSquare size={14} className="text-[#6E6E73] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-[10px] font-semibold text-[#8E8E93] mb-0.5 uppercase tracking-wide">승객은 이렇게 느꼈을 거예요</p>
+                      <p className="text-sm text-[#1D1D1F] leading-relaxed">{cat.passengerImpression}</p>
+                    </div>
                   </div>
-                  <div className="flex gap-2.5">
-                    <span className="font-bold text-sm flex-shrink-0 mt-0.5" style={{ color }}>!</span>
-                    <p className="text-sm text-[#1D1D1F] leading-relaxed">{cat.improve}</p>
+                  {/* specificIssue */}
+                  <div className="flex gap-2.5 items-start">
+                    <Search size={14} className="text-[#FF9500] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-[10px] font-semibold text-[#FF9500] mb-0.5 uppercase tracking-wide">여기를 살펴보면</p>
+                      <p className="text-sm text-[#1D1D1F] leading-relaxed">{cat.specificIssue}</p>
+                    </div>
                   </div>
-                  <div className="bg-[#F5F5F7] rounded-xl p-3 flex gap-2">
-                    <span className="text-[#6E6E73] text-sm flex-shrink-0">→</span>
-                    <p className="text-xs text-[#6E6E73] leading-relaxed">{cat.drill}</p>
+                  {/* actionGuide — highlighted */}
+                  <div className="bg-[#F0F9FF] border border-[#BAE6FD] rounded-xl p-3 flex gap-2.5 items-start">
+                    <ArrowRight size={14} className="text-[#0284C7] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-[10px] font-semibold text-[#0284C7] mb-0.5 uppercase tracking-wide">이렇게 해보세요</p>
+                      <p className="text-sm text-[#0C4A6E] leading-relaxed font-medium">{cat.actionGuide}</p>
+                    </div>
                   </div>
                 </div>
               )}

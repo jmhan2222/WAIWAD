@@ -48,9 +48,9 @@ export type FeedbackScore = '상' | '중' | '하'
 
 export interface CategoryFeedback {
   score: '상' | '중' | '하'
-  good: string
-  improve: string
-  drill: string
+  passengerImpression: string
+  specificIssue: string
+  actionGuide: string
 }
 
 export interface FeedbackResult {
@@ -63,4 +63,5 @@ export interface FeedbackResult {
   summary: string
   weakest: 'fluency' | 'voice' | 'intonation' | 'pronunciation'
   nextStep: string
+  drills?: string[]
 }

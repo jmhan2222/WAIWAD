@@ -2,6 +2,19 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 
 export type RecordingState = 'idle' | 'recording' | 'stopped'
 
+function getSupportedMimeType(): string {
+  const types = [
+    'audio/mp4',
+    'audio/webm;codecs=opus',
+    'audio/webm',
+    'audio/ogg',
+  ]
+  for (const type of types) {
+    if (MediaRecorder.isTypeSupported(type)) return type
+  }
+  return ''
+}
+
 export function useRecorder() {
   const [recordingState, setRecordingState] = useState<RecordingState>('idle')
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
@@ -33,7 +46,10 @@ export function useRecorder() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       streamRef.current = stream
 
-      const mediaRecorder = new MediaRecorder(stream)
+      const mimeType = getSupportedMimeType()
+      const mediaRecorder = mimeType
+        ? new MediaRecorder(stream, { mimeType })
+        : new MediaRecorder(stream)
       mediaRecorderRef.current = mediaRecorder
       chunksRef.current = []
 
@@ -42,7 +58,8 @@ export function useRecorder() {
       }
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
+        const actualMimeType = mediaRecorder.mimeType || mimeType || 'audio/webm'
+        const blob = new Blob(chunksRef.current, { type: actualMimeType })
         const url = URL.createObjectURL(blob)
         setAudioBlob(blob)
         setAudioURL(url)
