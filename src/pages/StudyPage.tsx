@@ -179,7 +179,11 @@ export function StudyPage() {
         {activeTab === 'study' && (
           <div className="space-y-3">
             <div className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
-              {lang === 'ja' ? (
+              {!plainText.trim() ? (
+                <p className="text-sm text-[#8E8E93] leading-relaxed">
+                  이 방송문의 텍스트가 아직 등록되지 않았어요.{'\n'}방송교범을 참고해 텍스트를 추가하면 자동으로 학습 가이드가 생성됩니다.
+                </p>
+              ) : lang === 'ja' ? (
                 <JapaneseScript text={plainText} />
               ) : markupLoading ? (
                 <div className="flex items-center gap-2.5 py-2">

@@ -42,7 +42,7 @@ if (!API_KEY) {
 const FORCE    = process.argv.includes('--force')
 const DRY_RUN  = process.argv.includes('--dry-run')
 const ONLY_ID  = process.argv.find(a => a.startsWith('--id='))?.slice(5)
-const DELAY_MS = 700  // API 호출 사이 딜레이 (rate limit 방지)
+const DELAY_MS = 1000  // API 호출 사이 딜레이 (rate limit 방지)
 
 // ── 타입 정의 ────────────────────────────────────────────────────────────────
 
@@ -105,7 +105,7 @@ function buildPrompt(plainText, lang, title) {
       `[방송문]\n${plainText}`,
       '',
       '위 방송문을 의미 단위 세그먼트로 나누어 억양 마크업을 생성하세요.',
-      '[타입] break-long(문장끝/의미전환,text="") | break-short(절사이,text="") | stress(핵심정보) | slow(천천히) | up(올림) | down(내림) | flat(평탄) | normal(일반)',
+      '[타입] break-long(문장끝/의미전환,text="") | break-short(절사이,text="") | stress(핵심정보 — 반드시 1~3어절만, 문장전체 X) | slow(천천히) | up(올림) | down(내림) | flat(평탄) | normal(일반)',
       ...common,
     ].join('\n'),
   }
@@ -117,7 +117,7 @@ function buildPrompt(plainText, lang, title) {
       `[Script]\n${plainText}`,
       '',
       'Generate intonation markup by splitting the text into meaning-unit segments.',
-      '[Types] break-long(sentence end, text="") | break-short(clause pause, text="") | stress(key info) | slow(read slowly) | up(rising) | down(falling) | flat(level) | normal',
+      '[Types] break-long(sentence end, text="") | break-short(clause pause, text="") | stress(key info — 1-3 words ONLY, never whole sentence) | slow(read slowly) | up(rising) | down(falling) | flat(level) | normal',
       '[Rule] Concatenated texts must equal the original. Break types: text must be "".',
       'Respond ONLY with: {"segments":[{"text":"...","type":"...","tip":"(optional)"},...]}',
     ].join('\n'),
@@ -130,7 +130,7 @@ function buildPrompt(plainText, lang, title) {
       `[放送文]\n${plainText}`,
       '',
       '放送文を意味単位のセグメントに分けてイントネーションマークアップを生成してください。',
-      '[タイプ] break-long(文末,text="") | break-short(節間,text="") | stress(重要情報) | slow(ゆっくり) | up(上昇) | down(下降) | flat(平坦) | normal',
+      '[タイプ] break-long(文末,text="") | break-short(節間,text="") | stress(重要情報 — 1〜3語節のみ、文全体禁止) | slow(ゆっくり) | up(上昇) | down(下降) | flat(平坦) | normal',
       '[規則] text結合=原文。breakのtextは必ず""。',
       '{"segments":[{"text":"...","type":"...","tip":"(任意)"},...]} のみで回答。',
     ].join('\n'),
@@ -144,7 +144,7 @@ function buildPrompt(plainText, lang, title) {
       `[广播文]\n${plainText}`,
       '',
       '将广播文按意义单位分段生成语调标记。',
-      '[类型] break-long(句末,text="") | break-short(分句,text="") | stress(关键信息) | slow(缓读) | up(升调) | down(降调) | flat(平调) | normal',
+      '[类型] break-long(句末,text="") | break-short(分句,text="") | stress(关键信息 — 仅限1-3词，禁止整句) | slow(缓读) | up(升调) | down(降调) | flat(平调) | normal',
       '[规则] text拼接=原文。break的text必须为""。',
       '{"segments":[{"text":"...","type":"...","tip":"(可选)"},...]}',
     ].join('\n'),
