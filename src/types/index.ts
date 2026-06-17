@@ -64,4 +64,5 @@ export interface FeedbackResult {
   weakest: 'fluency' | 'voice' | 'intonation' | 'pronunciation'
   nextStep: string
   drills?: string[]
+  partial?: boolean
 }

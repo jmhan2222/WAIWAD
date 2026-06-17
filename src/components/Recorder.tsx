@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
-import { Mic, Square, RotateCcw, Play, AlertCircle, Clock } from 'lucide-react'
+import { Mic, Square, RotateCcw, Play, AlertCircle, AlertTriangle, Clock } from 'lucide-react'
 import { useRecorder } from '../hooks/useRecorder'
-import { useGroq, GroqError } from '../hooks/useGroq'
+import { useGroq, GroqError, ValidationError } from '../hooks/useGroq'
 import type { FeedbackResult } from '../types'
 
 interface Props {
@@ -11,9 +11,10 @@ interface Props {
   onFeedback: (result: FeedbackResult) => void
 }
 
-interface ApiError {
+interface RecorderError {
   message: string
   isRateLimit: boolean
+  validationReason?: 'too_short' | 'unrelated_content' | 'mostly_silent'
 }
 
 function formatTime(seconds: number) {
@@ -25,27 +26,36 @@ function formatTime(seconds: number) {
 export function Recorder({ plain, lang, scriptName, onFeedback }: Props) {
   const { recordingState, audioURL, audioBlob, elapsedTime, startRecording, stopRecording, resetRecording } = useRecorder()
   const { transcribeAudio, generateFeedback, isTranscribing, isAnalyzing } = useGroq()
-  const [apiError, setApiError] = useState<ApiError | null>(null)
+  const [recorderError, setRecorderError] = useState<RecorderError | null>(null)
   const [audioPlayError, setAudioPlayError] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const handleFeedback = async () => {
     if (!audioBlob) return
-    setApiError(null)
+    setRecorderError(null)
     try {
       const transcription = await transcribeAudio(audioBlob, lang)
       const result = await generateFeedback(plain, transcription, lang, scriptName)
       onFeedback(result)
     } catch (e) {
-      if (e instanceof GroqError) {
-        setApiError({ message: e.message, isRateLimit: e.isRateLimit })
+      if (e instanceof ValidationError) {
+        setRecorderError({ message: e.message, isRateLimit: false, validationReason: e.reason })
+      } else if (e instanceof GroqError) {
+        setRecorderError({ message: e.message, isRateLimit: e.isRateLimit })
       } else {
-        setApiError({ message: '오류가 발생했습니다. 다시 시도해 주세요.', isRateLimit: false })
+        setRecorderError({ message: '오류가 발생했습니다. 다시 시도해 주세요.', isRateLimit: false })
       }
     }
   }
 
+  const handleReset = () => {
+    setRecorderError(null)
+    setAudioPlayError(false)
+    resetRecording()
+  }
+
   const isProcessing = isTranscribing || isAnalyzing
+  const isValidationError = !!recorderError?.validationReason
 
   return (
     <div className="space-y-4">
@@ -118,35 +128,29 @@ export function Recorder({ plain, lang, scriptName, onFeedback }: Props) {
             )}
 
             {/* 에러 박스 */}
-            {apiError && (
+            {recorderError && (
               <div className={`rounded-xl p-3.5 border flex gap-3 items-start ${
-                apiError.isRateLimit
+                isValidationError || recorderError.isRateLimit
                   ? 'bg-amber-50 border-amber-200'
                   : 'bg-red-50 border-red-200'
               }`}>
-                {apiError.isRateLimit
+                {isValidationError
+                  ? <AlertTriangle size={16} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                  : recorderError.isRateLimit
                   ? <Clock size={16} className="text-amber-500 flex-shrink-0 mt-0.5" />
                   : <AlertCircle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
                 }
                 <p className={`text-sm leading-relaxed ${
-                  apiError.isRateLimit ? 'text-amber-800' : 'text-red-800'
+                  isValidationError || recorderError.isRateLimit ? 'text-amber-800' : 'text-red-800'
                 }`}>
-                  {apiError.message}
+                  {recorderError.message}
                 </p>
               </div>
             )}
 
             <div className="flex flex-col gap-2">
-              {/* 에러 시: 다시 시도 (같은 오디오로) */}
-              {apiError ? (
-                <button
-                  onClick={handleFeedback}
-                  className="w-full py-3 bg-[#E8361E] text-white rounded-xl font-medium hover:bg-[#c82d18] transition-colors flex items-center justify-center gap-2"
-                >
-                  <Play size={16} />
-                  다시 시도
-                </button>
-              ) : (
+              {/* 검증 오류: 같은 녹음 재시도 불가 → AI 피드백 받기만 숨김 */}
+              {!recorderError && (
                 <button
                   onClick={handleFeedback}
                   className="w-full py-3 bg-[#E8361E] text-white rounded-xl font-medium hover:bg-[#c82d18] transition-colors flex items-center justify-center gap-2"
@@ -155,9 +159,19 @@ export function Recorder({ plain, lang, scriptName, onFeedback }: Props) {
                   AI 피드백 받기
                 </button>
               )}
+              {/* API 오류(네트워크/레이트리밋)만 동일 오디오로 재시도 가능 */}
+              {recorderError && !isValidationError && (
+                <button
+                  onClick={handleFeedback}
+                  className="w-full py-3 bg-[#E8361E] text-white rounded-xl font-medium hover:bg-[#c82d18] transition-colors flex items-center justify-center gap-2"
+                >
+                  <Play size={16} />
+                  다시 시도
+                </button>
+              )}
 
               <button
-                onClick={() => { setApiError(null); setAudioPlayError(false); resetRecording() }}
+                onClick={handleReset}
                 className="w-full py-2.5 border border-gray-300 text-gray-600 rounded-xl text-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5"
               >
                 <RotateCcw size={14} />

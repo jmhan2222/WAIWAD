@@ -19,6 +19,16 @@ export class GroqError extends Error {
   }
 }
 
+export class ValidationError extends Error {
+  constructor(
+    public readonly reason: 'too_short' | 'unrelated_content' | 'mostly_silent',
+    message: string,
+  ) {
+    super(message)
+    this.name = 'ValidationError'
+  }
+}
+
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
@@ -57,22 +67,12 @@ const KO_ALLOW_LIST = new Set([
   'JSON', 'OK', 'VIP', 'PA', 'FCL',
 ])
 
-// 3자 이상 연속 알파벳이 허용 목록에 없으면 외국어 혼입으로 판정
-function detectForeignWords(text: string, lang: Lang): boolean {
-  if (lang === 'ko') {
-    const matches = text.match(/[a-zA-Z]{3,}/g)
-    if (!matches) return false
-    return matches.some(m => !KO_ALLOW_LIST.has(m.toUpperCase()))
-  }
-  if (lang === 'ja') {
-    // 일본어 응답에 한글이 섞이면 혼입으로 판정
-    return /[가-힣]/.test(text)
-  }
-  if (lang === 'ca') {
-    // 중국어 응답에 한글이 섞이면 혼입으로 판정
-    return /[가-힣]/.test(text)
-  }
-  return false
+// 피드백 텍스트가 한국어가 아닌 언어로 작성됐는지 감지
+// (모든 언어의 피드백은 한국어여야 하므로 항상 ko 기준으로 검사)
+function detectForeignWords(text: string): boolean {
+  const matches = text.match(/[a-zA-Z]{3,}/g)
+  if (!matches) return false
+  return matches.some(m => !KO_ALLOW_LIST.has(m.toUpperCase()))
 }
 
 function extractTextFields(result: FeedbackResult): string[] {
@@ -93,8 +93,63 @@ function extractTextFields(result: FeedbackResult): string[] {
   ]
 }
 
-function hasForeignMixture(result: FeedbackResult, lang: Lang): boolean {
-  return extractTextFields(result).some(field => detectForeignWords(field, lang))
+function hasForeignMixture(result: FeedbackResult): boolean {
+  return extractTextFields(result).some(field => detectForeignWords(field))
+}
+
+// ── 녹음 검증 ─────────────────────────────────────────────────────────────────
+
+interface ValidationResult {
+  isValid: boolean
+  reason: 'too_short' | 'unrelated_content' | 'mostly_silent' | 'ok'
+  partial: boolean
+}
+
+function validateTranscription(transcription: string, originalText: string): ValidationResult {
+  const trimmed = transcription.trim()
+
+  if (trimmed.length < 10) {
+    return { isValid: false, reason: 'mostly_silent', partial: false }
+  }
+
+  const lengthRatio = trimmed.length / (originalText.trim().length || 1)
+  if (lengthRatio < 0.3) {
+    return { isValid: false, reason: 'too_short', partial: false }
+  }
+
+  return { isValid: true, reason: 'ok', partial: lengthRatio < 0.7 }
+}
+
+async function checkRelevance(originalText: string, transcription: string): Promise<boolean> {
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          {
+            role: 'system',
+            content: '당신은 텍스트 비교 전문가입니다. 원본 방송문과 사용자 발화를 비교하세요. 발음이 틀리거나 일부 생략해도 방송문을 읽으려 한 시도라면 RELATED. 방송문과 전혀 다른 화제나 의미 없는 말이면 UNRELATED. RELATED 또는 UNRELATED 중 하나만 답하세요.',
+          },
+          {
+            role: 'user',
+            content: `원본 방송문: ${originalText}\n\n사용자 발화: ${transcription}`,
+          },
+        ],
+        temperature: 0,
+        max_tokens: 10,
+      }),
+    })
+    if (!res.ok) return true // 실패 시 관대하게 통과
+    const data = await res.json() as { choices: { message: { content: string } }[] }
+    return !data.choices[0].message.content.trim().toUpperCase().includes('UNRELATED')
+  } catch {
+    return true // 네트워크 오류 시 통과
+  }
 }
 
 // ── 프롬프트 빌더 ─────────────────────────────────────────────────────────────
@@ -145,71 +200,71 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
 
   if (lang === 'en') return {
     system: [
-      'IMPORTANT: Write ALL responses in 100% English only.',
-      'Do not mix in Korean, Japanese, Chinese, Vietnamese, or any other language.',
-      'You are a clear, direct Jeju Air cabin announcement coach.',
-      'Never give vague feedback like "try to sound more natural". Instead be concrete and specific.',
-      'passengerImpression: describe how a passenger actually experienced this announcement (specific scenario).',
-      'specificIssue: state observed facts about where and what went wrong — avoid vague judgment words.',
-      'actionGuide: give a specific, actionable instruction with numbers or exact words. Bad: "speak more clearly". Good: "hold the word landing for 0.5 seconds longer".',
-      'drills: 3 achievable practice exercises based on the weakest category\'s actionGuide. Never require memorizing the full script.',
-      'Return ONLY valid JSON, no other text.',
+      '중요: 평가 대상 발화가 영어여도, 모든 피드백 텍스트(passengerImpression, specificIssue, actionGuide, summary, nextStep, drills)는 반드시 100% 한국어로만 작성하세요.',
+      '예: "Great job" 대신 "발음이 좋았어요", "Focus on intonation" 대신 "억양에 집중해보세요".',
+      '당신은 명확하고 구체적인 제주항공 기내방송 코치입니다.',
+      '모호한 피드백("조금 더 좋아질 것 같아요") 금지.',
+      'passengerImpression: 승객 관점에서 이 방송을 들었을 때의 구체적 인상, 한국어로.',
+      'specificIssue: 어디서 무엇이 어땠는지 관찰 사실 위주, 한국어로.',
+      'actionGuide: 숫자나 구체적 동작 포함한 행동 지침, 한국어로.',
+      'drills: weakest 카테고리 기반 실현 가능한 연습 3개, 암기 요구 금지, 한국어로.',
+      '유효한 JSON만 반환하세요.',
     ].join(' '),
     user: [
       `Script: ${title}`,
       `Criteria: Fluency(30pts)/Voice&Atmosphere(25pts)/Intonation(25pts)/Pronunciation(20pts)`,
       `Original: ${originalText}`,
       `Transcription: ${transcription}`,
-      `Respond in JSON only (use 상/중/하 for scores):\n${jsonSchema}`,
+      `JSON only (use 상/중/하 for scores):\n${jsonSchema}`,
       '',
-      'Final check: Every text value (passengerImpression, specificIssue, actionGuide, summary, nextStep, drills) must be in English only.',
+      '최종 확인: passengerImpression, specificIssue, actionGuide, summary, nextStep, drills의 모든 텍스트가 순수 한국어인지 확인 후 응답하세요.',
     ].join('\n'),
   }
 
   if (lang === 'ja') return {
     system: [
-      '重要：すべての回答を100%日本語のみで記述してください。',
-      '韓国語、英語、ベトナム語、中国語など他の言語の単語を混ぜないでください。',
-      'あなたは明確で具体的な済州航空の機内放送コーチです。',
-      '曖昧なフィードバック（「もう少し良くなれば」）は絶対禁止です。',
-      'passengerImpression: 乗客がこの放送を聞いたときの具体的な印象を場面で描写。',
-      'specificIssue: どこで何が問題だったか、曖昧な評価語でなく観察した事実を中心に。',
-      'actionGuide: 抽象的なアドバイス禁止。数字や具体的な動作を含めること。',
-      'drills: weakestカテゴリのactionGuideを基に実現可能な練習3つ。全文暗記を要求するドリルは絶対含めないこと。',
-      'JSONのみで回答してください。',
+      '중요: 평가 대상 발화가 일본어여도, 모든 피드백 텍스트(passengerImpression, specificIssue, actionGuide, summary, nextStep, drills)는 반드시 100% 한국어로만 작성하세요.',
+      '일본어 피드백 금지. 모든 설명은 한국어로 작성합니다.',
+      '당신은 명확하고 구체적인 제주항공 기내방송 코치입니다.',
+      '모호한 피드백 금지.',
+      'passengerImpression: 승객 관점에서 이 방송을 들었을 때의 구체적 인상, 한국어로.',
+      'specificIssue: 어디서 무엇이 어땠는지 관찰 사실 위주, 한국어로.',
+      'actionGuide: 숫자나 구체적 동작 포함한 행동 지침, 한국어로.',
+      'drills: weakest 카테고리 기반 실현 가능한 연습 3개, 암기 요구 금지, 한국어로.',
+      '유효한 JSON만 반환하세요.',
     ].join(' '),
     user: [
       `放送文: ${title}`,
       `評価基準: 流暢さ(30点)/雰囲気・声(25点)/イントネーション(25点)/発音(20点)`,
       `元の文: ${originalText}`,
       `書き起こし: ${transcription}`,
-      `JSONのみで回答 (スコアは상/중/하を使用):\n${jsonSchema}`,
+      `JSON only (スコアは상/중/하):\n${jsonSchema}`,
       '',
-      '最終確認：すべてのテキスト値が日本語のみであることを確認してから回答してください。',
+      '최종 확인: passengerImpression, specificIssue, actionGuide, summary, nextStep, drills의 모든 텍스트가 순수 한국어인지 확인 후 응답하세요.',
     ].join('\n'),
   }
 
   // ca (中文)
   return {
     system: [
-      '重要：所有回答必须100%使用中文书写。',
-      '不得混入韩语、英语、越南语、日语等任何其他语言的单词。',
-      '您是清晰、直接的济州航空机舱广播教练。',
-      '严禁模糊反馈（"再好一点就好了"）。',
-      'passengerImpression: 从乘客角度具体描述听到这段广播时的感受。',
-      'specificIssue: 具体说明在哪里出了什么问题，用观察到的事实代替模糊评价词。',
-      'actionGuide: 禁止抽象建议，包含数字或具体动作。',
-      'drills: 基于weakest类别的actionGuide，提供3个可实现的练习。不得要求背诵全文。',
-      '仅用JSON回答。',
+      '중요: 평가 대상 발화가 중국어여도, 모든 피드백 텍스트(passengerImpression, specificIssue, actionGuide, summary, nextStep, drills)는 반드시 100% 한국어로만 작성하세요.',
+      '중국어 피드백 금지. 모든 설명은 한국어로 작성합니다.',
+      '당신은 명확하고 구체적인 제주항공 기내방송 코치입니다.',
+      '모호한 피드백 금지.',
+      'passengerImpression: 승객 관점에서 이 방송을 들었을 때의 구체적 인상, 한국어로.',
+      'specificIssue: 어디서 무엇이 어땠는지 관찰 사실 위주, 한국어로.',
+      'actionGuide: 숫자나 구체적 동작 포함한 행동 지침, 한국어로.',
+      'drills: weakest 카테고리 기반 실현 가능한 연습 3개, 암기 요구 금지, 한국어로.',
+      '유효한 JSON만 반환하세요.',
     ].join(' '),
     user: [
       `广播文: ${title}`,
       `评分标准: 流利度(30分)/氛围声音(25分)/语调(25分)/发音(20分)`,
       `原文: ${originalText}`,
       `转录: ${transcription}`,
-      `仅用JSON回答 (评分使用상/중/하):\n${jsonSchema}`,
+      `JSON only (评分使用상/중/하):\n${jsonSchema}`,
       '',
-      '最终确认：请确保所有文本值均为纯中文后再回答。',
+      '최종 확인: passengerImpression, specificIssue, actionGuide, summary, nextStep, drills의 모든 텍스트가 순수 한국어인지 확인 후 응답하세요.',
     ].join('\n'),
   }
 }
@@ -441,22 +496,42 @@ export function useGroq() {
     setIsAnalyzing(true)
     setError(null)
     try {
-      const { system, user } = buildPrompt(lang, scriptName, originalText, transcription)
+      // ── 1단계: 길이 검증 ──────────────────────────────────────────────────────
+      const validation = validateTranscription(transcription, originalText)
 
-      // 1차 시도
+      if (!validation.isValid) {
+        const messages: Record<string, string> = {
+          mostly_silent: '녹음에서 음성이 거의 감지되지 않았어요. 마이크가 제대로 작동하는지 확인하고 다시 녹음해주세요.',
+          too_short: '녹음이 너무 짧아요. 방송문 전체를 끝까지 읽고 녹음해주세요. (원본 길이의 최소 절반 이상은 읽어야 정확한 피드백이 가능해요)',
+        }
+        throw new ValidationError(
+          validation.reason as 'too_short' | 'mostly_silent',
+          messages[validation.reason] ?? '녹음을 다시 시도해주세요.',
+        )
+      }
+
+      // ── 2단계: 관련성 검증 ────────────────────────────────────────────────────
+      const isRelated = await checkRelevance(originalText, transcription)
+      if (!isRelated) {
+        throw new ValidationError(
+          'unrelated_content',
+          '녹음된 내용이 방송문과 달라요. 화면에 표시된 방송문을 보면서 그대로 읽어주세요.',
+        )
+      }
+
+      // ── 3단계: 피드백 생성 ────────────────────────────────────────────────────
+      const { system, user } = buildPrompt(lang, scriptName, originalText, transcription)
       let result = await callLlama(system, user)
 
-      // 언어 혼입 감지 → 1회 재시도
-      if (hasForeignMixture(result, lang)) {
-        console.warn('[useGroq] 언어 혼입 감지 — 재시도합니다.', lang)
+      // 한국어 혼입 감지 → 1회 재시도
+      if (hasForeignMixture(result)) {
+        console.warn('[useGroq] 언어 혼입 감지 — 재시도합니다.')
         result = await callLlama(system, user)
 
-        // 재시도 후에도 혼입이 있으면 해당 필드에 오류 표시
-        if (hasForeignMixture(result, lang)) {
+        if (hasForeignMixture(result)) {
           console.warn('[useGroq] 재시도 후에도 언어 혼입 감지 — 필드 오류 표시')
           const FALLBACK = '[표현 오류 - 다시 시도해주세요]'
-          const fix = (field: string) =>
-            detectForeignWords(field, lang) ? FALLBACK : field
+          const fix = (field: string) => detectForeignWords(field) ? FALLBACK : field
 
           const fixCategory = (cat: FeedbackResult['categories']['fluency']) => ({
             ...cat,
@@ -479,8 +554,9 @@ export function useGroq() {
         }
       }
 
-      return result
+      return { ...result, ...(validation.partial ? { partial: true } : {}) }
     } catch (e) {
+      if (e instanceof ValidationError) throw e
       const err = e instanceof GroqError ? e : new GroqError('네트워크 오류가 발생했습니다. 연결을 확인해 주세요.', false)
       setError(err.message)
       throw err
