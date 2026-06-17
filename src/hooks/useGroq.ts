@@ -476,6 +476,48 @@ async function callLlama(system: string, user: string, temperature = 0.3): Promi
 // 한자 혼입 재시도 시 추가되는 강화 지시문
 const ANTI_KANJI = '방금 응답에 한자/한문이 포함되어 거부되었습니다. 한자를 단 한 글자도 쓰지 마세요. 발음을 설명할 때도 한글로만 표기하세요. 예: "认真" 대신 "진지하게", "发音" 대신 "발음"으로.'
 
+const CATEGORY_KO: Record<string, string> = {
+  fluency: '유창성', voice: '분위기·목소리', intonation: '억양', pronunciation: '발음',
+}
+
+async function retryEmptyCategory(
+  category: keyof FeedbackResult['categories'],
+  originalText: string,
+  transcription: string,
+  lang: Lang,
+  scriptName: string,
+): Promise<import('../types').CategoryFeedback | null> {
+  const catSchema = `{"score":"상|중|하","passengerImpression":"...","specificIssue":"...","actionGuide":"..."}`
+  const { system } = buildPrompt(lang, scriptName, originalText, transcription)
+  const userPrompt = [
+    `방송문: ${scriptName}`,
+    `원본: ${originalText}`,
+    `전사본: ${transcription}`,
+    `"${CATEGORY_KO[category] ?? category}" 카테고리만 평가하여 JSON으로 응답. specificIssue와 actionGuide를 각각 30자 이상으로 구체적으로 작성하세요:`,
+    catSchema,
+  ].join('\n')
+  try {
+    const res = await fetchWithRetry('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${GROQ_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: system + ' ' + ANTI_KANJI },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.3,
+        response_format: { type: 'json_object' },
+      }),
+    })
+    if (!res.ok) return null
+    const data = await res.json() as { choices: { message: { content: string } }[] }
+    return JSON.parse(data.choices[0].message.content) as import('../types').CategoryFeedback
+  } catch {
+    return null
+  }
+}
+
 // ── React Hook ────────────────────────────────────────────────────────────────
 
 export function useGroq() {
@@ -572,12 +614,27 @@ export function useGroq() {
         if (needsReeval.length > 0) result = { ...result, needsReeval }
       }
 
-      // ── 4단계: 빈 필드 검증 ──────────────────────────────────────────────────
+      // ── 4단계: 빈 필드 검증 및 자동 재시도 (최대 1회) ────────────────────────
       const emptyCategories = findEmptyCategories(result)
       if (emptyCategories.length > 0) {
-        console.warn('[generateFeedback] 빈/부실 필드 감지 — needsReeval 추가:', emptyCategories)
-        const existing = result.needsReeval ?? []
-        result = { ...result, needsReeval: [...new Set([...existing, ...emptyCategories])] }
+        console.warn('[generateFeedback] 빈/부실 필드 감지 — 자동 재시도:', emptyCategories)
+        const updatedCategories = { ...result.categories }
+        const tooShort = (s: string) => !s || s.trim().length < 15
+
+        for (const key of emptyCategories as (keyof typeof result.categories)[]) {
+          const retried = await retryEmptyCategory(key, originalText, transcription, lang, scriptName)
+          if (retried && !tooShort(retried.specificIssue) && !tooShort(retried.actionGuide)) {
+            updatedCategories[key] = retried
+          } else {
+            console.warn('[generateFeedback] 재시도 후에도 빈 필드 — 폴백 처리:', key)
+            updatedCategories[key] = {
+              ...updatedCategories[key],
+              specificIssue: '이 부분은 분석이 어려웠어요. 다시 녹음해서 시도해보세요.',
+              actionGuide: '방송문 전체를 다시 녹음하여 피드백을 받아보세요.',
+            }
+          }
+        }
+        result = { ...result, categories: updatedCategories }
       }
 
       return { ...result, ...(validation.partial ? { partial: Math.round(validation.lengthRatio * 100) } : {}) }
@@ -600,9 +657,6 @@ export function useGroq() {
   ): Promise<import('../types').CategoryFeedback> => {
     setIsAnalyzing(true)
     try {
-      const CATEGORY_KO: Record<string, string> = {
-        fluency: '유창성', voice: '분위기·목소리', intonation: '억양', pronunciation: '발음',
-      }
       const catSchema = `{"score":"상|중|하","passengerImpression":"...","specificIssue":"...","actionGuide":"..."}`
       const { system } = buildPrompt(lang, scriptName, originalText, transcription)
       const strongSystem = system + ' ' + ANTI_KANJI
