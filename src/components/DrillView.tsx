@@ -69,6 +69,77 @@ function getSegmentsForFocus(allSegments: MarkupSegment[] | null, focusText: str
   return filtered.length > 0 ? filtered : [{ text: focusText, types: ['normal'] }]
 }
 
+const DOT_SIZES = [7, 9, 11, 13]
+const ENCOURAGEMENTS = [
+  '',
+  '',
+  '',
+  '자연스러움이 늘고 있어요!',
+  '집중력이 대단해요!',
+  '꾸준히 하는 게 최고예요!',
+]
+
+function DrillCompletionCard({ category, focusText, attempts }: {
+  category: string
+  focusText: string
+  attempts: number
+}) {
+  const filledCount = Math.min(attempts, 4)
+  const msg = ENCOURAGEMENTS[Math.min(attempts, ENCOURAGEMENTS.length - 1)]
+  return (
+    <div
+      className="rounded-2xl p-5 relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(232,54,30,0.07) 100%)',
+        border: '1px solid rgba(139,92,246,0.2)',
+      }}
+    >
+      {/* Pill badge */}
+      <div className="flex justify-center mb-4">
+        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-semibold bg-white/80 text-purple-600 shadow-sm"
+          style={{ border: '1px solid rgba(139,92,246,0.25)' }}>
+          ✦ {CATEGORY_TITLES[category] ?? category} 집중 연습 후
+        </span>
+      </div>
+
+      {/* Big quote */}
+      {focusText && (
+        <p className="text-center text-[17px] font-bold text-[#1D1D1F] leading-snug mb-5 px-2">
+          &ldquo;{focusText}&rdquo;
+        </p>
+      )}
+
+      {/* Dots — growing sizes = visual progress */}
+      <div className="flex items-end justify-center gap-2 mb-3">
+        {DOT_SIZES.map((size, i) => (
+          <div
+            key={i}
+            className="rounded-full transition-all duration-500"
+            style={{
+              width: size,
+              height: size,
+              background: i < filledCount
+                ? `rgba(139,92,246,${0.5 + i * 0.15})`
+                : '#E5E5EA',
+              transform: i < filledCount ? 'scale(1)' : 'scale(0.85)',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Text */}
+      <p className="text-center text-sm text-[#1D1D1F] font-medium">
+        오늘 이 구간을{' '}
+        <span className="font-bold" style={{ color: '#8B5CF6' }}>{attempts}번</span>
+        {' '}연습했어요
+      </p>
+      {msg && (
+        <p className="text-center text-xs text-[#6E6E73] mt-0.5">{msg}</p>
+      )}
+    </div>
+  )
+}
+
 export function DrillView({ result, onRetry, scriptId, segments, announcementId }: Props) {
   const weakest = result.weakest ?? 'fluency'
   const checklist = CATEGORY_CHECKLISTS[weakest] ?? CATEGORY_CHECKLISTS.fluency
@@ -162,7 +233,16 @@ export function DrillView({ result, onRetry, scriptId, segments, announcementId 
         </div>
       )}
 
-      {/* Section D: 체크리스트 */}
+      {/* Section D: 완료 카드 (3회 이상 시도 시) */}
+      {attempts >= 3 && focusSegment && (
+        <DrillCompletionCard
+          category={weakest}
+          focusText={focusSegment.text}
+          attempts={attempts}
+        />
+      )}
+
+      {/* Section E: 체크리스트 */}
       <div className="bg-white rounded-2xl border border-[#E5E5EA] p-4">
         <p className="text-xs font-semibold text-[#6E6E73] mb-3">자가 체크리스트</p>
         <div className="space-y-3">

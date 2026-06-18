@@ -4,6 +4,60 @@ import { ChevronRight } from 'lucide-react'
 import { useAnnouncements } from '../hooks/useAnnouncements'
 import type { Announcement } from '../types'
 
+const STUDY_TABS = ['study', 'audio', 'record', 'drill'] as const
+const TAB_LABELS: Record<typeof STUDY_TABS[number], string> = {
+  study: '학습', audio: '보이스', record: '녹음', drill: '드릴',
+}
+
+function ProgressBar({ id }: { id: string }) {
+  const done = STUDY_TABS.map(t => localStorage.getItem(`tab_${id}_${t}`) === 'true')
+  const count = done.filter(Boolean).length
+  if (count === 0) return null
+  return (
+    <div className="mt-2.5">
+      <div className="flex gap-1 mb-1">
+        {STUDY_TABS.map((t, i) => (
+          <div
+            key={t}
+            className="flex-1 h-1 rounded-full transition-all duration-300"
+            style={{ background: done[i] ? '#34C759' : '#E5E5EA' }}
+          />
+        ))}
+      </div>
+      <p className="text-[9px] text-[#8E8E93]">
+        {count === 4
+          ? '모든 단계 완료 ✓'
+          : `${count}/4 단계 완료 — 다음: ${TAB_LABELS[STUDY_TABS[count]]}`}
+      </p>
+    </div>
+  )
+}
+
+function Sparkline({ id }: { id: string }) {
+  const history = JSON.parse(localStorage.getItem(`score_history_${id}`) ?? '[]') as number[]
+  if (history.length < 2) return null
+
+  const recent = history.slice(-5)
+  const W = 36, H = 18
+  const min = 1, max = 3
+
+  const pts = recent.map((v, i) => ({
+    x: (i / (recent.length - 1)) * W,
+    y: H - ((v - min) / (max - min + 0.01)) * (H - 4) - 2,
+  }))
+
+  const d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
+  const isUp = recent[recent.length - 1] >= recent[0]
+  const color = isUp ? '#34C759' : '#FF9500'
+
+  return (
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block', flexShrink: 0 }}>
+      <path d={d} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={pts[pts.length - 1].x} cy={pts[pts.length - 1].y} r="2.5" fill={color} />
+    </svg>
+  )
+}
+
 type QuarterFilter = 'all' | 'Q1' | 'Q2' | 'Q3' | 'Q4'
 type LangFilter = 'all' | 'ko' | 'en' | 'ja' | 'ca'
 
@@ -136,31 +190,37 @@ export function LibraryPage() {
                       <button
                         key={a.id}
                         onClick={() => navigate(`/study/${a.id}`)}
-                        className="w-full bg-white rounded-2xl border border-[#E5E5EA] p-4 text-left hover:border-[#8E8E93] hover:shadow-md hover:-translate-y-px transition-all duration-150 flex items-center gap-3 active:scale-[0.99]"
+                        className="w-full bg-white rounded-2xl border border-[#E5E5EA] p-4 text-left hover:border-[#8E8E93] hover:shadow-md hover:-translate-y-px transition-all duration-150 active:scale-[0.99]"
                       >
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-                            <span className="text-[10px] text-[#8E8E93] font-mono">{a.section}</span>
-                            {allQuarters.map(q => (
-                              <span
-                                key={q}
-                                className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-md ${QUARTER_STYLE[q] ?? 'bg-[#F5F5F7] text-[#6E6E73]'}`}
-                              >
-                                {q}
-                              </span>
-                            ))}
-                            {a.evalLang.map(l => (
-                              <span
-                                key={l}
-                                className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[#F5F5F7] text-[#6E6E73]"
-                              >
-                                {l.toUpperCase()}
-                              </span>
-                            ))}
+                        <div className="flex items-start gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                              <span className="text-[10px] text-[#8E8E93] font-mono">{a.section}</span>
+                              {allQuarters.map(q => (
+                                <span
+                                  key={q}
+                                  className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-md ${QUARTER_STYLE[q] ?? 'bg-[#F5F5F7] text-[#6E6E73]'}`}
+                                >
+                                  {q}
+                                </span>
+                              ))}
+                              {a.evalLang.map(l => (
+                                <span
+                                  key={l}
+                                  className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[#F5F5F7] text-[#6E6E73]"
+                                >
+                                  {l.toUpperCase()}
+                                </span>
+                              ))}
+                            </div>
+                            <p className="font-medium text-[#1D1D1F] text-sm truncate">{a.title}</p>
+                            <ProgressBar id={a.id} />
                           </div>
-                          <p className="font-medium text-[#1D1D1F] text-sm truncate">{a.title}</p>
+                          <div className="flex items-center gap-2 flex-shrink-0 mt-0.5">
+                            <Sparkline id={a.id} />
+                            <ChevronRight size={16} className="text-[#C7C7CC]" />
+                          </div>
                         </div>
-                        <ChevronRight size={16} className="text-[#C7C7CC] flex-shrink-0" />
                       </button>
                     )
                   })}

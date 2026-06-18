@@ -116,6 +116,17 @@ export function StudyPage() {
     setTranscription(tx)
     setWordTimestamps(words)
     markComplete(announcement.id, 'record')
+
+    // 점수 히스토리 저장 (LibraryPage 스파크라인용)
+    const scoreMap: Record<string, number> = { '상': 3, '중': 2, '하': 1 }
+    const avg = Math.round(
+      Object.values(result.categories)
+        .map(c => scoreMap[c.score] ?? 2)
+        .reduce((a, b) => a + b, 0) / 4 * 10
+    ) / 10
+    const histKey = `score_history_${announcement.id}`
+    const prev = JSON.parse(localStorage.getItem(histKey) ?? '[]') as number[]
+    localStorage.setItem(histKey, JSON.stringify([...prev, avg].slice(-8)))
   }
 
   const handleReeval = async (category: string) => {
