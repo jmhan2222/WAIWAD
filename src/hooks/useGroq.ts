@@ -68,35 +68,69 @@ const KO_ALLOW_LIST = new Set([
 ])
 
 // 피드백 텍스트가 한국어가 아닌 언어로 작성됐는지 감지
-// (모든 언어의 피드백은 한국어여야 하므로 항상 ko 기준으로 검사)
-function detectForeignWords(text: string): boolean {
-  const matches = text.match(/[a-zA-Z]{3,}/g)
-  if (!matches) return false
-  return matches.some(m => !KO_ALLOW_LIST.has(m.toUpperCase()))
+// CJK 한자·가나 (단 1자도 금지) + 허용목록 외 영문 단어(3자 이상)
+function detectForeignWords(text: string): { hasforeign: boolean; matches: string[] } {
+  // CJK 통합 한자(U+4E00-U+9FFF, U+3400-U+4DBF), 호환 한자(U+F900-U+FAFF),
+  // 일본어 히라가나(U+3040-U+309F), 가타카나(U+30A0-U+30FF)
+  const cjkMatches = text.match(/[一-鿿㐀-䶿぀-ゟ゠-ヿ豈-﫿]/g) ?? []
+  const latinMatches = (text.match(/[a-zA-Z]{3,}/g) ?? []).filter(m => !KO_ALLOW_LIST.has(m.toUpperCase()))
+  const matches = [...cjkMatches, ...latinMatches]
+  return { hasforeign: matches.length > 0, matches }
 }
 
-function extractTextFields(result: FeedbackResult): string[] {
+function detectForeignInResult(result: FeedbackResult): Array<{ fieldName: string; matches: string[] }> {
+  const issues: Array<{ fieldName: string; matches: string[] }> = []
+  const check = (fieldName: string, text: string) => {
+    const { hasforeign, matches } = detectForeignWords(text)
+    if (hasforeign) issues.push({ fieldName, matches })
+  }
   const { categories, summary, nextStep, drills, focusSegment } = result
-  const catFields = (cat: FeedbackResult['categories']['fluency']) => [
-    cat.passengerImpression,
-    cat.specificIssue,
-    cat.actionGuide,
-  ]
-  return [
-    ...catFields(categories.fluency),
-    ...catFields(categories.voice),
-    ...catFields(categories.intonation),
-    ...catFields(categories.pronunciation),
-    summary,
-    nextStep,
-    ...(drills ?? []),
-    ...(focusSegment?.reason ? [focusSegment.reason] : []),
-  ]
+  for (const catKey of ['fluency', 'voice', 'intonation', 'pronunciation'] as const) {
+    const cat = categories[catKey]
+    check(`categories.${catKey}.passengerImpression`, cat.passengerImpression)
+    check(`categories.${catKey}.specificIssue`, cat.specificIssue)
+    check(`categories.${catKey}.actionGuide`, cat.actionGuide)
+  }
+  check('summary', summary)
+  check('nextStep', nextStep)
+  ;(drills ?? []).forEach((d, i) => check(`drills[${i}]`, d))
+  if (focusSegment?.reason) check('focusSegment.reason', focusSegment.reason)
+  return issues
 }
 
-function hasForeignMixture(result: FeedbackResult): boolean {
-  return extractTextFields(result).some(field => detectForeignWords(field))
+function stripForeignChars(text: string): string {
+  return text
+    .replace(/[一-鿿㐀-䶿぀-ゟ゠-ヿ豈-﫿]/g, '')
+    .replace(/[a-zA-Z]{3,}/g, m => KO_ALLOW_LIST.has(m.toUpperCase()) ? m : '')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
 }
+
+function applyForeignStrip(result: FeedbackResult): FeedbackResult {
+  const s = stripForeignChars
+  const fixCat = (cat: FeedbackResult['categories']['fluency']) => ({
+    ...cat,
+    passengerImpression: s(cat.passengerImpression),
+    specificIssue: s(cat.specificIssue),
+    actionGuide: s(cat.actionGuide),
+  })
+  return {
+    ...result,
+    categories: {
+      fluency: fixCat(result.categories.fluency),
+      voice: fixCat(result.categories.voice),
+      intonation: fixCat(result.categories.intonation),
+      pronunciation: fixCat(result.categories.pronunciation),
+    },
+    summary: s(result.summary),
+    nextStep: s(result.nextStep),
+    drills: result.drills?.map(s),
+    focusSegment: result.focusSegment
+      ? { ...result.focusSegment, reason: s(result.focusSegment.reason) }
+      : undefined,
+  }
+}
+
 
 function findEmptyCategories(result: FeedbackResult): string[] {
   const tooShort = (s: string) => !s || s.trim().length < 15
@@ -192,6 +226,7 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
     system: [
       '중요: 모든 응답은 100% 한국어로만 작성하세요.',
       '영어, 베트남어, 중국어, 일본어, 한자, 병음 등 어떤 외국어/외래 문자도 섞지 마세요.',
+      '특히 한자(漢字)를 한국어 문장에 섞어 쓰지 마세요. 예: "변화" (O) / "変化" (X), "음성" (O) / "音声" (X). 일본어·중국어 단어를 한국어 문장 중간에 그대로 삽입하는 것은 절대 금지입니다. 모든 단어를 순수 한글로만 표기하세요.',
       '당신은 다정하지만 명확한 제주항공 기내방송 코치입니다.',
       '모호한 피드백("조금 더 좋아질 것 같아요")은 절대 금지합니다.',
       'passengerImpression: 승객 입장에서 이 방송을 들었을 때 어떤 느낌인지 구체적 상황으로 묘사.',
@@ -218,7 +253,7 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
 
   if (lang === 'en') return {
     system: [
-      '중요: 평가 대상 발화가 영어여도, 모든 피드백 텍스트는 반드시 100% 한국어로만 작성하세요. 한자·병음 금지.',
+      '중요: 평가 대상 발화가 영어여도, 모든 피드백 텍스트는 반드시 100% 한국어로만 작성하세요. 한자·병음 금지. 예: "변화" (O) / "変化" (X). 한자를 단 한 글자도 섞지 마세요.',
       '당신은 명확하고 구체적인 제주항공 기내방송 코치입니다.',
       '모호한 피드백 금지.',
       'specificIssue: 원본 방송문에서 실제 문구를 인용부호로 표시하세요. 관찰 사실만 기술. 나쁜 예: "문장 끝부분에서 음조가 내려갔습니다" / 좋은 예: "please fasten에서 음조가 평탄하게 끝났어요".',
@@ -243,7 +278,7 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
 
   if (lang === 'ja') return {
     system: [
-      '중요: 평가 대상 발화가 일본어여도, 모든 피드백 텍스트는 반드시 100% 한국어로만 작성하세요. 한자·병음 금지.',
+      '중요: 평가 대상 발화가 일본어여도, 모든 피드백 텍스트는 반드시 100% 한국어로만 작성하세요. 한자·병음·가나 금지. 예: "변화" (O) / "変化" (X), "発音" → "발음"으로. 한자/가나를 단 한 글자도 섞지 마세요.',
       '당신은 명확하고 구체적인 제주항공 기내방송 코치입니다.',
       '모호한 피드백 금지.',
       'specificIssue: 원본 방송문에서 실제 문구를 인용부호로 표시하세요, 관찰 사실만 한국어로 기술.',
@@ -269,7 +304,7 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
   // ca (中文)
   return {
     system: [
-      '중요: 평가 대상 발화가 중국어여도, 모든 피드백 텍스트는 반드시 100% 한국어로만 작성하세요. 한자·병음 절대 금지.',
+      '중요: 평가 대상 발화가 중국어여도, 모든 피드백 텍스트는 반드시 100% 한국어로만 작성하세요. 한자·병음 절대 금지. 예: "변화" (O) / "変化"/"变化" (X). 한자를 단 한 글자도 섞지 마세요.',
       '당신은 명확하고 구체적인 제주항공 기내방송 코치입니다.',
       '모호한 피드백 금지.',
       'specificIssue: 원본 방송문에서 실제 문구를 인용부호로 표시하세요, 관찰 사실만 한국어로 기술.',
@@ -592,26 +627,30 @@ export function useGroq() {
       const { system, user } = buildPrompt(lang, scriptName, originalText, transcription)
       let result = await callLlama(system, user, 0.3)
 
-      if (hasForeignMixture(result)) {
+      let foreignIssues = detectForeignInResult(result)
+      if (foreignIssues.length > 0) {
+        foreignIssues.forEach(({ fieldName, matches }) =>
+          console.warn('[언어검증] 외국어 감지', matches, '필드:', fieldName)
+        )
         console.warn('[generateFeedback] 1차 언어 혼입 감지 — 2차 재시도 (anti-kanji 프롬프트)')
         result = await callLlama(system + ' ' + ANTI_KANJI, user, 0.3)
+        foreignIssues = detectForeignInResult(result)
       }
 
-      if (hasForeignMixture(result)) {
+      if (foreignIssues.length > 0) {
+        foreignIssues.forEach(({ fieldName, matches }) =>
+          console.warn('[언어검증] 외국어 감지', matches, '필드:', fieldName)
+        )
         console.warn('[generateFeedback] 2차 언어 혼입 감지 — 3차 재시도 (temperature 0.1)')
         result = await callLlama(system + ' ' + ANTI_KANJI, user, 0.1)
+        foreignIssues = detectForeignInResult(result)
       }
 
-      if (hasForeignMixture(result)) {
-        console.error('[generateFeedback] 3회 재시도 모두 실패 — needsReeval 처리', result)
-        const needsReeval: string[] = []
-        for (const key of ['fluency', 'voice', 'intonation', 'pronunciation'] as const) {
-          const cat = result.categories[key]
-          const hasIssue = [cat.passengerImpression, cat.specificIssue, cat.actionGuide]
-            .some(f => detectForeignWords(f))
-          if (hasIssue) needsReeval.push(key)
-        }
-        if (needsReeval.length > 0) result = { ...result, needsReeval }
+      if (foreignIssues.length > 0) {
+        foreignIssues.forEach(({ fieldName, matches }) =>
+          console.error('[언어검증] 3회 재시도 후에도 외국어 잔존 — 강제 제거', matches, '필드:', fieldName)
+        )
+        result = applyForeignStrip(result)
       }
 
       // ── 4단계: 빈 필드 검증 및 자동 재시도 (최대 1회) ────────────────────────
@@ -690,7 +729,7 @@ export function useGroq() {
 
       let cat = await callForCat(0.3)
       const hasIssue = (c: import('../types').CategoryFeedback) =>
-        [c.passengerImpression, c.specificIssue, c.actionGuide].some(f => detectForeignWords(f))
+        [c.passengerImpression, c.specificIssue, c.actionGuide].some(f => detectForeignWords(f).hasforeign)
 
       if (hasIssue(cat)) cat = await callForCat(0.1)
 
