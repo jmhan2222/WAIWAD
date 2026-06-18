@@ -17,10 +17,18 @@ const PROJECT_ROOT = path.resolve(__dirname, '..')
 const announcementsPath = path.join(PROJECT_ROOT, 'public', 'data', 'announcements.json')
 const cachePath         = path.join(PROJECT_ROOT, 'public', 'data', 'markup-cache.json')
 
+const VALIDATE_COMPLETENESS = process.argv.includes('--validate-completeness')
+
 const { announcements } = JSON.parse(fs.readFileSync(announcementsPath, 'utf8'))
 const cache = fs.existsSync(cachePath)
   ? JSON.parse(fs.readFileSync(cachePath, 'utf8'))
   : {}
+
+const normalizeStr = s => s.replace(/\s+/g, '').trim()
+function checkCompleteness(originalText, segments) {
+  const reconstructed = normalizeStr(segments.map(s => s.text).join(''))
+  return originalText ? reconstructed.length / normalizeStr(originalText).length : 1
+}
 
 let hasText = 0, hasMarkup = 0
 const missing    = []   // { id, lang, title }
@@ -67,6 +75,34 @@ if (noText.length > 0) {
   for (const n of noText) {
     console.log(`  ${n.id.padEnd(20)} [${n.langs.join('/')}]  "${n.title}"`)
   }
+}
+
+// ── 완전성 검증 ──────────────────────────────────────────────────────────────
+if (VALIDATE_COMPLETENESS) {
+  const incomplete = []
+  for (const ann of announcements) {
+    for (const lang of ann.evalLang) {
+      const text = (ann[lang] ?? '').trim()
+      if (!text || !cache[ann.id]?.[lang]) continue
+      const ratio = checkCompleteness(text, cache[ann.id][lang])
+      if (ratio < 0.95) {
+        incomplete.push({ id: ann.id, lang, title: ann.title, ratio })
+      }
+    }
+  }
+
+  console.log('\n🔍 완전성 검증 결과 (95% 기준)')
+  console.log('─'.repeat(54))
+  if (incomplete.length === 0) {
+    console.log('  ✅ 모든 항목이 95% 이상 완전합니다.')
+  } else {
+    console.log(`  ❌ 불완전 항목: ${incomplete.length}개 — npm run markup:fix 로 재생성 가능`)
+    for (const m of incomplete) {
+      const pct = (m.ratio * 100).toFixed(1)
+      console.log(`  ${m.id.padEnd(20)} [${m.lang}]  ${pct.padStart(5)}%  "${m.title}"`)
+    }
+  }
+  console.log('─'.repeat(54))
 }
 
 console.log()

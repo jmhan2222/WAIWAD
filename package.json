@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "audio:organize": "node scripts/organize-audio.js",
     "markup:generate": "node scripts/pregenerate-markup.js",
-    "markup:check": "node scripts/check-markup-coverage.js"
+    "markup:check": "node scripts/check-markup-coverage.js",
+    "markup:validate": "node scripts/check-markup-coverage.js --validate-completeness",
+    "markup:fix": "node scripts/pregenerate-markup.js --fix-incomplete"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

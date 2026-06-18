@@ -39,10 +39,25 @@ if (!API_KEY) {
 
 // ── 옵션 파싱 ────────────────────────────────────────────────────────────────
 
-const FORCE    = process.argv.includes('--force')
-const DRY_RUN  = process.argv.includes('--dry-run')
-const ONLY_ID  = process.argv.find(a => a.startsWith('--id='))?.slice(5)
-const DELAY_MS = 1000  // API 호출 사이 딜레이 (rate limit 방지)
+const FORCE           = process.argv.includes('--force')
+const DRY_RUN         = process.argv.includes('--dry-run')
+const FIX_INCOMPLETE  = process.argv.includes('--fix-incomplete')
+const ONLY_ID         = process.argv.find(a => a.startsWith('--id='))?.slice(5)
+const DELAY_MS        = 1000  // API 호출 사이 딜레이 (rate limit 방지)
+
+const normalizeStr = s => s.replace(/\s+/g, '').trim()
+function completenessRatio(segments, originalText) {
+  const reconstructed = normalizeStr(segments.map(s => s.text).join(''))
+  return originalText ? reconstructed.length / normalizeStr(originalText).length : 1
+}
+function buildFallback(originalText, segments) {
+  const joined = segments.map(s => s.text).join('')
+  if (joined.length < originalText.length && originalText.startsWith(joined)) {
+    const missing = originalText.slice(joined.length)
+    return [...segments, { text: missing, types: ['normal'] }]
+  }
+  return [{ text: originalText, types: ['normal'] }]
+}
 
 // ── 타입 정의 ────────────────────────────────────────────────────────────────
 
@@ -193,12 +208,30 @@ async function main() {
     for (const lang of ann.evalLang) {
       const text = ann[lang]
       if (!text || !text.trim()) continue
-      if (!FORCE && cache[ann.id]?.[lang]) continue  // 이미 캐시됨
-      targets.push({ ann, lang, text })
+      if (FIX_INCOMPLETE) {
+        // 캐시에 있지만 완전성 95% 미달인 항목만 대상
+        const cached = cache[ann.id]?.[lang]
+        if (!cached) continue
+        const ratio = completenessRatio(cached, text)
+        if (ratio >= 0.95) continue
+        targets.push({ ann, lang, text, incompleteRatio: ratio })
+      } else {
+        if (!FORCE && cache[ann.id]?.[lang]) continue  // 이미 캐시됨
+        targets.push({ ann, lang, text })
+      }
     }
   }
 
-  console.log(`\n🎵  억양 마크업 사전 생성 ${DRY_RUN ? '[DRY RUN]' : ''}`)
+  if (FIX_INCOMPLETE && targets.length > 0) {
+    console.log(`\n🔍 불완전 항목 (${targets.length}개):`)
+    for (const { ann, lang, incompleteRatio } of targets) {
+      console.log(`  ${ann.id}  [${lang}]  ${(incompleteRatio * 100).toFixed(1)}%  "${ann.title}"`)
+    }
+    console.log()
+  }
+
+  const modeLabel = DRY_RUN ? '[DRY RUN]' : FIX_INCOMPLETE ? '[불완전 항목 재생성]' : ''
+  console.log(`\n🎵  억양 마크업 사전 생성 ${modeLabel}`)
   console.log(`📊  생성 대상: ${targets.length}개 (전체 건너뜀: ${
     announcements.reduce((n, a) => n + a.evalLang.filter(l => {
       const t = a[l]; return t && t.trim() && !FORCE && cache[a.id]?.[l]
@@ -225,19 +258,45 @@ async function main() {
 
     try {
       const { system, user } = buildPrompt(text, lang, ann.title)
-      const parsed = await callGroq(system, user)
-      const segments = normalizeSegments(parsed.segments, text)
+      let parsed = await callGroq(system, user)
+      let segments = normalizeSegments(parsed.segments, text)
 
-      if (segments) {
+      if (!segments) {
+        // normalizeSegments가 비율 0.7 미만으로 거부 — 전체 원문 normal로 폴백
+        console.log(`⚠️  형식 검증 실패 — 원문 전체 normal 폴백 적용`)
         if (!cache[ann.id]) cache[ann.id] = {}
-        cache[ann.id][lang] = segments
+        cache[ann.id][lang] = [{ text: text, types: ['normal'] }]
         fs.writeFileSync(cachePath, JSON.stringify(cache, null, 2))
-        console.log(`✅  ${segments.length}개 세그먼트`)
         ok++
-      } else {
-        console.log('⚠️  검증 실패 (스킵)')
-        fail++
+        if (i < targets.length - 1) await sleep(DELAY_MS)
+        continue
       }
+
+      // 완전성 검증 (95% 기준)
+      let ratio = completenessRatio(segments, text)
+      if (ratio < 0.95) {
+        process.stdout.write(`\n    ⚠️  완전성 미달 (${(ratio * 100).toFixed(1)}%) — 재시도... `)
+        const retryHint = '⚠️ 이전 시도에서 일부 문장이 누락되었습니다. 원본의 첫 글자부터 마지막 글자까지 모든 텍스트를 빠짐없이 세그먼트에 포함하세요. 특히 질문형 문장이나 마지막 안내 문장을 누락하지 마세요.'
+        const { user: retryUser } = buildPrompt(text, lang, ann.title)
+        parsed = await callGroq(system, `${retryUser}\n\n${retryHint}`)
+        const retried = normalizeSegments(parsed.segments, text)
+        if (retried) {
+          segments = retried
+          ratio = completenessRatio(segments, text)
+        }
+      }
+
+      if (ratio < 0.95) {
+        process.stdout.write(`\n    ❌  재시도 후에도 미달 (${(ratio * 100).toFixed(1)}%) — 폴백 적용 `)
+        segments = buildFallback(text, segments)
+      }
+
+      if (!cache[ann.id]) cache[ann.id] = {}
+      cache[ann.id][lang] = segments
+      fs.writeFileSync(cachePath, JSON.stringify(cache, null, 2))
+      const finalRatio = completenessRatio(segments, text)
+      console.log(`✅  ${segments.length}개 세그먼트 (완전성 ${(finalRatio * 100).toFixed(0)}%)`)
+      ok++
     } catch (e) {
       console.log(`❌  오류: ${e.message}`)
       fail++

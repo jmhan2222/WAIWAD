@@ -451,36 +451,74 @@ function normalizeSegments(raw: RawSegment[], originalText: string): MarkupSegme
   return segments
 }
 
+function validateMarkupCompleteness(
+  originalText: string,
+  segments: MarkupSegment[],
+): { isComplete: boolean; ratio: number } {
+  const normalize = (s: string) => s.replace(/\s+/g, '').trim()
+  const reconstructed = normalize(segments.map(s => s.text).join(''))
+  const ratio = originalText ? reconstructed.length / normalize(originalText).length : 1
+  return { isComplete: ratio >= 0.95, ratio }
+}
+
+function buildFallbackSegments(originalText: string, segments: MarkupSegment[]): MarkupSegment[] {
+  const joined = segments.map(s => s.text).join('')
+  if (joined.length < originalText.length && originalText.startsWith(joined)) {
+    const missing = originalText.slice(joined.length)
+    return [...segments, { text: missing, types: ['normal'] }]
+  }
+  return [{ text: originalText, types: ['normal'] }]
+}
+
 export async function generateMarkup(
   plainText: string,
   lang: Lang,
   title: string,
 ): Promise<MarkupSegment[]> {
-  const { system, user } = buildMarkupPrompt(plainText, lang, title)
+  const callApi = async (extraInstruction?: string): Promise<MarkupSegment[]> => {
+    const { system, user } = buildMarkupPrompt(plainText, lang, title)
+    const finalUser = extraInstruction ? `${user}\n\n${extraInstruction}` : user
 
-  const res = await fetchWithRetry('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${GROQ_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
-      ],
-      temperature: 0.2,
-      response_format: { type: 'json_object' },
-    }),
-  })
+    const res = await fetchWithRetry('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: finalUser },
+        ],
+        temperature: 0.2,
+        response_format: { type: 'json_object' },
+      }),
+    })
 
-  if (!res.ok) throw classifyError(res.status)
+    if (!res.ok) throw classifyError(res.status)
 
-  const data = await res.json() as { choices: { message: { content: string } }[] }
-  const parsed = JSON.parse(data.choices[0].message.content) as { segments: RawSegment[] }
+    const data = await res.json() as { choices: { message: { content: string } }[] }
+    const parsed = JSON.parse(data.choices[0].message.content) as { segments: RawSegment[] }
+    return normalizeSegments(Array.isArray(parsed.segments) ? parsed.segments : [], plainText)
+  }
 
-  return normalizeSegments(Array.isArray(parsed.segments) ? parsed.segments : [], plainText)
+  let segments = await callApi()
+  const { isComplete, ratio } = validateMarkupCompleteness(plainText, segments)
+
+  if (!isComplete) {
+    console.warn(`[generateMarkup] 완전성 미달 (${(ratio * 100).toFixed(0)}%) — 재시도 (${title})`)
+    const retryHint = '⚠️ 이전 시도에서 일부 문장이 누락되었습니다. 원본의 첫 글자부터 마지막 글자까지 모든 텍스트를 빠짐없이 세그먼트에 포함하세요. 특히 질문형 문장이나 마지막 안내 문장을 누락하지 마세요.'
+    segments = await callApi(retryHint)
+    const { isComplete: isComplete2, ratio: ratio2 } = validateMarkupCompleteness(plainText, segments)
+
+    if (!isComplete2) {
+      console.error(`[generateMarkup] 재시도 후에도 완전성 미달 (${(ratio2 * 100).toFixed(0)}%) — 폴백 적용 (${title})`)
+      segments = buildFallbackSegments(plainText, segments)
+    }
+  }
+
+  return segments
 }
 
 // ── LLaMA 호출 (단일) ─────────────────────────────────────────────────────────
