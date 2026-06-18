@@ -454,11 +454,26 @@ function normalizeSegments(raw: RawSegment[], originalText: string): MarkupSegme
 function validateMarkupCompleteness(
   originalText: string,
   segments: MarkupSegment[],
-): { isComplete: boolean; ratio: number } {
-  const normalize = (s: string) => s.replace(/\s+/g, '').trim()
-  const reconstructed = normalize(segments.map(s => s.text).join(''))
-  const ratio = originalText ? reconstructed.length / normalize(originalText).length : 1
-  return { isComplete: ratio >= 0.95, ratio }
+): { isComplete: boolean; missingSentences?: string[] } {
+  const reconstructed = segments.map(s => s.text).join('')
+  const normalize = (s: string) => s.replace(/\s+/g, '')
+
+  const originalSentences = originalText
+    .split(/(?<=[.!?！？。])\s*/)
+    .map(s => s.trim())
+    .filter(s => s.length > 0)
+
+  const normalizedReconstructed = normalize(reconstructed)
+  const missingSentences = originalSentences.filter(sentence => {
+    const norm = normalize(sentence)
+    const check = norm.substring(0, Math.min(15, norm.length))
+    return check.length > 0 && !normalizedReconstructed.includes(check)
+  })
+
+  return {
+    isComplete: missingSentences.length === 0,
+    missingSentences: missingSentences.length > 0 ? missingSentences : undefined,
+  }
 }
 
 function buildFallbackSegments(originalText: string, segments: MarkupSegment[]): MarkupSegment[] {
@@ -504,16 +519,16 @@ export async function generateMarkup(
   }
 
   let segments = await callApi()
-  const { isComplete, ratio } = validateMarkupCompleteness(plainText, segments)
+  const { isComplete, missingSentences } = validateMarkupCompleteness(plainText, segments)
 
   if (!isComplete) {
-    console.warn(`[generateMarkup] 완전성 미달 (${(ratio * 100).toFixed(0)}%) — 재시도 (${title})`)
+    console.warn(`[generateMarkup] 문장 누락 감지 (${missingSentences?.length}개) — 재시도 (${title})`, missingSentences)
     const retryHint = '⚠️ 이전 시도에서 일부 문장이 누락되었습니다. 원본의 첫 글자부터 마지막 글자까지 모든 텍스트를 빠짐없이 세그먼트에 포함하세요. 특히 질문형 문장이나 마지막 안내 문장을 누락하지 마세요.'
     segments = await callApi(retryHint)
-    const { isComplete: isComplete2, ratio: ratio2 } = validateMarkupCompleteness(plainText, segments)
+    const { isComplete: isComplete2, missingSentences: missing2 } = validateMarkupCompleteness(plainText, segments)
 
     if (!isComplete2) {
-      console.error(`[generateMarkup] 재시도 후에도 완전성 미달 (${(ratio2 * 100).toFixed(0)}%) — 폴백 적용 (${title})`)
+      console.error(`[generateMarkup] 재시도 후에도 문장 누락 — 폴백 적용 (${title})`, missing2)
       segments = buildFallbackSegments(plainText, segments)
     }
   }

@@ -43,13 +43,29 @@ const FORCE           = process.argv.includes('--force')
 const DRY_RUN         = process.argv.includes('--dry-run')
 const FIX_INCOMPLETE  = process.argv.includes('--fix-incomplete')
 const ONLY_ID         = process.argv.find(a => a.startsWith('--id='))?.slice(5)
+const ONLY_LANG       = process.argv.find(a => a.startsWith('--lang='))?.slice(7)
 const DELAY_MS        = 1000  // API 호출 사이 딜레이 (rate limit 방지)
 
-const normalizeStr = s => s.replace(/\s+/g, '').trim()
-function completenessRatio(segments, originalText) {
-  const reconstructed = normalizeStr(segments.map(s => s.text).join(''))
-  return originalText ? reconstructed.length / normalizeStr(originalText).length : 1
+const normalizeStr = s => s.replace(/\s+/g, '')
+function checkSentences(segments, originalText) {
+  const reconstructed = segments.map(s => s.text).join('')
+  const normalizedRecon = normalizeStr(reconstructed)
+  const sentences = originalText
+    .split(/(?<=[.!?！？。])\s*/)
+    .map(s => s.trim())
+    .filter(s => s.length > 0)
+  const missing = sentences.filter(sentence => {
+    const norm = normalizeStr(sentence)
+    const check = norm.substring(0, Math.min(15, norm.length))
+    return check.length > 0 && !normalizedRecon.includes(check)
+  })
+  return { isComplete: missing.length === 0, missingSentences: missing }
 }
+function saveCache(cachePath, cache) {
+  cache._generatedAt = new Date().toISOString()
+  fs.writeFileSync(cachePath, JSON.stringify(cache, null, 2))
+}
+
 function buildFallback(originalText, segments) {
   const joined = segments.map(s => s.text).join('')
   if (joined.length < originalText.length && originalText.startsWith(joined)) {
@@ -206,15 +222,16 @@ async function main() {
   for (const ann of announcements) {
     if (ONLY_ID && ann.id !== ONLY_ID) continue
     for (const lang of ann.evalLang) {
+      if (ONLY_LANG && lang !== ONLY_LANG) continue
       const text = ann[lang]
       if (!text || !text.trim()) continue
       if (FIX_INCOMPLETE) {
-        // 캐시에 있지만 완전성 95% 미달인 항목만 대상
+        // 캐시에 있지만 문장 단위 검증 실패인 항목만 대상
         const cached = cache[ann.id]?.[lang]
         if (!cached) continue
-        const ratio = completenessRatio(cached, text)
-        if (ratio >= 0.95) continue
-        targets.push({ ann, lang, text, incompleteRatio: ratio })
+        const { isComplete, missingSentences } = checkSentences(cached, text)
+        if (isComplete) continue
+        targets.push({ ann, lang, text, missingSentences })
       } else {
         if (!FORCE && cache[ann.id]?.[lang]) continue  // 이미 캐시됨
         targets.push({ ann, lang, text })
@@ -224,8 +241,11 @@ async function main() {
 
   if (FIX_INCOMPLETE && targets.length > 0) {
     console.log(`\n🔍 불완전 항목 (${targets.length}개):`)
-    for (const { ann, lang, incompleteRatio } of targets) {
-      console.log(`  ${ann.id}  [${lang}]  ${(incompleteRatio * 100).toFixed(1)}%  "${ann.title}"`)
+    for (const { ann, lang, missingSentences } of targets) {
+      console.log(`  ${ann.id}  [${lang}]  "${ann.title}"`)
+      for (const s of missingSentences ?? []) {
+        console.log(`    누락: "${s.substring(0, 50)}${s.length > 50 ? '...' : ''}"`)
+      }
     }
     console.log()
   }
@@ -266,36 +286,38 @@ async function main() {
         console.log(`⚠️  형식 검증 실패 — 원문 전체 normal 폴백 적용`)
         if (!cache[ann.id]) cache[ann.id] = {}
         cache[ann.id][lang] = [{ text: text, types: ['normal'] }]
-        fs.writeFileSync(cachePath, JSON.stringify(cache, null, 2))
+        saveCache(cachePath, cache)
         ok++
         if (i < targets.length - 1) await sleep(DELAY_MS)
         continue
       }
 
-      // 완전성 검증 (95% 기준)
-      let ratio = completenessRatio(segments, text)
-      if (ratio < 0.95) {
-        process.stdout.write(`\n    ⚠️  완전성 미달 (${(ratio * 100).toFixed(1)}%) — 재시도... `)
+      // 완전성 검증 (문장 단위)
+      let { isComplete, missingSentences } = checkSentences(segments, text)
+      if (!isComplete) {
+        process.stdout.write(`\n    ⚠️  문장 누락 (${missingSentences.length}개) — 재시도... `)
         const retryHint = '⚠️ 이전 시도에서 일부 문장이 누락되었습니다. 원본의 첫 글자부터 마지막 글자까지 모든 텍스트를 빠짐없이 세그먼트에 포함하세요. 특히 질문형 문장이나 마지막 안내 문장을 누락하지 마세요.'
         const { user: retryUser } = buildPrompt(text, lang, ann.title)
         parsed = await callGroq(system, `${retryUser}\n\n${retryHint}`)
         const retried = normalizeSegments(parsed.segments, text)
         if (retried) {
           segments = retried
-          ratio = completenessRatio(segments, text)
+          const r2 = checkSentences(segments, text)
+          isComplete = r2.isComplete
+          missingSentences = r2.missingSentences
         }
       }
 
-      if (ratio < 0.95) {
-        process.stdout.write(`\n    ❌  재시도 후에도 미달 (${(ratio * 100).toFixed(1)}%) — 폴백 적용 `)
+      if (!isComplete) {
+        process.stdout.write(`\n    ❌  재시도 후에도 문장 누락 (${missingSentences?.length}개) — 폴백 적용 `)
         segments = buildFallback(text, segments)
       }
 
       if (!cache[ann.id]) cache[ann.id] = {}
       cache[ann.id][lang] = segments
       fs.writeFileSync(cachePath, JSON.stringify(cache, null, 2))
-      const finalRatio = completenessRatio(segments, text)
-      console.log(`✅  ${segments.length}개 세그먼트 (완전성 ${(finalRatio * 100).toFixed(0)}%)`)
+      const { isComplete: finalOk } = checkSentences(segments, text)
+      console.log(`✅  ${segments.length}개 세그먼트 (${finalOk ? '완전' : '⚠️불완전'})`)
       ok++
     } catch (e) {
       console.log(`❌  오류: ${e.message}`)

@@ -24,10 +24,20 @@ const cache = fs.existsSync(cachePath)
   ? JSON.parse(fs.readFileSync(cachePath, 'utf8'))
   : {}
 
-const normalizeStr = s => s.replace(/\s+/g, '').trim()
+const normalizeStr = s => s.replace(/\s+/g, '')
 function checkCompleteness(originalText, segments) {
-  const reconstructed = normalizeStr(segments.map(s => s.text).join(''))
-  return originalText ? reconstructed.length / normalizeStr(originalText).length : 1
+  const reconstructed = segments.map(s => s.text).join('')
+  const normalizedRecon = normalizeStr(reconstructed)
+  const sentences = originalText
+    .split(/(?<=[.!?！？。])\s*/)
+    .map(s => s.trim())
+    .filter(s => s.length > 0)
+  const missing = sentences.filter(sentence => {
+    const norm = normalizeStr(sentence)
+    const check = norm.substring(0, Math.min(15, norm.length))
+    return check.length > 0 && !normalizedRecon.includes(check)
+  })
+  return { isComplete: missing.length === 0, missingSentences: missing }
 }
 
 let hasText = 0, hasMarkup = 0
@@ -84,22 +94,24 @@ if (VALIDATE_COMPLETENESS) {
     for (const lang of ann.evalLang) {
       const text = (ann[lang] ?? '').trim()
       if (!text || !cache[ann.id]?.[lang]) continue
-      const ratio = checkCompleteness(text, cache[ann.id][lang])
-      if (ratio < 0.95) {
-        incomplete.push({ id: ann.id, lang, title: ann.title, ratio })
+      const { isComplete, missingSentences } = checkCompleteness(text, cache[ann.id][lang])
+      if (!isComplete) {
+        incomplete.push({ id: ann.id, lang, title: ann.title, missingSentences })
       }
     }
   }
 
-  console.log('\n🔍 완전성 검증 결과 (95% 기준)')
+  console.log('\n🔍 완전성 검증 결과 (문장 단위)')
   console.log('─'.repeat(54))
   if (incomplete.length === 0) {
-    console.log('  ✅ 모든 항목이 95% 이상 완전합니다.')
+    console.log('  ✅ 모든 항목의 문장이 완전합니다.')
   } else {
     console.log(`  ❌ 불완전 항목: ${incomplete.length}개 — npm run markup:fix 로 재생성 가능`)
     for (const m of incomplete) {
-      const pct = (m.ratio * 100).toFixed(1)
-      console.log(`  ${m.id.padEnd(20)} [${m.lang}]  ${pct.padStart(5)}%  "${m.title}"`)
+      console.log(`  ${m.id.padEnd(20)} [${m.lang}]  "${m.title}"`)
+      for (const s of m.missingSentences) {
+        console.log(`    누락: "${s.substring(0, 40)}${s.length > 40 ? '...' : ''}"`)
+      }
     }
   }
   console.log('─'.repeat(54))

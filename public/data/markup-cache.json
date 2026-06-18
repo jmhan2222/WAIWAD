@@ -208,404 +208,18 @@
     ],
     "ja": [
       {
-        "text": "오하요-고자이마스 / 곤니치와 / 곰방와",
+        "text": "[오하요-고자이마스 / 곤니치와 / 곰방와]\n[おはようございます。/ こんにちは。/ こんばんは。]\n\n혼지츠와 고토-죠- 아리가토-고자이마스\nほんじつは ごとうじょう ありがとうございます。\n\n[10분 초과 지연 시]\n마타、[▶지연 사유]니요리 슛빠츠가 오쿠레타텐 [오와비 모-시아게마스 / 고료-쇼-오네가이이타시마스]\nまた、[▶지연 사유]により しゅっぱつが おくれたてん [おわび もうしあげます。/ ごりょうしょうおねがいいたします。]\n\n[목적지]마데노 히코-지칸와 리리쿠고 ___지칸 ___훈(뿐)오 요테-시테오리마스\n[목적지] までの ひこうじかんは りりくご ___じかん ___ふん(ぷん)を よていしております。\n\n[무단 촬영 제한]\n마타、키나이데 죠-무인야 호카노 오캬쿠사마오 무단데 사츠에-스루코토와 키나이노 치츠죠이지노타메、오코토와리시테오리마스\nまた、きないで じょうむいんや ほかの おきゃくさまを むだんで さつえいする ことは きないの ちつじょいじのため、おことわりしております。\n\n안젠나 소라노타비노타메、죠-무인카라노 안나이니 고쿄-료쿠 오네가이이타시마스。아리가토-고자이마시타\nあんぜんな そらのたびのため、じょうむいんからの あんないに ごきょうりょく おねがいいたします。ありがとうございました。",
         "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "おはようございます。/ こんにちは。/ こんばんは。",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "혼지츠와 고토-죠- 아리가토-고자이마스",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "ほんじつは ごとうじょう ありがとうございます。",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "마타、",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "[▶지연 사유]니요리 슛빠츠가 오쿠레타텐",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "おわ비 모-시아게마스 / 고료-쇼-오네가이이타시마스",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "また、",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "[▶지연 사유]により しゅっぱつ가 おくれたてん",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "おわび もうしあげます。/ ごりょうしょうおねがいいたします。",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "[목적지]마데노 히코-지칸와 리리쿠고 ___지칸 ___훈(뿐)오 요테-시테오리마스",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "[목적지] までの ひこうじかんは りりくご ___じかん ___ふん(ぷん)を よていしております。",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "마타、키나이데 죠-무인야 호카노 오캬쿠사마오 무단데 사츠에-스루코토와 키나이노 치츠죠이지노타메、",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "오코토와리시테오리마스",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "また、きないで じょうむいんや ほかの おきゃくさまを むだんで さつえいする ことは きないの ちつじょいじのため、おことわりしております。",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "안젠나 소라노타비노타메、죠-무인카라노 안나이니 고쿄-료쿠 오네가이이타시마스。",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "아리가토-고자이마시타",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "あんぜんな そらのたびのため、じょうむいんからの あんないに ごきょうりょく おねがいいたします。ありがとうございました。",
-        "types": [
-          "break-long"
+          "normal"
         ]
       }
     ],
     "ko": [
       {
-        "text": "손님 여러분, 안녕하세요! ",
+        "text": "손님 여러분, 안녕하세요! 제주항공 탑승을 환영합니다.\n\n[10분 초과 지연 시] [▶지연 사유](로/으로) 출발이 늦어진 점 [죄송합니다. / 양해해 주시기 바랍니다.]\n\n오늘 [목적지]까지 비행시간은 이륙 후 ___시간 ___분으로 예상됩니다.\n\n[무단 촬영 제한] (또한,) 기내에서 승무원 및 타인을 무단 촬영할 경우, 기내 질서 유지를 위해 제한될 수 있음을 알려드립니다.\n\n안전한 비행을 위해 승무원 안내에 적극 협조해 주세요! 고맙습니다.",
         "types": [
           "normal"
         ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "제주항공 탑승을 환영합니다.",
-        "types": [
-          "down"
-        ],
-        "tip": "인사"
-      },
-      {
-        "text": "",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "10분 초과 지연 시 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "[▶지연 사유](로/으로) 출발이 늦어진 점 ",
-        "types": [
-          "slow"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "[죄송합니다. / 양해해 주시기 바랍니다.]",
-        "types": [
-          "down"
-        ],
-        "tip": "사과"
-      },
-      {
-        "text": "",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "오늘 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "[목적지]까지 ",
-        "types": [
-          "stress"
-        ],
-        "tip": "목적지"
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "비행시간은 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "이륙 후 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "___시간 ___분으로 ",
-        "types": [
-          "stress"
-        ],
-        "tip": "비행시간"
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "예상됩니다.",
-        "types": [
-          "down"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "[무단 촬영 제한] ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "(또는,) ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "기내에서 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "승무원 및 ",
-        "types": [
-          "stress"
-        ],
-        "tip": "승무원"
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "타인을 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "무단 촬영할 경우, ",
-        "types": [
-          "slow"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "기내 질서 유지를 위해 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "제한될 수 있음을 ",
-        "types": [
-          "slow"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "알려드립니다.",
-        "types": [
-          "down"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "안전한 비행을 위해 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "승무원 안내에 ",
-        "types": [
-          "stress"
-        ],
-        "tip": "승무원 안내"
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "적극 협조해 주세요! ",
-        "types": [
-          "up"
-        ],
-        "tip": "요청"
-      },
-      {
-        "text": "",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "고맙습니다.",
-        "types": [
-          "down"
-        ],
-        "tip": "마무리"
       }
     ]
   },
@@ -614,62 +228,41 @@
       {
         "text": "손님 여러분, 잠시 앞을 주목해 주세요.",
         "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "지금부터 ",
-        "types": [
           "normal"
         ]
       },
       {
-        "text": "안전한 비행을 위한 5가지 수칙",
-        "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
-      },
-      {
-        "text": "을 안내해 드리겠습니다.",
+        "text": "",
         "types": [
           "break-long"
         ]
       },
       {
-        "text": "첫째, ",
+        "text": "지금부터 안전한 비행을 위한 5가지 수칙을 안내해 드리겠습니다.",
         "types": [
           "normal"
         ]
       },
       {
-        "text": "머리 위 좌석벨트 표시등이 켜지면",
-        "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
-      },
-      {
-        "text": " 벨트를 매 주시고, 풀 때는 덮개를 위로 올려주세요.",
+        "text": "",
         "types": [
           "break-long"
         ]
       },
       {
-        "text": "둘째, ",
+        "text": "첫째, 머리 위 좌석벨트 표시등이 켜지면 벨트를 매 주시고, 풀 때는 덮개를 위로 올려주세요.",
         "types": [
           "normal"
         ]
       },
       {
-        "text": "산소마스크는 산소가 필요한 비상시",
+        "text": "",
         "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
+          "break-long"
+        ]
       },
       {
-        "text": " 머리 위 선반에서 저절로 내려옵니다. ",
+        "text": "둘째, 산소마스크는 산소가 필요한 비상시 머리 위 선반에서 저절로 내려옵니다.",
         "types": [
           "normal"
         ]
@@ -677,106 +270,65 @@
       {
         "text": "이 때, ",
         "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "방역 마스크 등 호흡에 방해되는 물건을 제거",
-        "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
-      },
-      {
-        "text": "한 뒤, 마스크를 앞으로 잡아당겨 코와 입에 대고 호흡하세요. ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "산소마스크는 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "본인 먼저 착용",
-        "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
-      },
-      {
-        "text": "한 후 주변 사람을 도와주시기 바랍니다.",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "셋째, ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "비상 탈출 시",
-        "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
-      },
-      {
-        "text": " 선반의 비상등과 바닥의 야광유도선을 따라 가장 가까운 비상구로 탈출하세요. ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "비상구는 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "총 8개",
-        "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
-      },
-      {
-        "text": "로 오른쪽과 왼쪽에 각각 있습니다.",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "넷째, ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "구명복은 좌석 또는 팔걸이 아래에 있습니다.",
-        "types": [
           "break-short"
         ]
       },
       {
-        "text": "머리 위에서부터 입고, ",
+        "text": "방역 마스크 등 호흡에 방해되는 물건을 제거한 뒤, ",
         "types": [
           "normal"
         ]
       },
       {
-        "text": "끈을 허리에 돌려 고리에 끼운 후",
+        "text": "마스크를 앞으로 잡아당겨 ",
         "types": [
           "stress"
-        ],
-        "tip": "핵심정보"
+        ]
       },
       {
-        "text": " 몸에 맞게 조여주세요. ",
+        "text": "코와 입에 대고 호흡하세요.",
+        "types": [
+          "normal"
+        ]
+      },
+      {
+        "text": "산소마스크는 본인 먼저 착용한 후 주변 사람을 도와주시기 바랍니다.",
+        "types": [
+          "normal"
+        ]
+      },
+      {
+        "text": "",
+        "types": [
+          "break-long"
+        ]
+      },
+      {
+        "text": "셋째, 비상 탈출 시, 선반의 비상등과 바닥의 야광유도선을 따라 가장 가까운 비상구로 탈출하세요.",
+        "types": [
+          "normal"
+        ]
+      },
+      {
+        "text": "비상구는 총 8개로 오른쪽과 왼쪽에 각각 있습니다.",
+        "types": [
+          "normal"
+        ]
+      },
+      {
+        "text": "",
+        "types": [
+          "break-long"
+        ]
+      },
+      {
+        "text": "넷째, 구명복은 좌석 또는 팔걸이 아래에 있습니다.",
+        "types": [
+          "normal"
+        ]
+      },
+      {
+        "text": "머리 위에서부터 입고, 끈을 허리에 돌려 고리에 끼운 후 몸에 맞게 조여주세요.",
         "types": [
           "normal"
         ]
@@ -784,135 +336,103 @@
       {
         "text": "탈출 직전 비상구 앞에서 ",
         "types": [
+          "break-short"
+        ]
+      },
+      {
+        "text": "빨간색 손잡이를 당겨 부풀리고, ",
+        "types": [
+          "stress"
+        ]
+      },
+      {
+        "text": "양 옆의 고무관을 이용해 조절하면 됩니다.",
+        "types": [
           "normal"
         ]
       },
       {
-        "text": "빨간색 손잡이를 당겨",
-        "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
-      },
-      {
-        "text": " 부풀리고, 양 옆의 고무관을 이용해 조절하면 됩니다.",
+        "text": "",
         "types": [
           "break-long"
         ]
       },
       {
-        "text": "손님 여러분, ",
+        "text": "손님 여러분, 더 궁금한 내용 있으신가요? ",
+        "types": [
+          "up"
+        ]
+      },
+      {
+        "text": "마지막으로 자세한 안전 수칙은 좌석 앞 안내서를 확인해 주세요.",
+        "types": [
+          "down"
+        ]
+      },
+      {
+        "text": "",
+        "types": [
+          "break-long"
+        ]
+      },
+      {
+        "text": "아울러, 비상구는 반드시 승무원의 지시가 있을 경우에만 개방해야 하며, ",
         "types": [
           "normal"
         ]
       },
       {
-        "text": "더 궁금한 내용",
-        "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
-      },
-      {
-        "text": " 있으신가요? ",
+        "text": "임의로 조작할 경우 ",
         "types": [
           "break-short"
         ]
       },
       {
-        "text": "마지막으로 ",
+        "text": "최고 10년 징역의 처벌대상이 될 수 있습니다.",
         "types": [
-          "normal"
+          "stress"
         ]
       },
       {
-        "text": "자세한 안전 수칙",
-        "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
-      },
-      {
-        "text": "은 좌석 앞 안내서를 확인해 주세요.",
+        "text": "",
         "types": [
           "break-long"
         ]
       },
       {
-        "text": "아울러, ",
+        "text": "또한, 승무원의 업무 방해 행위, ",
         "types": [
           "normal"
         ]
       },
       {
-        "text": "비상구는 반드시 승무원의 지시",
+        "text": "전자담배를 포함한 기내 흡연, ",
         "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
+          "break-short"
+        ]
       },
       {
-        "text": "가 있을 경우에만 개방해야 하며, ",
+        "text": "전자기기 사용기준 위반은 ",
         "types": [
           "normal"
         ]
       },
       {
-        "text": "임의로 조작",
+        "text": "항공보안법에 의거하여 ",
         "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
-      },
-      {
-        "text": "할 경우 최고 10년 징역의 처벌대상이 될 수 있습니다.",
-        "types": [
-          "break-long"
+          "break-short"
         ]
       },
       {
-        "text": "또한, ",
+        "text": "처벌받을 수 있으니 ",
+        "types": [
+          "stress"
+        ]
+      },
+      {
+        "text": "안전한 비행을 위해 협조해 주시기 바랍니다.",
         "types": [
           "normal"
-        ]
-      },
-      {
-        "text": "승무원의 업무 방해 행위",
-        "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
-      },
-      {
-        "text": ", 전자담배를 포함한 기내 흡연, ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "전자기기 사용기준 위반",
-        "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
-      },
-      {
-        "text": "은 항공보안법에 의거하여 처벌받을 수 있으니 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "안전한 비행",
-        "types": [
-          "stress"
-        ],
-        "tip": "핵심정보"
-      },
-      {
-        "text": "을 위해 협조해 주시기 바랍니다.",
-        "types": [
-          "break-long"
         ]
       }
     ],
@@ -1044,14 +564,14 @@
         ]
       },
       {
-        "text": "방역 마스크 등 호흡에 방해되는 물건을 제거한 뒤",
+        "text": "방역 마스크 등 호흡에 방해되는 물건을 제거",
         "types": [
           "stress"
         ],
         "tip": "핵심 정보"
       },
       {
-        "text": ", 마스크를 앞으로 잡아당겨 코와 입에 대고 호흡하세요. ",
+        "text": "한 뒤, 마스크를 앞으로 잡아당겨 코와 입에 대고 호흡하세요. ",
         "types": [
           "normal"
         ]
@@ -1063,7 +583,14 @@
         ]
       },
       {
-        "text": "본인 먼저 착용한 후 주변사람을 도와주시기 바랍니다.",
+        "text": "본인 먼저 착용",
+        "types": [
+          "stress"
+        ],
+        "tip": "핵심 정보"
+      },
+      {
+        "text": "한 후 주변사람을 도와주시기 바랍니다.",
         "types": [
           "break-long"
         ]
@@ -1151,33 +678,52 @@
         ]
       },
       {
-        "text": "빨간색 손잡이를 당겨",
+        "text": "빨간색 손잡이를 당겨 부풀리고",
         "types": [
           "stress"
         ],
         "tip": "핵심 정보"
       },
       {
-        "text": " 부풀리고, 양 옆의 고무관을 이용해 조절하면 됩니다.",
+        "text": ", 양 옆의 고무관을 이용해 조절하면 됩니다.",
         "types": [
           "break-long"
         ]
       },
       {
-        "text": "자세한 안전 수칙은 ",
+        "text": "손님 여러분, ",
         "types": [
           "normal"
         ]
       },
       {
-        "text": "좌석 앞 안내서",
+        "text": "더 궁금한 내용",
         "types": [
           "stress"
         ],
         "tip": "핵심 정보"
       },
       {
-        "text": "를 확인해 주세요.",
+        "text": " 있으신가요? ",
+        "types": [
+          "normal"
+        ]
+      },
+      {
+        "text": "마지막으로 ",
+        "types": [
+          "normal"
+        ]
+      },
+      {
+        "text": "자세한 안전 수칙",
+        "types": [
+          "stress"
+        ],
+        "tip": "핵심 정보"
+      },
+      {
+        "text": "은 좌석 앞 안내서를 확인해 주세요.",
         "types": [
           "break-long"
         ]
@@ -1202,14 +748,14 @@
         ]
       },
       {
-        "text": "임의로 조작할 경우",
+        "text": "임의로 조작",
         "types": [
           "stress"
         ],
         "tip": "핵심 정보"
       },
       {
-        "text": " 최고 10년 징역의 처벌대상이 될 수 있습니다.",
+        "text": "할 경우 최고 10년 징역의 처벌대상이 될 수 있습니다.",
         "types": [
           "break-long"
         ]
@@ -1260,14 +806,14 @@
         ]
       },
       {
-        "text": "안전한 비행을 위해",
+        "text": "안전한 비행",
         "types": [
           "stress"
         ],
         "tip": "핵심 정보"
       },
       {
-        "text": " 협조해 주시기 바랍니다.",
+        "text": "을 위해 협조해 주시기 바랍니다.",
         "types": [
           "break-long"
         ]
@@ -1501,54 +1047,9 @@
     ],
     "ja": [
       {
-        "text": "히죠-쿠치와 카나라즈 죠-무인노 시자가 아루 바아이노미 오아케쿠다사이",
+        "text": "히죠-쿠치와 카나라즈 죠-무인노 시지가 아루 바아이노미 오아케쿠다사이。무단데 소-사시타 바아이、사이다이 10넨노 초-에키니나루 카노-세이가 아리마스\nひじょうくちは かならず じょうむいんの しじが ある ばあいのみ おあけください。むだんで そうさした ばあい、さいだい 10ねんの ちょうえきになる かのうせいがあります。\n\n마타、죠-무인노 교-무보-가이코-이、덴시타바코오 후쿠무 키나이데노 키츠엔、소시테 덴시키키시요-키쥰노 이한와、코-쿠-호안호-니요리 쇼바츠노 타이쇼-토나리마스\nまた、じょうむいんの ぎょうむぼうがいこうい、でんしタバコを ふくむ きないでの きつえん、そして でんしききしようきじゅんの いはんは、こうくうほあんほうにより しょばつの たいしょうとなります。\n\n안젠나 운코-노타메、미나사마노 고쿄-료쿠 오네가이이타시마스\nあんぜんな うんこうのため、みなさまの ごきょうりょく おねがいいたします。",
         "types": [
-          "stress"
-        ],
-        "tip": "重要情報:ヒジョウクチワカナラズジョウムインノシジガアルバアイノミオアケクダサイ"
-      },
-      {
-        "text": "무단데 소-사시타 바아이、사이다이 10넨노 초-에키니나루 카노-세이가 아리마스",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "ひじょうくちは かならず じょうむいんの しじが ある ばあいのみ おあけください",
-        "types": [
-          "stress"
-        ],
-        "tip": "重要情報:ヒジョウクチハカナラズジョウムインノシジガアルバアイノミオアケクダサイ"
-      },
-      {
-        "text": "무다んで そうさした ばあい、さいだ이 10ねんの ちょうえきになる かのうせいがあります",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "마타、죠-무인노 교-무보-가이코-이、덴시타바코오 후쿠무 키나이데노 키츠엔、소시테 덴시키키시요-키쥰노 이한와、코-쿠-호안호-니요리 쇼바츠노 타이쇼-토나리마스",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "また、じょうむいんの ぎょうむぼうがいこうい、でんしタバコを ふくむ きないでの きつえん、そして でんしききしようきじゅんの いはんは、こうくうほあんほうにより しょばつの たいしょうとなります",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "안젠나 운코-노타메、미나사마노 고쿄-료쿠 오네가이이타시마스",
-        "types": [
-          "stress"
-        ],
-        "tip": "重要情報:안젠나 운코-노타메、미나사마노 고쿄-료쿠 오네가이이타시마스"
-      },
-      {
-        "text": "あんぜんな うんこうのため、みなさまの ごきょうりょく おねがいいたします",
-        "types": [
-          "break-long"
+          "normal"
         ]
       }
     ]
@@ -1787,340 +1288,18 @@
   "3-1": {
     "ko": [
       {
-        "text": "손님 여러분, ",
+        "text": "[Off] 손님 여러분, 좌석벨트 표시등이 꺼졌습니다. 그러나 비행기가 갑자기 흔들릴 수 있으니 항상 좌석벨트를 매 주시기 바랍니다.\n\n[On] 손님 여러분, 기류 변화로 비행기가 계속해서 흔들릴 것으로 예상됩니다. 안전을 위해 머리 위 좌석벨트 표시등이 꺼질 때까지 자리에 앉아 잠시만 더 기다려 주시기 바랍니다.\n\n보조배터리, 전자담배, 라이터는 선반에 보관할 수 없으며, 보조배터리는 단락 방지 조치하여 직접 소지하거나 앞 좌석 주머니에 보관하시기 바랍니다.\n\n또한 보조배터리와 전자담배는 기내에서 충전이 불가하며, 전자기기가 좌석에 끼거나, 뜨거워지고 부풀어 오를 경우에는 승무원에게 즉시 알려주시기 바랍니다.\n\n[추가방송] 아울러, 안전한 여행을 위해 기내에서는 보조배터리 사용이 금지되어 있으니, 여러분의 적극적인 협조를 부탁드립니다.",
         "types": [
           "normal"
-        ]
-      },
-      {
-        "text": "좌석벨트 표시등이 꺼졌습니다.",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "그러나 비행기가 갑자기 흔들릴 수 있으니 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "항상 좌석벨트를 매 주시기 바랍니다.",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "손님 여러분, ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "기류 변화로 비행기가 계속해서 흔들릴 것으로 예상됩니다.",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "안전을 위해 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "머리 위 좌석벨트 표시등이 꺼질 때까지 ",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "자리에 앉아 잠시만 더 기다려 주시기 바랍니다.",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "보조배터리, 전자담배, 라이터는 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "선반에 보관할 수 없으며, ",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "보조배터리는 단락 방지 조치하여 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "직접 소지하거나 앞 좌석 주머니에 보관하시기 바랍니다.",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "또한 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "보조배터리와 전자담배는 기내에서 충전이 불가하며, ",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "전자기가 좌석에 끼거나, ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "뜨거워지고 부풀어 오를 경우에는 ",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "승무원에게 즉시 알려주시기 바랍니다.",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-long"
-        ]
-      },
-      {
-        "text": "아울러, ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "안전한 여행을 위해 ",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "기내에서는 보조배터리 사용이 금지되어 있으니, ",
-        "types": [
-          "stress"
-        ]
-      },
-      {
-        "text": "여러분의 적극적인 협조를 부탁드립니다.",
-        "types": [
-          "stress"
         ]
       }
     ],
     "en": [
       {
-        "text": "Dear Passengers, the fasten seatbelt sign is now off.",
+        "text": "[Off] Dear Passengers, the fasten seatbelt sign is now off. However, please keep your seatbelt fastened in case of turbulence.\n\n[On] Dear Passengers, we will be continuously passing through turbulence. For your safety, please keep your seatbelt fastened until the fasten seatbelt sign is turned off.\n\nPower banks, electronic cigarettes, and lighters must not be placed in the overhead bins. Please carry power banks with you or keep them in the seat pocket with proper short-circuit protection.\n\nCharging power banks or electronic cigarettes is not permitted on board. If you notice any device getting stuck in the seat, swelling, or overheating, please inform the cabin crew immediately.\n\n[추가방송] Lastly, for a safe journey, please note that the use of power banks is not permitted on board. Thank you for your understanding.",
         "types": [
-          "break-long"
-        ],
-        "tip": "pause"
-      },
-      {
-        "text": "However, ",
-        "types": [
-          "break-short"
+          "normal"
         ]
-      },
-      {
-        "text": "please keep your seatbelt fastened",
-        "types": [
-          "stress"
-        ],
-        "tip": "key info"
-      },
-      {
-        "text": " in case of ",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "turbulence.",
-        "types": [
-          "down"
-        ],
-        "tip": "end of sentence"
-      },
-      {
-        "text": "Dear Passengers, we will be continuously passing through ",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "turbulence.",
-        "types": [
-          "stress"
-        ],
-        "tip": "key info"
-      },
-      {
-        "text": " For your ",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "safety",
-        "types": [
-          "stress"
-        ],
-        "tip": "key info"
-      },
-      {
-        "text": " please keep your seatbelt fastened until the fasten seatbelt sign is turned off.",
-        "types": [
-          "down"
-        ],
-        "tip": "end of sentence"
-      },
-      {
-        "text": "Power banks, electronic cigarettes, and lighters must not be placed in the overhead bins.",
-        "types": [
-          "break-long"
-        ],
-        "tip": "important info"
-      },
-      {
-        "text": "Please carry power banks with you or keep them in the seat pocket with proper ",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "short-circuit protection.",
-        "types": [
-          "stress"
-        ],
-        "tip": "key info"
-      },
-      {
-        "text": "Charging power banks or electronic cigarettes is not permitted on board.",
-        "types": [
-          "break-long"
-        ],
-        "tip": "important rule"
-      },
-      {
-        "text": "If you notice any device getting ",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "stuck",
-        "types": [
-          "stress"
-        ],
-        "tip": "key issue"
-      },
-      {
-        "text": " in the seat, ",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "swelling",
-        "types": [
-          "stress"
-        ],
-        "tip": "key issue"
-      },
-      {
-        "text": " or ",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "overheating",
-        "types": [
-          "stress"
-        ],
-        "tip": "key issue"
-      },
-      {
-        "text": " please inform the cabin crew immediately.",
-        "types": [
-          "down"
-        ],
-        "tip": "end of sentence"
-      },
-      {
-        "text": "Lastly, for a safe journey, please note that the use of ",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "power banks",
-        "types": [
-          "stress"
-        ],
-        "tip": "key info"
-      },
-      {
-        "text": " is not permitted on board.",
-        "types": [
-          "down"
-        ],
-        "tip": "end of sentence"
-      },
-      {
-        "text": "Thank you for your understanding.",
-        "types": [
-          "break-long"
-        ],
-        "tip": "polite closing"
       }
     ]
   },
@@ -2135,37 +1314,7 @@
     ],
     "en": [
       {
-        "text": "Dear passengers, we will be distributing the entry documents.",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "For further guidelines, please refer to the Jeju Air application.",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "Dear Passengers, Arrival Card and customs declaration form are not provided on flights to Japan.",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "Please complete your registration through Visit Japan Web.",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "Dear passengers, we will be distributing the entry documents.",
-        "types": [
-          "normal"
-        ]
-      },
-      {
-        "text": "If you are carrying items to declare, it is mandatory to fill out a customs declaration form.",
+        "text": "[서류 배포] Dear passengers, we will be distributing the entry documents. For further guidelines, please refer to the Jeju Air application.\n\n[일본] Dear Passengers, Arrival Card and customs declaration form are not provided on flights to Japan. Please complete your registration through Visit Japan Web.\n\n[대한민국] Dear passengers, we will be distributing the entry documents. If you are carrying items to declare, it is mandatory to fill out a customs declaration form.",
         "types": [
           "normal"
         ]
@@ -2183,44 +1332,10 @@
     ],
     "en": [
       {
-        "text": "Dear Passengers, AIR CAFÉ sales are now commencing.",
+        "text": "Dear Passengers, AIR CAFÉ sales are now commencing. If you would like to purchase any AIR CAFÉ items, please contact our cabin crew.\n\n[외부 주류] Please be aware that alcohol purchased from outside is not permitted and we may limit ordering additional alcohol.",
         "types": [
-          "break-long"
-        ],
-        "tip": "end of first sentence"
-      },
-      {
-        "text": "If you would like to purchase any AIR CAFÉ items,",
-        "types": [
-          "break-short"
+          "normal"
         ]
-      },
-      {
-        "text": "please contact our cabin crew.",
-        "types": [
-          "break-long"
-        ],
-        "tip": "end of second sentence"
-      },
-      {
-        "text": "Please be aware that alcohol purchased from outside",
-        "types": [
-          "break-short"
-        ]
-      },
-      {
-        "text": "is not permitted",
-        "types": [
-          "stress"
-        ],
-        "tip": "key info"
-      },
-      {
-        "text": "and we may limit ordering additional alcohol.",
-        "types": [
-          "break-long"
-        ],
-        "tip": "end of third sentence"
       }
     ]
   },
@@ -2388,67 +1503,10 @@
     ],
     "en": [
       {
-        "text": "Dear passengers, cabin lights will now be turned off.",
+        "text": "Dear passengers, cabin lights will now be turned off.\n\nPlease use the reading light in the panel above you.\n\nLavatories are located at the front and rear of the aircraft.\n\n[금연 안내] Also, smoking and use of electronic cigarettes are not permitted during the entire flight. You could be fined if you violate aviation security laws.",
         "types": [
-          "break-long"
-        ],
-        "tip": "End of sentence"
-      },
-      {
-        "text": "Please use the reading light in the panel above you.",
-        "types": [
-          "break-long"
-        ],
-        "tip": "End of sentence"
-      },
-      {
-        "text": "Lavatories are located at the front and rear of the aircraft.",
-        "types": [
-          "break-long"
-        ],
-        "tip": "End of sentence"
-      },
-      {
-        "text": "Also, ",
-        "types": [
-          "break-short"
-        ],
-        "tip": "Pause before key info"
-      },
-      {
-        "text": "smoking",
-        "types": [
-          "stress"
-        ],
-        "tip": "Key info"
-      },
-      {
-        "text": " and use of electronic cigarettes are not permitted during the entire flight.",
-        "types": [
-          "break-long"
-        ],
-        "tip": "End of sentence"
-      },
-      {
-        "text": "You could be fined ",
-        "types": [
-          "break-short"
-        ],
-        "tip": "Pause before consequence"
-      },
-      {
-        "text": "fined",
-        "types": [
-          "stress"
-        ],
-        "tip": "Key consequence"
-      },
-      {
-        "text": " if you violate aviation security laws.",
-        "types": [
-          "break-long"
-        ],
-        "tip": "End of sentence"
+          "normal"
+        ]
       }
     ]
   },
@@ -2552,90 +1610,73 @@
         "types": [
           "break-long"
         ],
-        "tip": "Greeting"
+        "tip": "sentence start"
       },
       {
         "text": "If you are returning to Korea,",
         "types": [
           "break-short"
         ],
-        "tip": "Condition"
+        "tip": "condition"
       },
       {
-        "text": "carrying any",
+        "text": "carrying any livestock products, fresh fruits, or plants is strictly ",
         "types": [
           "normal"
         ]
       },
       {
-        "text": "livestock products, fresh fruits, or plants",
+        "text": "prohibited",
         "types": [
           "stress"
         ],
-        "tip": "Prohibited items"
+        "tip": "key info"
       },
       {
-        "text": "is strictly prohibited.",
+        "text": ".",
         "types": [
           "break-long"
         ],
-        "tip": "Prohibition"
+        "tip": "sentence end"
       },
       {
-        "text": "Also, we advise you to refrain from visiting",
+        "text": "Also, we advise you to refrain from visiting livestock facilities during your stay.",
         "types": [
-          "break-short"
-        ],
-        "tip": "Additional advice"
+          "normal"
+        ]
       },
       {
-        "text": "livestock facilities",
-        "types": [
-          "stress"
-        ],
-        "tip": "Facilities to avoid"
-      },
-      {
-        "text": "during your stay.",
+        "text": "[필리핀] In addition, you must complete customs declaration through e-Travel.",
         "types": [
           "break-long"
         ],
-        "tip": "Timeframe"
+        "tip": "new topic"
       },
       {
-        "text": "In addition, you must complete customs declaration through",
+        "text": "Non-declaration or false declaration will be subjected to ",
         "types": [
-          "break-short"
-        ],
-        "tip": "Additional requirement"
-      },
-      {
-        "text": "e-Travel.",
-        "types": [
-          "stress"
-        ],
-        "tip": "Declaration method"
-      },
-      {
-        "text": "Non-declaration or false declaration will be subjected to",
-        "types": [
-          "break-short"
-        ],
-        "tip": "Consequence introduction"
+          "normal"
+        ]
       },
       {
         "text": "legal punishment",
         "types": [
           "stress"
         ],
-        "tip": "Consequence"
+        "tip": "key info"
       },
       {
-        "text": "under the regulations of the authorities.",
+        "text": " under the regulations of the authorities.",
+        "types": [
+          "normal"
+        ]
+      },
+      {
+        "text": "",
         "types": [
           "break-long"
         ],
-        "tip": "Authority"
+        "tip": "end of announcement"
       }
     ]
   },
@@ -2678,13 +1719,13 @@
         ]
       },
       {
-        "text": "과태료가 ",
+        "text": "과태료가 부과되니 ",
         "types": [
           "stress"
         ]
       },
       {
-        "text": "부과되니 유의하시기 바랍니다.",
+        "text": "유의하시기 바랍니다.",
         "types": [
           "down"
         ]
@@ -2696,19 +1737,19 @@
         ]
       },
       {
-        "text": "또한,海外 여행객은 축산시설 방문을 자제해 주시고, ",
+        "text": "또한, 해외 여행객은 ",
         "types": [
           "flat"
         ]
       },
       {
-        "text": "가축전염병 발생 국가에 방문한 ",
+        "text": "축산시설 방문을 자제해 주시고, ",
         "types": [
           "stress"
         ]
       },
       {
-        "text": "축산관련업 종사자는 ",
+        "text": "가축전염병 발생 국가에 방문한 축산관련업 종사자는 ",
         "types": [
           "flat"
         ]
@@ -3034,58 +2075,38 @@
       {
         "text": "各位旅客，我们即将到达",
         "types": [
-          "normal"
-        ],
-        "tip": "开始广播"
-      },
-      {
-        "text": "",
-        "types": [
           "break-short"
-        ],
-        "tip": "停顿一下"
+        ]
       },
       {
-        "text": "公机场",
-        "types": [
-          "stress"
-        ],
-        "tip": "关键信息"
-      },
-      {
-        "text": "。请系好安全带，调直椅背，收起小桌板，放下扶手，把遮光板打开。",
-        "types": [
-          "slow"
-        ],
-        "tip": "重要信息，缓慢读出"
-      },
-      {
-        "text": "",
+        "text": "[공항]。",
         "types": [
           "break-long"
-        ],
-        "tip": "长时间停顿"
+        ]
       },
       {
-        "text": "而且，请再次确认您的随身行李存放状态。",
-        "types": [
-          "normal"
-        ],
-        "tip": "继续广播"
-      },
-      {
-        "text": "",
+        "text": "请系好安全带，调直椅背，收起小桌板，收起",
         "types": [
           "break-short"
-        ],
-        "tip": "短暂停顿"
+        ]
       },
       {
-        "text": "为了安全，请不要使用洗手间。",
+        "text": "扶手，把遮光板打开。",
         "types": [
-          "stress"
-        ],
-        "tip": "关键信息"
+          "break-long"
+        ]
+      },
+      {
+        "text": "而且，请再次确认您的随身行李存放状态。为了安全，请不要使用",
+        "types": [
+          "break-short"
+        ]
+      },
+      {
+        "text": "洗手间。",
+        "types": [
+          "break-long"
+        ]
       }
     ]
   },
@@ -3219,87 +2240,9 @@
     ],
     "ja": [
       {
-        "text": "미나사마、",
+        "text": "미나사마、[목적지]에 요-코소!\nみなさま、[목적지]へ ようこそ！\n\n안젠노타메 시-토베루토 챠쿠요-노사인가 키에루마데 오자세키니테 스왓떼 오마치쿠다사이\nあんぜんのため シートベルト ちゃくようのサインが きえるまで おざせきにて すわって おまちください。\n\n마타、슈-노-다나오 아케루사이와 나카노 모노가 오치나이요- 고츄-이쿠다사이\nまた、しゅうのうだなを あけるさいは なかの ものが おちないよう ごちゅういください。\n\n[국내 군사공항]\n나오、군지시세츠노 호안 이지노타메、마도노 히요케오 오시메 쿠다사이\nなお、ぐんじしせつの ほあん いじのため、まどの ひよけを おしめ ください。\n\n아리가토-고자이마시타\nありがとうございました。",
         "types": [
-          "up"
-        ]
-      },
-      {
-        "text": "[목적지]에 요-코소!",
-        "types": [
-          "down"
-        ]
-      },
-      {
-        "text": "みなさま、",
-        "types": [
-          "up"
-        ]
-      },
-      {
-        "text": "[목적지]へ ようこそ!",
-        "types": [
-          "down"
-        ]
-      },
-      {
-        "text": "안젠노타메 시-토베루토 챠쿠요-노사인가 키에루마데 오자세키니테 스왓떼 오마치쿠다사이",
-        "types": [
-          "flat"
-        ]
-      },
-      {
-        "text": "あんぜんのため シートベルト ちゃくようのサインが きえるまで おざせきにて すわって おまちください。",
-        "types": [
-          "flat"
-        ]
-      },
-      {
-        "text": "마타、",
-        "types": [
-          "up"
-        ]
-      },
-      {
-        "text": "슈-노-다나오 아케루사이와 나카노 모노가 오치나이요- 고츄-이쿠다사이",
-        "types": [
-          "down"
-        ]
-      },
-      {
-        "text": "また、しゅうのうだなを あけるさいは なかの ものが おちないよう ごちゅういください。",
-        "types": [
-          "flat"
-        ]
-      },
-      {
-        "text": "나오、군지시세츠노 호안 이지노타메、마도노 히요케오 오시메 쿠다사이",
-        "types": [
-          "flat"
-        ]
-      },
-      {
-        "text": "なお、ぐんじしせつの ほあん いじのため、まどの ひよけを おしめ ください。",
-        "types": [
-          "flat"
-        ]
-      },
-      {
-        "text": "아리가토-고자이마시타",
-        "types": [
-          "down"
-        ]
-      },
-      {
-        "text": "ありがとうございました。",
-        "types": [
-          "down"
-        ]
-      },
-      {
-        "text": "",
-        "types": [
-          "break-long"
+          "normal"
         ]
       }
     ],
@@ -3518,5 +2461,6 @@
         ]
       }
     ]
-  }
+  },
+  "_generatedAt": "2026-06-18T05:30:04.335Z"
 }
