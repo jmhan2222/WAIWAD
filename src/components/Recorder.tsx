@@ -2,13 +2,15 @@ import { useState, useRef } from 'react'
 import { Mic, Square, RotateCcw, Play, AlertCircle, AlertTriangle, Clock } from 'lucide-react'
 import { useRecorder } from '../hooks/useRecorder'
 import { useGroq, GroqError, ValidationError } from '../hooks/useGroq'
-import type { FeedbackResult } from '../types'
+import { buildReferenceRhythm, buildUserRhythm, analyzeRhythm, formatMismatchSummary } from '../hooks/rhythmUtils'
+import type { FeedbackResult, MarkupSegment, WordTimestamp } from '../types'
 
 interface Props {
   plain: string
   lang: 'ko' | 'en' | 'ja' | 'ca'
   scriptName: string
-  onFeedback: (result: FeedbackResult, transcription: string) => void
+  segments?: MarkupSegment[] | null
+  onFeedback: (result: FeedbackResult, transcription: string, words: WordTimestamp[]) => void
 }
 
 interface RecorderError {
@@ -23,7 +25,7 @@ function formatTime(seconds: number) {
   return `${m}:${s}`
 }
 
-export function Recorder({ plain, lang, scriptName, onFeedback }: Props) {
+export function Recorder({ plain, lang, scriptName, segments, onFeedback }: Props) {
   const { recordingState, audioURL, audioBlob, elapsedTime, startRecording, stopRecording, resetRecording } = useRecorder()
   const { transcribeAudio, generateFeedback, isTranscribing, isAnalyzing } = useGroq()
   const [recorderError, setRecorderError] = useState<RecorderError | null>(null)
@@ -34,9 +36,20 @@ export function Recorder({ plain, lang, scriptName, onFeedback }: Props) {
     if (!audioBlob) return
     setRecorderError(null)
     try {
-      const transcription = await transcribeAudio(audioBlob, lang)
-      const result = await generateFeedback(plain, transcription, lang, scriptName)
-      onFeedback(result, transcription)
+      const { text, words } = await transcribeAudio(audioBlob, lang)
+
+      let rhythmSummary: string | undefined
+      if (segments && segments.length > 0 && words.length > 0) {
+        const refRhythm = buildReferenceRhythm(segments)
+        const userRhythm = buildUserRhythm(words)
+        const analysis = analyzeRhythm(refRhythm, userRhythm, segments)
+        if (analysis.mismatchPoints.length > 0) {
+          rhythmSummary = formatMismatchSummary(analysis.mismatchPoints)
+        }
+      }
+
+      const result = await generateFeedback(plain, text, lang, scriptName, rhythmSummary)
+      onFeedback(result, text, words)
     } catch (e) {
       if (e instanceof ValidationError) {
         setRecorderError({ message: e.message, isRateLimit: false, validationReason: e.reason })

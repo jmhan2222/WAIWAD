@@ -10,7 +10,7 @@ import { FeedbackView } from '../components/FeedbackView'
 import { DrillView } from '../components/DrillView'
 import { JapaneseScript } from '../components/JapaneseScript'
 import { MarkupScript } from '../components/MarkupScript'
-import type { FeedbackResult } from '../types'
+import type { FeedbackResult, WordTimestamp } from '../types'
 
 type Lang = 'ko' | 'en' | 'ja' | 'ca'
 type Tab = 'study' | 'audio' | 'record' | 'drill'
@@ -60,6 +60,7 @@ export function StudyPage() {
   const [selectedLang, setSelectedLang] = useState<Lang | null>(null)
   const [feedback, setFeedback] = useState<FeedbackResult | null>(null)
   const [transcription, setTranscription] = useState<string | null>(null)
+  const [wordTimestamps, setWordTimestamps] = useState<WordTimestamp[]>([])
   const [showDrill, setShowDrill] = useState(false)
 
   const { regenerateCategory, isAnalyzing: isReanalyzing } = useGroq()
@@ -101,6 +102,7 @@ export function StudyPage() {
     setSelectedLang(l)
     setFeedback(null)
     setTranscription(null)
+    setWordTimestamps([])
     setShowDrill(false)
   }
 
@@ -109,9 +111,10 @@ export function StudyPage() {
     if (tab !== 'record') setShowDrill(false)
   }
 
-  const handleFeedback = (result: FeedbackResult, tx: string) => {
+  const handleFeedback = (result: FeedbackResult, tx: string, words: WordTimestamp[]) => {
     setFeedback(result)
     setTranscription(tx)
+    setWordTimestamps(words)
     markComplete(announcement.id, 'record')
   }
 
@@ -147,6 +150,7 @@ export function StudyPage() {
     setActiveTab('record')
     setFeedback(null)
     setTranscription(null)
+    setWordTimestamps([])
     setShowDrill(false)
   }
 
@@ -297,6 +301,7 @@ export function StudyPage() {
                 plain={plainText}
                 lang={lang}
                 scriptName={announcement.title}
+                segments={markupSegments}
                 onFeedback={handleFeedback}
               />
             ) : (
@@ -305,6 +310,8 @@ export function StudyPage() {
                 onDrill={handleDrill}
                 onReeval={handleReeval}
                 isReanalyzing={isReanalyzing}
+                wordTimestamps={wordTimestamps}
+                segments={markupSegments ?? undefined}
               />
             )}
           </div>

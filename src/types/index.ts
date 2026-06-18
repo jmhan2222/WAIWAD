@@ -73,3 +73,26 @@ export interface FeedbackResult {
   needsReeval?: string[]
   focusSegment?: FocusSegment
 }
+
+export interface WordTimestamp {
+  word: string
+  start: number
+  end: number
+}
+
+export interface RhythmPoint {
+  position: number
+  intensity: number
+  type: 'stress' | 'slow' | 'normal' | 'pause'
+}
+
+export interface RhythmMismatch {
+  position: number
+  issue: 'too_fast' | 'too_slow' | 'missing_pause' | 'missing_stress' | 'extra_pause'
+  expectedText: string
+}
+
+export interface RhythmAnalysis {
+  similarityScore: number
+  mismatchPoints: RhythmMismatch[]
+}

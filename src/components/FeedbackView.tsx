@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, MessageSquare, Search, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react'
-import type { FeedbackResult } from '../types'
+import type { FeedbackResult, MarkupSegment, WordTimestamp } from '../types'
+import { RhythmComparisonChart } from './RhythmComparisonChart'
 
 interface Props {
   result: FeedbackResult
   onDrill: () => void
   onReeval?: (category: string) => Promise<void>
   isReanalyzing?: boolean
+  wordTimestamps?: WordTimestamp[]
+  segments?: MarkupSegment[]
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -57,7 +60,7 @@ function CircleGauge({ score }: { score: string }) {
   )
 }
 
-export function FeedbackView({ result, onDrill, onReeval, isReanalyzing }: Props) {
+export function FeedbackView({ result, onDrill, onReeval, isReanalyzing, wordTimestamps, segments }: Props) {
   const { categories, summary, weakest, nextStep } = result
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [reevalingKey, setReevalingKey] = useState<string | null>(null)
@@ -186,6 +189,11 @@ export function FeedbackView({ result, onDrill, onReeval, isReanalyzing }: Props
           )
         })}
       </div>
+
+      {/* Rhythm Comparison Chart */}
+      {wordTimestamps && wordTimestamps.length > 0 && segments && segments.length > 0 && (
+        <RhythmComparisonChart segments={segments} words={wordTimestamps} />
+      )}
 
       {/* Drill CTA */}
       <button

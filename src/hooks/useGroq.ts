@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import type { FeedbackResult, MarkupSegment, SegmentType } from '../types'
+import type { FeedbackResult, MarkupSegment, SegmentType, WordTimestamp } from '../types'
 
 type Lang = 'ko' | 'en' | 'ja' | 'ca'
 
@@ -202,7 +202,7 @@ async function checkRelevance(originalText: string, transcription: string): Prom
 
 // ── 프롬프트 빌더 ─────────────────────────────────────────────────────────────
 
-function buildPrompt(lang: Lang, title: string, originalText: string, transcription: string) {
+function buildPrompt(lang: Lang, title: string, originalText: string, transcription: string, rhythmSummary?: string) {
   const jsonSchema = `{
   "categories": {
     "fluency": {
@@ -244,6 +244,12 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
       `평가기준: 유창성(30점)/분위기목소리(25점)/억양(25점)/발음(20점)`,
       `원본: ${originalText}`,
       `전사본: ${transcription}`,
+      ...(rhythmSummary ? [
+        '',
+        '리듬 분석 데이터 (참고용):',
+        rhythmSummary,
+        'fluency와 intonation 카테고리의 specificIssue·actionGuide를 위 분석 데이터를 참고해 위치 기반으로 작성하세요.',
+      ] : []),
       `JSON만 응답:\n${jsonSchema}`,
       '',
       '다시 한번 확인: 응답에 한국어가 아닌 단어가 하나라도 포함되면 안 됩니다.',
@@ -270,6 +276,12 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
       `Criteria: Fluency(30pts)/Voice&Atmosphere(25pts)/Intonation(25pts)/Pronunciation(20pts)`,
       `Original: ${originalText}`,
       `Transcription: ${transcription}`,
+      ...(rhythmSummary ? [
+        '',
+        '리듬 분석 데이터 (참고용):',
+        rhythmSummary,
+        'fluency와 intonation 카테고리의 specificIssue·actionGuide를 위 분석 데이터를 참고해 위치 기반으로 작성하세요.',
+      ] : []),
       `JSON only (use 상/중/하 for scores):\n${jsonSchema}`,
       '',
       '최종 확인: passengerImpression, specificIssue, actionGuide, summary, nextStep, drills의 모든 텍스트가 순수 한국어인지 확인 후 응답하세요.',
@@ -295,6 +307,12 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
       `評価基準: 流暢さ(30点)/雰囲気・声(25点)/イントネーション(25点)/発音(20点)`,
       `元の文: ${originalText}`,
       `書き起こし: ${transcription}`,
+      ...(rhythmSummary ? [
+        '',
+        '리듬 분석 데이터 (참고용):',
+        rhythmSummary,
+        'fluency와 intonation 카테고리의 specificIssue·actionGuide를 위 분석 데이터를 참고해 위치 기반으로 작성하세요.',
+      ] : []),
       `JSON only (スコアは상/중/하):\n${jsonSchema}`,
       '',
       '최종 확인: passengerImpression, specificIssue, actionGuide, summary, nextStep, drills의 모든 텍스트가 순수 한국어인지 확인 후 응답하세요.',
@@ -321,6 +339,12 @@ function buildPrompt(lang: Lang, title: string, originalText: string, transcript
       `评分标准: 流利度(30分)/氛围声音(25分)/语调(25分)/发音(20分)`,
       `原文: ${originalText}`,
       `转录: ${transcription}`,
+      ...(rhythmSummary ? [
+        '',
+        '리듬 분석 데이터 (참고용):',
+        rhythmSummary,
+        'fluency와 intonation 카테고리의 specificIssue·actionGuide를 위 분석 데이터를 참고해 위치 기반으로 작성하세요.',
+      ] : []),
       `JSON only (评分使用상/중/하):\n${jsonSchema}`,
       '',
       '최종 확인: passengerImpression, specificIssue, actionGuide, summary, nextStep, drills의 모든 텍스트가 순수 한국어인지 확인 후 응답하세요.',
@@ -613,7 +637,10 @@ export function useGroq() {
   const [isAnalyzing, setIsAnalyzing]       = useState(false)
   const [error, setError]                   = useState<string | null>(null)
 
-  const transcribeAudio = useCallback(async (audioBlob: Blob, lang: Lang): Promise<string> => {
+  const transcribeAudio = useCallback(async (
+    audioBlob: Blob,
+    lang: Lang,
+  ): Promise<{ text: string; words: WordTimestamp[] }> => {
     setIsTranscribing(true)
     setError(null)
     try {
@@ -624,7 +651,7 @@ export function useGroq() {
       formData.append('file', audioBlob, `recording.${ext}`)
       formData.append('model', 'whisper-large-v3')
       formData.append('language', WHISPER_LANG[lang])
-      formData.append('response_format', 'json')
+      formData.append('response_format', 'verbose_json')
 
       const res = await fetchWithRetry('https://api.groq.com/openai/v1/audio/transcriptions', {
         method: 'POST',
@@ -633,8 +660,26 @@ export function useGroq() {
       })
 
       if (!res.ok) throw classifyError(res.status)
-      const data = await res.json() as { text: string }
-      return data.text
+
+      interface GroqSegment { start: number; end: number; text: string }
+      const data = await res.json() as { text: string; segments?: GroqSegment[] }
+
+      const words: WordTimestamp[] = []
+      for (const seg of data.segments ?? []) {
+        const segDuration = seg.end - seg.start
+        const parts = seg.text.trim().split(/\s+/).filter(Boolean)
+        if (!parts.length || segDuration <= 0) continue
+        const totalChars = parts.reduce((s, p) => s + p.length, 0) || 1
+        let charOffset = 0
+        for (const word of parts) {
+          const wStart = seg.start + (charOffset / totalChars) * segDuration
+          const wEnd = seg.start + ((charOffset + word.length) / totalChars) * segDuration
+          words.push({ word, start: wStart, end: wEnd })
+          charOffset += word.length
+        }
+      }
+
+      return { text: data.text, words }
     } catch (e) {
       const err = e instanceof GroqError ? e : new GroqError('네트워크 오류가 발생했습니다. 연결을 확인해 주세요.', false)
       setError(err.message)
@@ -649,6 +694,7 @@ export function useGroq() {
     transcription: string,
     lang: Lang,
     scriptName: string,
+    rhythmSummary?: string,
   ): Promise<FeedbackResult> => {
     setIsAnalyzing(true)
     setError(null)
@@ -677,7 +723,7 @@ export function useGroq() {
       }
 
       // ── 3단계: 피드백 생성 (최대 3회 재시도) ────────────────────────────────────
-      const { system, user } = buildPrompt(lang, scriptName, originalText, transcription)
+      const { system, user } = buildPrompt(lang, scriptName, originalText, transcription, rhythmSummary)
       let result = await callLlama(system, user, 0.3)
 
       let foreignIssues = detectForeignInResult(result)
