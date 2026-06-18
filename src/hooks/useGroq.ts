@@ -630,6 +630,36 @@ async function retryEmptyCategory(
   }
 }
 
+// ── 오디오 길이 기반 단어 타임스탬프 추정 ─────────────────────────────────────
+
+async function getAudioDuration(blob: Blob): Promise<number> {
+  return new Promise(resolve => {
+    const url = URL.createObjectURL(blob)
+    const audio = new Audio(url)
+    const cleanup = () => URL.revokeObjectURL(url)
+    audio.addEventListener('loadedmetadata', () => { cleanup(); resolve(audio.duration || 30) })
+    audio.addEventListener('error', () => { cleanup(); resolve(30) })
+  })
+}
+
+async function estimateWordTimestamps(blob: Blob, text: string): Promise<WordTimestamp[]> {
+  try {
+    const duration = await getAudioDuration(blob)
+    const wordList = text.trim().split(/\s+/).filter(Boolean)
+    if (!wordList.length || duration <= 0) return []
+    const totalChars = wordList.reduce((s, w) => s + w.length, 0) || 1
+    let charPos = 0
+    return wordList.map(word => {
+      const start = (charPos / totalChars) * duration
+      charPos += word.length
+      const end = (charPos / totalChars) * duration
+      return { word, start, end }
+    })
+  } catch {
+    return []
+  }
+}
+
 // ── React Hook ────────────────────────────────────────────────────────────────
 
 export function useGroq() {
@@ -651,7 +681,7 @@ export function useGroq() {
       formData.append('file', audioBlob, `recording.${ext}`)
       formData.append('model', 'whisper-large-v3')
       formData.append('language', WHISPER_LANG[lang])
-      formData.append('response_format', 'verbose_json')
+      formData.append('response_format', 'json')
 
       const res = await fetchWithRetry('https://api.groq.com/openai/v1/audio/transcriptions', {
         method: 'POST',
@@ -661,23 +691,10 @@ export function useGroq() {
 
       if (!res.ok) throw classifyError(res.status)
 
-      interface GroqSegment { start: number; end: number; text: string }
-      const data = await res.json() as { text: string; segments?: GroqSegment[] }
+      const data = await res.json() as { text: string }
 
-      const words: WordTimestamp[] = []
-      for (const seg of data.segments ?? []) {
-        const segDuration = seg.end - seg.start
-        const parts = seg.text.trim().split(/\s+/).filter(Boolean)
-        if (!parts.length || segDuration <= 0) continue
-        const totalChars = parts.reduce((s, p) => s + p.length, 0) || 1
-        let charOffset = 0
-        for (const word of parts) {
-          const wStart = seg.start + (charOffset / totalChars) * segDuration
-          const wEnd = seg.start + ((charOffset + word.length) / totalChars) * segDuration
-          words.push({ word, start: wStart, end: wEnd })
-          charOffset += word.length
-        }
-      }
+      // 녹음 총 길이로 단어별 타임스탬프 추정 (글자 수 비중)
+      const words = await estimateWordTimestamps(audioBlob, data.text)
 
       return { text: data.text, words }
     } catch (e) {
