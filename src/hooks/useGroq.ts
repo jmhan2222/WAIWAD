@@ -3,7 +3,12 @@ import type { FeedbackResult, MarkupSegment, SegmentType, WordTimestamp } from '
 
 type Lang = 'ko' | 'en' | 'ja' | 'ca'
 
-const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY as string | undefined
+if (!GROQ_API_KEY) {
+  console.error('[useGroq] ❌ VITE_GROQ_API_KEY 환경변수가 undefined입니다. .env.local 또는 배포 환경변수를 확인하세요.')
+} else {
+  console.info(`[useGroq] ✅ API Key 로드됨 (길이: ${GROQ_API_KEY.length}, 시작: ${GROQ_API_KEY.slice(0, 6)}...)`)
+}
 
 const WHISPER_LANG: Record<Lang, string> = {
   ko: 'ko', en: 'en', ja: 'ja', ca: 'zh',
@@ -44,6 +49,14 @@ function classifyError(status: number): GroqError {
     return new GroqError('API 키가 올바르지 않습니다. 설정을 확인해 주세요.', false)
   }
   return new GroqError(`오류가 발생했습니다. (${status})`, false)
+}
+
+// 에러 응답 body를 콘솔에 찍고 throw — 원인 진단용
+async function logAndThrow(res: Response, context: string): Promise<never> {
+  let body = '(body 읽기 실패)'
+  try { body = await res.text() } catch { /* noop */ }
+  console.error(`[Groq ${context}] HTTP ${res.status}:`, body.slice(0, 400))
+  throw classifyError(res.status)
 }
 
 async function fetchWithRetry(url: string, options: RequestInit): Promise<Response> {
@@ -535,7 +548,7 @@ export async function generateMarkup(
       }),
     })
 
-    if (!res.ok) throw classifyError(res.status)
+    if (!res.ok) await logAndThrow(res, 'generateMarkup')
 
     const data = await res.json() as { choices: { message: { content: string } }[] }
     const parsed = JSON.parse(data.choices[0].message.content) as { segments: RawSegment[] }
@@ -580,7 +593,7 @@ async function callLlama(system: string, user: string, temperature = 0.3): Promi
     }),
   })
 
-  if (!res.ok) throw classifyError(res.status)
+  if (!res.ok) await logAndThrow(res, 'callLlama')
   const data = await res.json() as { choices: { message: { content: string } }[] }
   return JSON.parse(data.choices[0].message.content) as FeedbackResult
 }
@@ -689,7 +702,7 @@ export function useGroq() {
         body: formData,
       })
 
-      if (!res.ok) throw classifyError(res.status)
+      if (!res.ok) await logAndThrow(res, 'transcribeAudio')
 
       const data = await res.json() as { text: string }
 
@@ -838,7 +851,7 @@ export function useGroq() {
             response_format: { type: 'json_object' },
           }),
         })
-        if (!res.ok) throw classifyError(res.status)
+        if (!res.ok) await logAndThrow(res, 'regenerateCategory')
         const data = await res.json() as { choices: { message: { content: string } }[] }
         return JSON.parse(data.choices[0].message.content) as import('../types').CategoryFeedback
       }
